@@ -1,4 +1,8 @@
 # おおまかなセクション
+- はじめに
+  - お問い合わせ先
+  - 免責事項
+- 目次
 - RxSwift入門
   - 対象読者
   - 必須知識
@@ -9,16 +13,39 @@
   - どこが便利なの？
   - どこで使えるの？
   - どう書くの？
+- RxSwiftの導入方法
+  - 導入要件
+- 基本的な書き方
+- 応用
 - サンプルアプリのパターン比較
   - ゴリゴリパターン
   - delegateパターン
   - KVOパターン
   - RxSwiftパターン
+- 様々なRxSwift系ライブラリ
+  - RxOptional
+  - RxWebkit
+  - RxDataSources
 
 # 書かない
 
-- RxSwiftの基本的な知識
-  - 公式ドキュメントが１番わかりやすい
+
+# メリデメ
+## メリット
+- 時間経過に関する処理をシンプルに書ける
+- ViewControllerの呼び出し側で処理が書ける
+- 非同期処理のコールバック地獄をシンプルに書ける
+- コード全体が一貫する
+- まとまった流れが見やすい
+- 差分がわかりやすい
+- スレッドを買えやすい
+
+## デメリット
+- デバッグしにくい
+- 学習コストが高い
+- 一度errorが発生すると止まってしまう
+  - UIとバインドするような時は止まってしまうと困るので、errorが流れないものを使う
+- 簡単な処理で使うと長くなりがち
 
 # 文章構成
 
@@ -41,6 +68,7 @@
   - UILabel UITextView UITableView UICollectionView
 
 # 推奨知識
+
 - mapやfilterなどの高階関数の扱い
 - 設計パターン
   - MVVMアーキテクチャ
@@ -80,7 +108,75 @@ Reactive Extensionとは、`Reactive Programming` を実現するための`デ�
 本書では RxSwift について解説しますが世の中には `RxJava`, `RxJS`, `RxScala` など様々なライブラリがあります。
 どのライブラリも概念はおおまかな考え方は一緒です。概念だけでも１度覚えておくと他の言語でもすぐに扱えるようになるためこの機会にぜひ覚えてみましょう！
 
+# iOSアプリ開発とSwift
 
+iOSのアプリ開発において、いまではほぼSwift一択の状況ではないでしょうか？
+Swiftが登場したころからStoryboardの機能も充実し、UIと処理の分けてさらに書きやすくなりました。
+Objective-Cを使っていたころよりもアプリ開発が楽になり、アプリ開発初心者でもかなりとっつきやすくなったのがわかります。
+
+ですが、かなりとっつきやすくなったと言ってもまだ問題はいくつかあります。
+例えば、「非同期処理が実装しにくい、読みにくい」「通信処理の成功・失敗の制御」「DelegateやIBActionだと動作するところと処理が離れている」などあります。
+これを解決するのが、RxSwiftです。
+
+では具体的にどう解決できるのか簡単なサンプルを例に出しながら解説します。
+
+# RxSwiftで何が解決できる？
+
+まず１番わかりやすくて簡単なのは「DelegateやIBActionだと動作するところと処理が離れている」の解決です。
+
+UIButtonとUILabelが画面に配置されていて、ボタンをタップすると文字列が変更されるという仕様のアプリをIBActionを使って作ってみましょう。
+
+画面
+
+simpletap1.png
+simpletap2.png
+
+RxSwiftを使わないコード
+
+class SimpleTapViewController: UIViewController {
+    
+    @IBOutlet weak var messageLabel: UILabel!
+    
+    @IBAction func buttonTap(_ sender: Any) {
+        messageLabel.text = "Changed!!"
+    }
+}
+
+通常の書き方だと、１つのボタンに対して１つの関数を定義します。
+この場合だとUIと処理が1対1で非常に強い結合度になり、
+ボタンを１つ増やすたびに対応する関数が１つずつ増えていき、コード量が次第に大きくなってしまいます。
+
+次に、RxSwiftを用いて書いてみます。
+
+RxSwiftを使ったコード
+
+class SimpleTapViewController: UIViewController {
+    
+    @IBOutlet weak var tapButton: UIButton!
+    @IBOutlet weak var messageLabel: UILabel!
+    
+    private let disposeBag = DisposeBag()
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        tapButton.rx.tap
+            .subscribe(onNext: { [weak self] in
+                self?.messageLabel.text = "Changed!!"
+            })
+            .disposed(by: disposeBag)
+    }
+}
+
+RxSwiftで書くと、UIと処理を分けて書くことができます。
+１つのボタンと１つの関数が強く結合していたのが、１つのボタンと１つのプロパティの結合ですむようになります
+ボタンを１つ増やすたびに対応するプロパティが１行増えるだけなので、コードがとてもシンプルになります。
+また、画面上のUIを変更してもソースコードへの影響は少なくなるので楽になります。
+
+Delegateを利用するパターンも見てみましょう
+
+UILabel, UITextField
+
+文字をバインドするパターン
 
 # どこが便利なの？
 
