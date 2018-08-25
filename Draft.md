@@ -8,20 +8,28 @@
   - 必須知識
   - 想定環境
   - ReactiveExtensionとは 概要
+    - 思想
+    - 歴史
   - RxSwiftとは　概要
   - RxCocoaとは　概要
-  - どこが便利なの？
+  - どこが便利なの？何が嬉しいのか
+  - RxSwiftの特徴
   - どこで使えるの？
   - どう書くの？
+  - 導入事例
 - RxSwiftの導入方法
   - 導入要件
 - 基本的な書き方
+  - Hello world
 - 応用
 - サンプルアプリのパターン比較
   - ゴリゴリパターン
   - delegateパターン
   - KVOパターン
   - RxSwiftパターン
+- 次のステップ
+  - 学習方法
+  - コミュニティ
 - 様々なRxSwift系ライブラリ
   - RxOptional
   - RxWebkit
@@ -115,7 +123,7 @@ Swiftが登場したころからStoryboardの機能も充実し、UIと処理�
 Objective-Cを使っていたころよりもアプリ開発が楽になり、アプリ開発初心者でもかなりとっつきやすくなったのがわかります。
 
 ですが、かなりとっつきやすくなったと言ってもまだ問題はいくつかあります。
-例えば、「非同期処理が実装しにくい、読みにくい」「通信処理の成功・失敗の制御」「DelegateやIBActionだと動作するところと処理が離れている」などあります。
+例えば、「非同期処理が実装しにくい、読みにくい」「通信処理の成功・失敗の制御」「DelegateやaddTarget, IBAction等、動作するところと処理が離れている」などあります。
 これを解決するのが、RxSwiftです。
 
 では具体的にどう解決できるのか簡単なサンプルを例に出しながら解説します。
@@ -172,11 +180,96 @@ RxSwiftで書くと、UIと処理を分けて書くことができます。
 ボタンを１つ増やすたびに対応するプロパティが１行増えるだけなので、コードがとてもシンプルになります。
 また、画面上のUIを変更してもソースコードへの影響は少なくなるので楽になります。
 
-Delegateを利用するパターンも見てみましょう
+addTargetを利用するパターンも見てみましょう
 
-UILabel, UITextField
+UILabel, UITextFieldを画面に２つずつ配置し、入力したテキストをバリデーションしてUILabelに反映する機能をイメージして作ってみます
 
-文字をバインドするパターン
+画面
+
+simpletextfieldlabelexample1.png
+
+文字を入力するたびに「あとN文字」と表示してくれるUIを作ります
+
+## addTarget を用いたコード
+
+class ExampleViewController: UIViewController {
+    
+    @IBOutlet weak var nameField: UITextField!
+    @IBOutlet weak var nameLabel: UILabel!
+    
+    @IBOutlet weak var addressField: UITextField!
+    @IBOutlet weak var addressLabel: UILabel!
+
+    let maxNameFieldSize = 10
+    let maxAddressFieldSize = 50
+    
+    let limitText: (Int) -> String = {
+        return "あと\($0)文字"
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        nameField.addTarget(self, action: #selector(nameFieldEditingChanged(sender:)), for: .editingChanged)
+        addressField.addTarget(self, action: #selector(addressFieldEditingChanged(sender:)), for: .editingChanged)
+    }
+
+    @objc func nameFieldEditingChanged(sender: UITextField) {
+        guard let changedText = sender.text else { return }
+        let limitCount = maxNameFieldSize - changedText.count
+        nameLabel.text = limitText(limitCount)
+    }
+    
+    @objc func addressFieldEditingChanged(sender: UITextField) {
+        guard let changedText = sender.text else { return }
+        let limitCount = maxAddressFieldSize - changedText.count
+        addressLabel.text = limitText(limitCount)
+    }
+}
+
+UIと処理のコードが離れているので、パッとじゃ処理のイメージがしにくいですね。
+対象のViewがもっと増えるとどの関数がどのUIの処理なのかわかりにくくなってしまいます。
+
+次にRxSwiftを用いて書いてみます
+
+class RxExampleViewController: UIViewController {
+    
+    // フィールド宣言は全く同じなので省略
+    
+    private let disposeBag = DisposeBag()
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        nameField.rx.text
+            .map { [weak self] text -> String? in
+                guard let text = text else { return nil }
+                guard let maxNameFieldSize = self?.maxNameFieldSize else { return nil }
+                let limitCount = maxNameFieldSize - text.count
+                return self?.limitText(limitCount)
+            }
+            .filterNil()
+            .observeOn(MainScheduler.instance)
+            .bind(to: nameLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        addressField.rx.text
+            .map { [weak self] text -> String? in
+                guard let text = text else { return nil }
+                guard let maxAddressFieldSize = self?.maxAddressFieldSize else { return nil }
+                let limitCount = maxAddressFieldSize - text.count
+                return self?.limitText(limitCount)
+            }
+            .filterNil()
+            .observeOn(MainScheduler.instance)
+            .bind(to: addressLabel.rx.text)
+            .disposed(by: disposeBag)
+    }
+}
+
+先程のaddTargetのパターンと全く同じ動作をします。
+全ての処理がviewDidLoad()上で書けるようになり、UIと処理がバラバラにならないのですごく見やすいですね。
+慣れていない方は逆に少し読みにくいかもしれませんが、Rxの書き方に慣れるとすごくコードが読みやすくなります。
+
 
 # どこが便利なの？
 
