@@ -1,21 +1,23 @@
 # おおまかなセクション
 - はじめに
+  - 対象読者
+  - 必須知識
+  - 推奨知識
+  - 想定環境
   - お問い合わせ先
   - 免責事項
 - 目次
+- iOSアプリ開発とSwift
 - RxSwift入門
-  - 対象読者
-  - 必須知識
-  - 想定環境
-  - ReactiveExtensionとは 概要
+  - 覚えておきたい用語と１業概要
+  - RxSwiftって何？
+  - ReactiveExtensionって何？
     - 思想
     - 歴史
+  - iOSアプリ開発とSwift
   - RxSwiftとは　概要
-  - RxCocoaとは　概要
-  - どこが便利なの？何が嬉しいのか
   - RxSwiftの特徴
-  - どこで使えるの？
-  - どう書くの？
+  - RxSwiftで何が解決できる？
   - 導入事例
 - RxSwiftの導入方法
   - 導入要件
@@ -59,23 +61,23 @@
 
 ##### ここまでメモ #####
 
-# この本で書くこと
+# はじめに
 
-# 対象読者
+## 対象読者
 本書は次の読者を対象として作成しています。 
 
 - プログラミング歴1年以上（種類問わず）
 - Swift による iOS アプリの開発経験が少しだけある（3ヶ月〜1年未満）
 - RxSwiftライブラリを使った開発をしたことが全くない・ほんの少しだけある
 
-# 必須知識
+## 必須知識
 - Swiftの基本的な言語仕様
   - if, for, switch, enum, class, struct
 - Xcode の基本的な操作
 - よく使われる UIKitの仕様
   - UILabel UITextView UITableView UICollectionView
 
-# 推奨知識
+## 推奨知識
 
 - mapやfilterなどの高階関数の扱い
 - 設計パターン
@@ -85,36 +87,21 @@
   - KVO パターン
   - オブザーバパターン
 
-# 想定環境
+## 想定環境
 - OSX High Sierra
 - Xcode 9.4
 - Swift 4.1
 - cocoapods 1.5.3
 
-# 覚えておきたい用語と１行概要
+## お問い合わせ先
 
-- Reactive Extensions
-  - GoFのデザインパターンの１つ、 `オブザーバパターン` を表したインターフェース
-- RxSwift
-  - ReactiveExtensionsのSwift版のライブラリ
-- RxCocoa
-  - UIKitでRxを使えるように様々なクラスをextensionで定義してくれているライブラリ
-- オブザーバパターン
-  - プログラム内のオブジェクトのイベント( 事象 )を他のオブジェクトへ通知する処理で使われるデザインパターンの一種
+- Twitter
+  - @k0uhashi
 
+## 免責事項
 
-# RxSwiftって何？
+# 目次
 
-RxSwift とはReactive ExtensionsのSwift版です
-Reactive Extensionsについては後述しますが非同期操作とイベント/データストリームの実装を容易にできるライブラリのことを指します
-
-# Reactive Extensionって何？
-
-Reactive Extensionとは、`Reactive Programming` を実現するための`デザイン`とその`実装`ができる`ライブラリ`のことを指します。
-元々は `Microsoft` が研究して開発した `.NET用のライブラリ` でしたが、これがとても有用な概念だったため `JavaScript` や `Java`, `Swift` など、垣根を越えて様々な言語に移植されています。
-
-本書では RxSwift について解説しますが世の中には `RxJava`, `RxJS`, `RxScala` など様々なライブラリがあります。
-どのライブラリも概念はおおまかな考え方は一緒です。概念だけでも１度覚えておくと他の言語でもすぐに扱えるようになるためこの機会にぜひ覚えてみましょう！
 
 # iOSアプリ開発とSwift
 
@@ -128,7 +115,41 @@ Objective-Cを使っていたころよりもアプリ開発が楽になり、ア
 
 では具体的にどう解決できるのか簡単なサンプルを例に出しながら解説します。
 
-# RxSwiftで何が解決できる？
+# RxSwift入門
+
+## 覚えておきたい用語と１行概要
+
+- Reactive Extensions
+  - GoFのデザインパターンの１つ、 `オブザーバパターン` を表したインターフェース
+- RxSwift
+  - ReactiveExtensionsのSwift版のライブラリ
+- RxCocoa
+  - UIKitでRxを使えるように様々なクラスをextensionで定義してくれているライブラリ
+- オブザーバパターン
+  - プログラム内のオブジェクトのイベント（事象）を他のオブジェクトへ通知する処理で使われるデザインパターンの一種
+
+
+## RxSwiftって何？
+
+RxSwift とはReactive ExtensionsのSwift版です
+Reactive Extensionsについては後述しますが非同期操作とイベント/データストリームの実装を容易にできるライブラリのことを指します
+
+## Reactive Extensionって何？
+
+### 思想
+Reactive Extensionとは、`Reactive Programming` を実現するための`デザイン`とその`実装`ができる`ライブラリ`のことを指します。
+
+### 歴史
+元々は `Microsoft` が研究して開発した `.NET用のライブラリ` でしたが、これがとても有用な概念だったため `JavaScript` や `Java`, `Swift` など、垣根を越えて様々な言語に移植されています。
+
+本書では RxSwift について解説しますが世の中には `RxJava`, `RxJS`, `RxScala` など様々なライブラリがあります。
+どのライブラリも概念はおおまかな考え方は一緒です。概念だけでも１度覚えておくと他の言語でもすぐに扱えるようになるためこの機会にぜひ覚えてみましょう！
+
+## RxSwiftの特徴
+
+WIP
+
+## RxSwiftで何が解決できる？
 
 まず１番わかりやすくて簡単なのは「DelegateやIBActionだと動作するところと処理が離れている」の解決です。
 
@@ -139,7 +160,7 @@ UIButtonとUILabelが画面に配置されていて、ボタンをタップす�
 simpletap1.png
 simpletap2.png
 
-RxSwiftを使わないコード
+### RxSwiftを使わないコード
 
 class SimpleTapViewController: UIViewController {
     
@@ -156,7 +177,7 @@ class SimpleTapViewController: UIViewController {
 
 次に、RxSwiftを用いて書いてみます。
 
-RxSwiftを使ったコード
+### RxSwiftを使ったコード
 
 class SimpleTapViewController: UIViewController {
     
@@ -190,7 +211,7 @@ simpletextfieldlabelexample1.png
 
 文字を入力するたびに「あとN文字」と表示してくれるUIを作ります
 
-## addTarget を用いたコード
+### addTarget を用いたコード
 
 class ExampleViewController: UIViewController {
     
@@ -231,6 +252,8 @@ UIと処理のコードが離れているので、パッとじゃ処理のイメ
 
 次にRxSwiftを用いて書いてみます
 
+### RxSwift version
+
 class RxExampleViewController: UIViewController {
     
     // フィールド宣言は全く同じなので省略
@@ -268,17 +291,11 @@ class RxExampleViewController: UIViewController {
 
 先程のaddTargetのパターンと全く同じ動作をします。
 全ての処理がviewDidLoad()上で書けるようになり、UIと処理がバラバラにならないのですごく見やすいですね。
-慣れていない方は逆に少し読みにくいかもしれませんが、Rxの書き方に慣れるとすごくコードが読みやすくなります。
+慣れていない方はまだ少し読みにくいかもしれませんが、Rxの書き方に慣れるとすごく読みやすくなります。
 
+## 導入事例
 
-# どこが便利なの？
+# RxSwiftの導入方法
 
-# どこで使えるの？
-
-# どう書くの？
-
-# 目次
-
-# 初めてのRxSwift
 
 
