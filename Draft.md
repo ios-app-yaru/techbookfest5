@@ -19,8 +19,9 @@
   - RxSwiftの特徴
   - RxSwiftで何が解決できる？
   - 導入事例
-- RxSwiftの導入方法
+- RxSwiftの導入
   - 導入要件
+  - 導入方法
 - 基本的な書き方
   - Hello world
 - 応用
@@ -295,7 +296,39 @@ class RxExampleViewController: UIViewController {
 
 ## 導入事例
 
-# RxSwiftの導入方法
+WIP
 
+# RxSwiftの導入
 
+## 導入要件
 
+- Xcode 9.0
+- Swift 4
+- Swift 3.x （rxswift-3.0 ブランチを指定)
+- Swift 2.3 （rxswift-2.0 ブランチを指定)
+
+## 導入方法
+
+RxSwiftの導入方法はCocoaPodsやCarthage, SwiftPackageManager等いくつかありますが、ここでは１番簡単でよく使われる（著者の観測範囲）CocoaPodsでの導入方法を紹介します。（CocoaPods v1.5.3）
+
+```
+vi Podfile
+```
+
+```
+# Podfile
+use_frameworks!
+
+target 'YOUR_TARGET_NAME' do
+    pod 'RxSwift',    '~> 4.0'
+    pod 'RxCocoa',    '~> 4.0'
+end
+```
+
+```
+pod install
+```
+
+# 基本的な書き方
+
+- 
