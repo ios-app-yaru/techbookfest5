@@ -312,6 +312,7 @@ WIP
 RxSwiftの導入方法はCocoaPodsやCarthage, SwiftPackageManager等いくつかありますが、ここでは１番簡単でよく使われる（著者の観測範囲）CocoaPodsでの導入方法を紹介します。（CocoaPods v1.5.3）
 
 ```
+# プロジェクトのルートディレクトリで実行
 vi Podfile
 ```
 
@@ -325,10 +326,11 @@ target 'YOUR_TARGET_NAME' do
 end
 ```
 
+- `YOUR_TARGET_NAME` は各自のプロジェクト名に置き換えてください
+
 ```
 pod install
 ```
 
 # 基本的な書き方
 
-- 
