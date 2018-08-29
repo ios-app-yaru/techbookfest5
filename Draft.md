@@ -23,6 +23,7 @@
   - 導入要件
   - 導入方法
 - 基本的な書き方
+  - メソッドチェーンのように直感的に書ける
   - Hello world
 - 応用
 - サンプルアプリのパターン比較
@@ -333,4 +334,77 @@ pod install
 ```
 
 # 基本的な書き方
+
+## メソッドチェーンのように直感的に書ける
+
+RxSwift/RxCocoaは、メソッドチェーンのように直感的に書くことができます。
+メソッドチェーンとは、その名前の通りメソッドを実行してその結果に対してさらにメソッドを実行するような書き方を指します。具体的には次のように書くことができます
+
+```
+hogeButton.rx.tap
+  .subscribe(onNext: { [weak self] in 
+    // 処理
+  })
+  .disposed(by: disposeBag)
+```
+
+## Hello World
+
+RxSwiftでのHello World的な書き方を書いてみます。
+書き方はいろいろありますが、今回は２つのパターンで書いてみます。
+
+1. Observable<T>.interval を使った、一定間隔で値を流し、購読する方法
+
+```
+Observable<Int>.interval(0.5, scheduler: MainScheduler.instance)
+  .subscribe(onNext: { event in
+    print("event = \(event)")
+  })
+  .disposed(by: disposeBag)
+```
+
+結果は次の通り
+
+```
+event = 0
+event = 1
+event = 2
+event = 3
+event = 4
+...(以下、ずっと＋１ずつ加算されて出力される)
+```
+
+`interval` はよく使われる文なので覚えておきましょう
+
+2. ストリームを定義し、好きなタイミングで値を流し、購読する方法
+
+```
+let helloWorldSubject = PublishSubject<String>()
+
+helloWorldSubject
+  .subscribe(onNext: { [weak self] value in
+    print("value = \(value)")
+  })
+  .disposed(by: disposeBag)
+
+helloWorldSubject.onNext("Hello World!")
+helloWorldSubject.onNext("Hello World!!")
+helloWorldSubject.onNext("Hello World!!!")
+```
+
+結果は次の通り
+
+```
+value = Hello World!
+value = Hello World!!
+value = Hello World!!!
+```
+
+処理の流れのイメージは次の通りです。
+
+1. `helloWorldSubject` という川（ストリーム）を定義
+2. 川（ストリーム）を監視、値が流れてきたら print文で値を出力
+3. 値を流す
+
+なんとなく処理の流れは掴めたでしょうか？このHelloWorldの構文はRxSwiftの中ではほんの一部にすぎないので、やりながら覚えていきましょう！
 
