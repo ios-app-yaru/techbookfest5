@@ -25,6 +25,10 @@
 - 基本的な書き方
   - メソッドチェーンのように直感的に書ける
   - Hello world
+  - よく使われるクラス
+    - Observable
+    - Dispose
+    - Subject
 - 応用
 - サンプルアプリのパターン比較
   - ゴリゴリパターン
@@ -39,31 +43,13 @@
   - RxWebkit
   - RxDataSources
 
-# 書かない
-
-
-# メリデメ
-## メリット
-- 時間経過に関する処理をシンプルに書ける
-- ViewControllerの呼び出し側で処理が書ける
-- 非同期処理のコールバック地獄をシンプルに書ける
-- コード全体が一貫する
-- まとまった流れが見やすい
-- 差分がわかりやすい
-- スレッドを買えやすい
-
-## デメリット
-- デバッグしにくい
-- 学習コストが高い
-- 一度errorが発生すると止まってしまう
-  - UIとバインドするような時は止まってしまうと困るので、errorが流れないものを使う
-- 簡単な処理で使うと長くなりがち
-
 # 文章構成
 
 ##### ここまでメモ #####
 
 # はじめに
+
+WIP
 
 ## 対象読者
 本書は次の読者を対象として作成しています。 
@@ -75,19 +61,19 @@
 ## 必須知識
 - Swiftの基本的な言語仕様
   - if, for, switch, enum, class, struct
+  - mapやfilterなどの高階関数の扱い
 - Xcode の基本的な操作
 - よく使われる UIKitの仕様
   - UILabel UITextView UITableView UICollectionView
 
 ## 推奨知識
 
-- mapやfilterなどの高階関数の扱い
 - 設計パターン
   - MVVMアーキテクチャ
 - デザインパターン
-  - delegate パターン
-  - KVO パターン
-  - オブザーバパターン
+  - delegateパターン
+  - KVOパターン
+  - Observerパターン
 
 ## 想定環境
 - OSX High Sierra
@@ -113,7 +99,7 @@ Objective-Cを使っていたころよりもアプリ開発が楽になり、ア
 
 ですが、かなりとっつきやすくなったと言ってもまだ問題はいくつかあります。
 例えば、「非同期処理が実装しにくい、読みにくい」「通信処理の成功・失敗の制御」「DelegateやaddTarget, IBAction等、動作するところと処理が離れている」などあります。
-これを解決するのが、RxSwiftです。
+これを解決する１つの方法としてあるのが、RxSwift（リアクティブプログラミング）の導入です。
 
 では具体的にどう解決できるのか簡単なサンプルを例に出しながら解説します。
 
@@ -133,36 +119,60 @@ Objective-Cを使っていたころよりもアプリ開発が楽になり、ア
 
 ## RxSwiftって何？
 
-RxSwift とはReactive ExtensionsのSwift版です
-Reactive Extensionsについては後述しますが非同期操作とイベント/データストリームの実装を容易にできるライブラリのことを指します
+RxSwift とは「ReactiveExtensions」のSwift版です
+Reactive Extensionsについては後述しますが非同期操作とイベント/データストリーム（時系列処理）の実装を容易にできるライブラリのことを指します
 
-## Reactive Extensionって何？
+## Reactive Extensionsって何？
 
 ### 思想
-Reactive Extensionとは、`Reactive Programming` を実現するための`デザイン`とその`実装`ができる`ライブラリ`のことを指します。
+Reactive Extensionsとは、「Reactive Programming」を実現するための「デザイン」とその実装ができる「ライブラリ」のことを指します。
 
 ### 歴史
-元々は `Microsoft` が研究して開発した `.NET用のライブラリ` でしたが、これがとても有用な概念だったため `JavaScript` や `Java`, `Swift` など、垣根を越えて様々な言語に移植されています。
+元々は `Microsoft` が研究して開発した `.NET用のライブラリ` で、２００９年に「Reactive Extensions」という名前で公開しました。現在はオープンソース化され「ReactiveX」という名前に変更されています。
+この「ReactiveExtensions」の考え方がとても有用だったため JavaScriptやJava、Swiftなど、垣根を越えて様々な言語に移植されていて、その中の１つが本書で紹介する「RxSwift」です。
 
-本書では RxSwift について解説しますが世の中には `RxJava`, `RxJS`, `RxScala` など様々なライブラリがあります。
+本書では RxSwiftと関連するライブラリ群についてのみ解説しますが世の中には `RxJava`, `RxJS`, `RxScala` など様々なライブラリがあります。
 どのライブラリも概念はおおまかな考え方は一緒です。概念だけでも１度覚えておくと他の言語でもすぐに扱えるようになるためこの機会にぜひ覚えてみましょう！
 
 ## RxSwiftの特徴
 
-WIP
+RxSwiftの特徴として、「値の変化が検知しやすい」「非同期処理を簡潔に書ける」等が挙げられます。
+これは主にUIの検知（タップや文字入力の検知）、通信処理等で使われ、RxSwiftを用いるとdelegateやcallbackを用いたコードよりもスッキリと書けるようになります。
+
+その他のメリットとしては次のものが挙げられます。
+
+- 時間経過に関する処理をシンプルに書ける
+- ViewControllerの呼び出し側で処理が書ける
+- コード全体が一貫する
+- まとまった流れが見やすい
+- 差分がわかりやすい
+- スレッドを変えやすい
+
+また、デメリットとして主に「学習コストが高い」「デバッグしにくい」が挙げられます。
+プロジェクトメンバーが全員RxSwiftを書けるわけではないのにも関わらず、とりあえずRxSwiftを使えば開発速度が早くなるんでしょ？という考え方で安易に導入すると逆に危険です。
+
+その他のデメリットとしては次のものが挙げられます。
+
+- 一度errorが発生すると止まってしまう
+  - UIとバインドするような時は止まってしまうと困るので、errorが流れないものを使う
+- 簡単な処理で使うと長くなりがち
+
+プロジェクトによってRxSwiftの有用性が変わるので、そのプロジェクトの特性とRxSwiftのメリット・デメリットを照らし合わせた上で検討しましょう。
 
 ## RxSwiftで何が解決できる？
 
-まず１番わかりやすくて簡単なのは「DelegateやIBActionだと動作するところと処理が離れている」の解決です。
+RxSwiftでは本当に色々なことができますが、１番わかりやすくて簡単なのは「DelegateやIBActionだと動作するところと処理が離れている」の解決です。実際にコードを書いて見てみましょう。
 
-UIButtonとUILabelが画面に配置されていて、ボタンをタップすると文字列が変更されるという仕様のアプリをIBActionを使って作ってみましょう。
+UIButtonとUILabelが画面に配置されていて、ボタンをタップすると文字列が変更されるという仕様のアプリを題材として作ります。
 
 画面
 
 simpletap1.png
 simpletap2.png
 
-### RxSwiftを使わないコード
+まずは従来のIBActionを使った方法で作ってみましょう。
+
+### IBActionを用いたコード
 
 class SimpleTapViewController: UIViewController {
     
@@ -174,12 +184,14 @@ class SimpleTapViewController: UIViewController {
 }
 
 通常の書き方だと、１つのボタンに対して１つの関数を定義します。
-この場合だとUIと処理が1対1で非常に強い結合度になり、
-ボタンを１つ増やすたびに対応する関数が１つずつ増えていき、コード量が次第に大きくなってしまいます。
+この場合だとUIと処理が1対1で非常に強い結合度になりますね。
+仕様が非常にシンプルなため、コードもシンプルに書けてはいますが、ボタンを１つ増やすたびに対応する関数が１つずつ増えていき、コード量が次第に大きくなってしまいます。
 
 次に、RxSwiftを用いて書いてみます。
 
-### RxSwiftを使ったコード
+### RxSwiftを用いたコード
+import RxSwift
+import RxCocoa
 
 class SimpleTapViewController: UIViewController {
     
@@ -201,17 +213,15 @@ class SimpleTapViewController: UIViewController {
 RxSwiftで書くと、UIと処理を分けて書くことができます。
 １つのボタンと１つの関数が強く結合していたのが、１つのボタンと１つのプロパティの結合ですむようになります
 ボタンを１つ増やすたびに対応するプロパティが１行増えるだけなので、コードがとてもシンプルになります。
-また、画面上のUIを変更してもソースコードへの影響は少なくなるので楽になります。
+また、画面上のUIを変更してもソースコードへの影響は少なくなるので変更が楽になります。
 
-addTargetを利用するパターンも見てみましょう
+addTargetを利用する場合のコードも見てみましょう
 
-UILabel, UITextFieldを画面に２つずつ配置し、入力したテキストをバリデーションしてUILabelに反映する機能をイメージして作ってみます
+UILabel, UITextFieldを画面に２つずつ配置し、入力したテキストをバリデーションして「あとN文字」とUILabelに反映するよくある仕組みのアプリを作ってみます
 
-画面
+画面のイメージ
 
 simpletextfieldlabelexample1.png
-
-文字を入力するたびに「あとN文字」と表示してくれるUIを作ります
 
 ### addTarget を用いたコード
 
@@ -256,6 +266,9 @@ UIと処理のコードが離れているので、パッとじゃ処理のイメ
 
 ### RxSwift version
 
+import RxSwift
+import RxCocoa
+
 class RxExampleViewController: UIViewController {
     
     // フィールド宣言は全く同じなので省略
@@ -272,7 +285,7 @@ class RxExampleViewController: UIViewController {
                 let limitCount = maxNameFieldSize - text.count
                 return self?.limitText(limitCount)
             }
-            .filterNil()
+            .filterNil() // import RxOptional が必要
             .observeOn(MainScheduler.instance)
             .bind(to: nameLabel.rx.text)
             .disposed(by: disposeBag)
@@ -284,7 +297,7 @@ class RxExampleViewController: UIViewController {
                 let limitCount = maxAddressFieldSize - text.count
                 return self?.limitText(limitCount)
             }
-            .filterNil()
+            .filterNil() // import RxOptional が必要
             .observeOn(MainScheduler.instance)
             .bind(to: addressLabel.rx.text)
             .disposed(by: disposeBag)
@@ -312,6 +325,27 @@ WIP
 
 RxSwiftの導入方法はCocoaPodsやCarthage, SwiftPackageManager等いくつかありますが、ここでは１番簡単でよく使われる（著者の観測範囲）CocoaPodsでの導入方法を紹介します。（CocoaPods v1.5.3）
 
+CocoaPodsとは、iOS/Mac向けのアプリを開発する際のライブラリ管理をしてくれるツールのことで、これを使うと外部ライブラリが簡単に導入できます
+
+CocoaPodsを導入するにはRubyが端末にインストールされてる必要があります。（Macではデフォルトで入っているのであまり気にしなくても良いです）
+
+次のコマンドでCocoaPodsを導入できます
+
+```
+gem install cocoapods
+gem install -v 1.5.3 cocoapods # バージョンを本書と同じにしたい場合はコッチ
+```
+
+これでCocoaPodsをPCに導入することができました。
+次に、CocoaPodsを用いて、プロジェクトに外部ライブラリを導入してみます。
+
+大まかな流れは次の通りです。
+
+1. Podfileというファイルを作成 （導入したいライブラリを定義するファイル）
+2. ターミナルで pod install と入力
+
+では、実際にやってみましょう。
+
 ```
 # プロジェクトのルートディレクトリで実行
 vi Podfile
@@ -330,15 +364,21 @@ end
 - `YOUR_TARGET_NAME` は各自のプロジェクト名に置き換えてください
 
 ```
+# プロジェクトのルートディレクトリで実行
 pod install
 ```
 
 # 基本的な書き方
 
+ここからは、RxSwiftの書き方を説明していきます。
+RxSwiftの書き方は様々あり、本書では全てを紹介しきれませんが、よく使われるところを抜粋して紹介します。
+
 ## メソッドチェーンのように直感的に書ける
 
 RxSwift/RxCocoaは、メソッドチェーンのように直感的に書くことができます。
-メソッドチェーンとは、その名前の通りメソッドを実行してその結果に対してさらにメソッドを実行するような書き方を指します。具体的には次のように書くことができます
+メソッドチェーンとは、その名前の通りメソッドを実行してその結果に対してさらにメソッドを実行するような書き方を指します。jQueryを扱ってた人はなんとなくわかるかと思います。
+
+具体的には次のように書くことができます
 
 ```
 hogeButton.rx.tap
@@ -348,12 +388,15 @@ hogeButton.rx.tap
   .disposed(by: disposeBag)
 ```
 
+hogeButtonのタップイベントを監視し、タップされたときにsubscribe onNextのクロージャ内の処理を実行します。
+最後にクラスが
+
 ## Hello World
 
 RxSwiftでのHello World的な書き方を書いてみます。
 書き方はいろいろありますが、今回は２つのパターンで書いてみます。
 
-1. Observable<T>.interval を使った、一定間隔で値を流し、購読する方法
+1. Observable<T>.interval を使い、一定間隔で値を流し購読する方法
 
 ```
 Observable<Int>.interval(0.5, scheduler: MainScheduler.instance)
@@ -374,11 +417,18 @@ event = 4
 ...(以下、ずっと＋１ずつ加算されて出力される)
 ```
 
+Observable<Int>のstatic関数であるintervalメソッドを使い、指定した秒数間隔で値を流すObserverを生成します。
+次に、そのObserverを監視(Subscribe)し値が流れてきたらprint関数を実行します。
+最後にこのコードを定義したクラスが解放されたら自動的に監視を止めるようにしています。
+
 `interval` はよく使われる文なので覚えておきましょう
 
 2. ストリームを定義し、好きなタイミングで値を流し、購読する方法
 
 ```
+import RxSwift
+import RxCocoa
+
 let helloWorldSubject = PublishSubject<String>()
 
 helloWorldSubject
@@ -402,9 +452,19 @@ value = Hello World!!!
 
 処理の流れのイメージは次の通りです。
 
-1. `helloWorldSubject` という川（ストリーム）を定義
-2. 川（ストリーム）を監視、値が流れてきたら print文で値を出力
+1. `helloWorldSubject` というSubjectを定義
+2. Subjectを監視(Subscribe)、値が流れてきたら print文で値を出力
 3. 値を流す
 
 なんとなく処理の流れは掴めたでしょうか？このHelloWorldの構文はRxSwiftの中ではほんの一部にすぎないので、やりながら覚えていきましょう！
 
+## よく使われるクラスについて
+
+さて、ここまで本書を読み進めてきていくつか気になるワードやメソッド、クラス名が出てきたのではないでしょうか？
+ここからようやくそれらのクラスについて少し触れていきたいと思います。
+
+### Observable
+
+### Dispose
+
+### Subject
