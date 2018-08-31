@@ -95,10 +95,10 @@ WIP
 
 iOSのアプリ開発において、いまではほぼSwift一択の状況ではないでしょうか？
 Swiftが登場したころからStoryboardの機能も充実し、UIと処理の分けてさらに書きやすくなりました。
-Objective-Cを使っていたころよりもアプリ開発が楽になり、アプリ開発初心者でもかなりとっつきやすくなったのがわかります。
+Objective-Cを使っていたころよりもアプリ開発が楽になり、iOSアプリ開発初心者でもかなりとっつきやすくなったのがわかります。
 
 ですが、かなりとっつきやすくなったと言ってもまだ問題はいくつかあります。
-例えば、「非同期処理が実装しにくい、読みにくい」「通信処理の成功・失敗の制御」「DelegateやaddTarget, IBAction等、動作するところと処理が離れている」などあります。
+例えば、「非同期処理が実装しにくい、読みにくい」「通信処理の成功・失敗の制御」「DelegateやaddTarget, IBAction等、UIと処理が離れている」などあります。
 これを解決する１つの方法としてあるのが、RxSwift（リアクティブプログラミング）の導入です。
 
 では具体的にどう解決できるのか簡単なサンプルを例に出しながら解説します。
@@ -137,7 +137,7 @@ Reactive Extensionsとは、「Reactive Programming」を実現するための�
 ## RxSwiftの特徴
 
 RxSwiftの特徴として、「値の変化が検知しやすい」「非同期処理を簡潔に書ける」等が挙げられます。
-これは主にUIの検知（タップや文字入力の検知）、通信処理等で使われ、RxSwiftを用いるとdelegateやcallbackを用いたコードよりもスッキリと書けるようになります。
+これは主にUIの検知（タップや文字入力の検知）や通信処理等で使われ、RxSwiftを用いるとdelegateやcallbackを用いたコードよりもスッキリと見やすいコードを書けるようになります。
 
 その他のメリットとしては次のものが挙げられます。
 
@@ -149,7 +149,7 @@ RxSwiftの特徴として、「値の変化が検知しやすい」「非同期�
 - スレッドを変えやすい
 
 また、デメリットとして主に「学習コストが高い」「デバッグしにくい」が挙げられます。
-プロジェクトメンバーが全員RxSwiftを書けるわけではないのにも関わらず、とりあえずRxSwiftを使えば開発速度が早くなるんでしょ？という考え方で安易に導入すると逆に危険です。
+プロジェクトメンバーが全員RxSwiftを書けるわけではないのにも関わらず、とりあえずRxSwiftを使えば開発速度が早くなるんでしょ？という考え方で安易に導入すると逆に開発速度が落ちる可能性があります。
 
 その他のデメリットとしては次のものが挙げられます。
 
@@ -161,7 +161,7 @@ RxSwiftの特徴として、「値の変化が検知しやすい」「非同期�
 
 ## RxSwiftで何が解決できる？
 
-RxSwiftでは本当に色々なことができますが、１番わかりやすくて簡単なのは「DelegateやIBActionだと動作するところと処理が離れている」の解決です。実際にコードを書いて見てみましょう。
+RxSwiftでは本当に色々なことができますが、１番わかりやすくて簡単なのは「DelegateやIBActionだと動作するところと処理が離れている」の解決だと思います。実際にコードを書いて見てみましょう。
 
 UIButtonとUILabelが画面に配置されていて、ボタンをタップすると文字列が変更されるという仕様のアプリを題材として作ります。
 
@@ -174,6 +174,7 @@ simpletap2.png
 
 ### IBActionを用いたコード
 
+```
 class SimpleTapViewController: UIViewController {
     
     @IBOutlet weak var messageLabel: UILabel!
@@ -182,6 +183,7 @@ class SimpleTapViewController: UIViewController {
         messageLabel.text = "Changed!!"
     }
 }
+```
 
 通常の書き方だと、１つのボタンに対して１つの関数を定義します。
 この場合だとUIと処理が1対1で非常に強い結合度になりますね。
@@ -190,6 +192,8 @@ class SimpleTapViewController: UIViewController {
 次に、RxSwiftを用いて書いてみます。
 
 ### RxSwiftを用いたコード
+
+```
 import RxSwift
 import RxCocoa
 
@@ -209,10 +213,13 @@ class SimpleTapViewController: UIViewController {
             .disposed(by: disposeBag)
     }
 }
+```
 
-RxSwiftで書くと、UIと処理を分けて書くことができます。
-１つのボタンと１つの関数が強く結合していたのが、１つのボタンと１つのプロパティの結合ですむようになります
-ボタンを１つ増やすたびに対応するプロパティが１行増えるだけなので、コードがとてもシンプルになります。
+全く同じ処理をRxSwiftで書きました。
+tapButtonのタップイベントを購読し、イベントが発生したらUILabelのテキストを変更しています。
+コードを見比べてみると、１つのボタンと１つの関数が強く結合していたのが、１つのボタンと１つのプロパティの結合で済むようになっていて、UIと処理の制約を少し緩くできました。
+
+シンプルな処理なのでコード量はRxSwiftを用いた場合のほうが長いですが、この先ボタンを増やすことを考えると、１つ増やすたびに対応するプロパティが１行増えるだけなので、コードがとてもシンプルになります。
 また、画面上のUIを変更してもソースコードへの影響は少なくなるので変更が楽になります。
 
 addTargetを利用する場合のコードも見てみましょう
@@ -310,12 +317,16 @@ class RxExampleViewController: UIViewController {
 
 ## 導入事例
 
-WIP
+- LINE（プロダクト不明）
+  - 出典元：iOSDCのノベルティ
+- NIKKEI 日経電子版
+  - 出典元：iOSDCのノベルティ
 
 # RxSwiftの導入
 
 ## 導入要件
 
+- RxSwiftリポジトリより引用（２０１８年８月３１日現在）
 - Xcode 9.0
 - Swift 4
 - Swift 3.x （rxswift-3.0 ブランチを指定)
@@ -323,11 +334,11 @@ WIP
 
 ## 導入方法
 
-RxSwiftの導入方法はCocoaPodsやCarthage, SwiftPackageManager等いくつかありますが、ここでは１番簡単でよく使われる（著者の観測範囲）CocoaPodsでの導入方法を紹介します。（CocoaPods v1.5.3）
+RxSwiftの導入方法はCocoaPodsやCarthage、SwiftPackageManager等いくつかありますが、ここでは１番簡単でよく使われる（著者の観測範囲）CocoaPodsでの導入方法を紹介します。
 
 CocoaPodsとは、iOS/Mac向けのアプリを開発する際のライブラリ管理をしてくれるツールのことで、これを使うと外部ライブラリが簡単に導入できます
 
-CocoaPodsを導入するにはRubyが端末にインストールされてる必要があります。（Macではデフォルトで入っているのであまり気にしなくても良いです）
+CocoaPodsを導入するにはRubyが端末にインストールされてる必要があります。（Macではデフォルトで入っているのであまり気にしなくても良いですが）
 
 次のコマンドでCocoaPodsを導入できます
 
@@ -336,13 +347,14 @@ gem install cocoapods
 gem install -v 1.5.3 cocoapods # バージョンを本書と同じにしたい場合はコッチ
 ```
 
-これでCocoaPodsをPCに導入することができました。
+これでCocoaPodsを端末に導入することができました。
 次に、CocoaPodsを用いて、プロジェクトに外部ライブラリを導入してみます。
 
 大まかな流れは次の通りです。
 
-1. Podfileというファイルを作成 （導入したいライブラリを定義するファイル）
-2. ターミナルで pod install と入力
+1. Podfileというファイルを作成
+2. Podfileに導入したいライブラリを定義
+3. ターミナルで pod install と入力
 
 では、実際にやってみましょう。
 
@@ -368,10 +380,15 @@ end
 pod install
 ```
 
+`Pod installation complete!` というメッセージが出力されたら導入成功です！
+もし導入できていなさそうな出力であれば、書き方やtypoをもう一度確認してみてください。
+
+Tips: PodfileはRubyと全く同じ構文で定義されています
+
 # 基本的な書き方
 
 ここからは、RxSwiftの書き方を説明していきます。
-RxSwiftの書き方は様々あり、本書では全てを紹介しきれませんが、よく使われるところを抜粋して紹介します。
+RxSwiftの書き方は様々あり、本書では全てを紹介できませんがよく使われるところを抜粋して紹介します。
 
 ## メソッドチェーンのように直感的に書ける
 
@@ -388,42 +405,21 @@ hogeButton.rx.tap
   .disposed(by: disposeBag)
 ```
 
-hogeButtonのタップイベントを監視し、タップされたときにsubscribe onNextのクロージャ内の処理を実行します。
-最後にクラスが
+hogeButtonのタップイベントを購読し、タップされたときにsubscribeメソッド引数であるonNextのクロージャ内の処理を実行します。
+最後にクラスが解放されたとき自動的に購読を破棄してくれるようにdisposed(by:)メソッドを使っています。
+
+まとめると、次の流れで定義しています。
+
+1. イベントの購読
+2. イベントが流れてきたときの処理
+3. クラスが破棄と同時に購読を破棄
 
 ## Hello World
 
 RxSwiftでのHello World的な書き方を書いてみます。
-書き方はいろいろありますが、今回は２つのパターンで書いてみます。
+公式なHelloWorldな書き方ではありませんが、なんとなく概念は掴めるかと思います
 
-1. Observable<T>.interval を使い、一定間隔で値を流し購読する方法
-
-```
-Observable<Int>.interval(0.5, scheduler: MainScheduler.instance)
-  .subscribe(onNext: { event in
-    print("event = \(event)")
-  })
-  .disposed(by: disposeBag)
-```
-
-結果は次の通り
-
-```
-event = 0
-event = 1
-event = 2
-event = 3
-event = 4
-...(以下、ずっと＋１ずつ加算されて出力される)
-```
-
-Observable<Int>のstatic関数であるintervalメソッドを使い、指定した秒数間隔で値を流すObserverを生成します。
-次に、そのObserverを監視(Subscribe)し値が流れてきたらprint関数を実行します。
-最後にこのコードを定義したクラスが解放されたら自動的に監視を止めるようにしています。
-
-`interval` はよく使われる文なので覚えておきましょう
-
-2. ストリームを定義し、好きなタイミングで値を流し、購読する方法
+- ストリームを定義し、好きなタイミングで値を流し、購読する
 
 ```
 import RxSwift
@@ -453,18 +449,69 @@ value = Hello World!!!
 処理の流れのイメージは次の通りです。
 
 1. `helloWorldSubject` というSubjectを定義
-2. Subjectを監視(Subscribe)、値が流れてきたら print文で値を出力
-3. 値を流す
+2. Subjectを購読
+3. 値が流れてきたら print文で値を出力させる
+4. 定義したクラスが破棄されたら購読も自動的に破棄させる
+5. 値を流す
 
-なんとなく処理の流れは掴めたでしょうか？このHelloWorldの構文はRxSwiftの中ではほんの一部にすぎないので、やりながら覚えていきましょう！
+Subjectを使った書き方はよく使われます。例えば、ViewController/ViewModel間のデータの受け渡しや親子ViewController間でのデータ受け渡しで使われます。
+
+上記のコードは同じクラス内に書いていて、Subjectの強みがあまり出ません。
+実際にViewController/ViewModelに分けて書いてみましょう。
+
+```
+class HogeViewController: UIViewController {
+    
+  private let disposeBag = DisposeBag()
+  
+  var viewModel: HogeViewModel!
+
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    
+    viewModel = HogeViewModel()
+    
+    viewModel.helloWorldSubject
+      .subscribe(onNext: { [weak self] value in
+        print("value = \(value)")
+      })
+      .disposed(by: disposeBag)
+    
+    viewModel.updateItem()
+  }
+
+}
+
+class HogeViewModel {
+  let helloWorldSubject = PublishSubject<String>()
+  
+  func updateItem() {
+    helloWorldSubject.onNext("Hello World!")
+    helloWorldSubject.onNext("Hello World!!")
+    helloWorldSubject.onNext("Hello World!!!")
+  }
+}
+```
+
+出力結果自体は先程と同じです。
+このコードを図で表してみましょう。
+
+image: helloworldsubject.png
+
+ViewControllerがViewModelのSubjectを購読したことで、変更があった場合にイベント・値を受け取れます。
+ViewModelはデータの変更をViewControllerに伝える必要がなくなるので、ViewControllerを知らなくても良くなり、「UIとロジックの分離」ができました。テストも書きやすくなりますね。
+
+なんとなく処理の流れは掴めたでしょうか？ここで記載したHelloWorldのコードはRxSwiftの数ある機能の中ではほんの一部にしかすぎないので、やりながら覚えていきましょう！
 
 ## よく使われるクラスについて
 
 さて、ここまで本書を読み進めてきていくつか気になるワードやメソッド、クラス名が出てきたのではないでしょうか？
-ここからようやくそれらのクラスについて少し触れていきたいと思います。
+ここからようやくそれらのクラスについてもう少し深く触れていきたいと思います。
 
 ### Observable
 
 ### Dispose
 
 ### Subject
+
+### Bind
