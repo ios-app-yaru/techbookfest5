@@ -1,4 +1,49 @@
-# おおまかなセクション
+# はじめに
+
+- WIP
+
+## 対象読者
+
+本書は次の読者を対象として作成しています。 
+
+- プログラミング歴1年以上（種類問わず）
+- Swift による iOS アプリの開発経験が少しだけある（3ヶ月〜1年未満）
+- RxSwiftライブラリを使った開発をしたことが全くない・ほんの少しだけある
+
+## 必須知識
+- Swiftの基本的な言語仕様
+  - if, for, switch, enum, class, struct
+  - mapやfilterなどの高階関数の扱い
+- Xcode の基本的な操作
+- よく使われる UIKitの仕様
+  - UILabel UITextView UITableView UICollectionView
+
+## 推奨知識
+
+- 設計パターン
+  - MVVMアーキテクチャ
+- デザインパターン
+  - delegateパターン
+  - KVOパターン
+  - Observerパターン
+
+## 想定環境
+- OSX High Sierra
+- Xcode 9.4
+- Swift 4.1
+- cocoapods 1.5.3
+
+## お問い合わせ先
+
+- Twitter
+  - @k0uhashi
+
+## 免責事項
+
+- WIP
+
+# 目次
+
 - はじめに
   - 対象読者
   - 必須知識
@@ -42,54 +87,6 @@
   - RxOptional
   - RxWebkit
   - RxDataSources
-
-# 文章構成
-
-##### ここまでメモ #####
-
-# はじめに
-
-WIP
-
-## 対象読者
-本書は次の読者を対象として作成しています。 
-
-- プログラミング歴1年以上（種類問わず）
-- Swift による iOS アプリの開発経験が少しだけある（3ヶ月〜1年未満）
-- RxSwiftライブラリを使った開発をしたことが全くない・ほんの少しだけある
-
-## 必須知識
-- Swiftの基本的な言語仕様
-  - if, for, switch, enum, class, struct
-  - mapやfilterなどの高階関数の扱い
-- Xcode の基本的な操作
-- よく使われる UIKitの仕様
-  - UILabel UITextView UITableView UICollectionView
-
-## 推奨知識
-
-- 設計パターン
-  - MVVMアーキテクチャ
-- デザインパターン
-  - delegateパターン
-  - KVOパターン
-  - Observerパターン
-
-## 想定環境
-- OSX High Sierra
-- Xcode 9.4
-- Swift 4.1
-- cocoapods 1.5.3
-
-## お問い合わせ先
-
-- Twitter
-  - @k0uhashi
-
-## 免責事項
-
-# 目次
-
 
 # iOSアプリ開発とSwift
 
@@ -232,6 +229,7 @@ simpletextfieldlabelexample1.png
 
 ### addTarget を用いたコード
 
+```
 class ExampleViewController: UIViewController {
     
     @IBOutlet weak var nameField: UITextField!
@@ -265,6 +263,7 @@ class ExampleViewController: UIViewController {
         addressLabel.text = limitText(limitCount)
     }
 }
+```
 
 UIと処理のコードが離れているので、パッとじゃ処理のイメージがしにくいですね。
 対象のViewがもっと増えるとどの関数がどのUIの処理なのかわかりにくくなってしまいます。
@@ -273,6 +272,7 @@ UIと処理のコードが離れているので、パッとじゃ処理のイメ
 
 ### RxSwift version
 
+```
 import RxSwift
 import RxCocoa
 
@@ -310,6 +310,7 @@ class RxExampleViewController: UIViewController {
             .disposed(by: disposeBag)
     }
 }
+```
 
 先程のaddTargetのパターンと全く同じ動作をします。
 全ての処理がviewDidLoad()上で書けるようになり、UIと処理がバラバラにならないのですごく見やすいですね。
@@ -506,7 +507,7 @@ ViewModelはデータの変更をViewControllerに伝える必要がなくなる
 ## よく使われるクラスについて
 
 さて、ここまで本書を読み進めてきていくつか気になるワードやメソッド、クラス名が出てきたのではないでしょうか？
-ここからようやくそれらのクラスについてもう少し深く触れていきたいと思います。
+ここからようやくそれらのクラスとそれらを支える概念についてもう少し深く触れていきたいと思います。
 
 ### Observable
 
