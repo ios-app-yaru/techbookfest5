@@ -511,8 +511,73 @@ ViewModelはデータの変更をViewControllerに伝える必要がなくなる
 
 ### Observable
 
+- ObservableとObserver
+
 ### Dispose
+
+- DisposeBag
+- 購読をイイ感じに破棄してくれる
 
 ### Subject
 
-### Bind
+ObservableにもObserverにもなれるすごいやつです。種類は次の４種類が用意されています
+
+- PublishSubject
+- BehaviorSubject
+- PublishRelay
+- BehaviorRelay
+
+それぞれの違いを下記のテーブル図にまとめました。
+
+| |流れるイベント|初期値|
+|:-:|:-:|:-:|
+|PublishSubject|onNext, onError, onComplete|持たない|
+|BehaviorSubject|onNext, onError, onComplete|持つ|
+|PublishRelay|onNext|持たない|
+|BehaviorRelay|onNext|持つ|
+
+初期値について
+
+初期値を持つ・持たないの違いは、Subject、RelayをObserverした瞬間にイベントが流れるか流れないかの違いです。やりたいことに合わせて使い分けましょう。
+
+とはいえ、最初はどう使い分けるかが難しいと思います。特にSubjectとRelayはどう使えばよいか困る人も多いと思います。簡単な使い分けを紹介すると、「通信処理やDB処理等」エラーが発生したときに分岐させたい場合はSubject、UIに値をBindするようなものはRelayを使いましょう。（RxSwiftのデメリットでも触れましたが、UIにBindしているObservableでonErrorやonCompleteが発生しまうと、購読が止まってしまう為、onNextのみが流れるRelayを使うのが適切です。）
+
+
+### bind
+
+「bind」と聞くと双方向データバインディングを想像しますが、RxSwiftでは単方向データバインディングです。
+それに、bindメソッドが独自でなにか難しいことをやっているわけではなく、実態はsubscribeしてデータをセットしているだけです。
+
+実際にコードを比較してみましょう。
+
+```
+import RxSwift
+import RxCocoa
+
+// ...
+
+@IBOutlet weak var nameTextField: UITextView!
+@IBOutlet weak var nameLabel: UILabel!
+private let disposeBag = DisposeBag()
+
+// ①bindを利用
+nameTextField.rx.text
+  .bind(to: nameLabel.rx.text)
+  .disposed(by: disposeBag)
+
+// ②subscribeを利用
+nameTextField.rx.text
+  .subscribe(onNext: { [weak self] text in 
+    nameLabel.text = text
+  })
+  .disposed(by: disposeBag)
+```
+
+上記のコードでは①bindを利用した場合と②subscribeを利用した場合それぞれ定義しましたが、全く同じ動作をします。
+
+
+
+
+- イベントストリームを抽象化
+- イベントとは？
+  - ボタンのタップUISegmentControlの状態が変わった、UILabelのテキストが変わった
