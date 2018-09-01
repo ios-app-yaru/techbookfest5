@@ -511,12 +511,105 @@ ViewModelはデータの変更をViewControllerに伝える必要がなくなる
 
 ### Observable
 
-- ObservableとObserver
+Observableは翻訳すると観測可能という意味で文字通り観測可能なものを表現するクラスです。
+
+ここで次の図を見てください。
+
+image: what-observable.png
+
+RxSwift（ReactiveExtension）について少し調べた方は大体みたことあるような図ではないでしょうか？
+これがまさにObservableを表しています。
+
+Observableが流すイベントには次の種類あります。
+
+- onNext
+  - デフォルトのイベント
+  - 値を格納でき、何度でも呼ばれる
+- onError
+  - エラーイベント
+  - １度だけ呼ばれ、その時点で終了、購読を破棄
+- onCompleted
+  - 完了イベント
+  - １度だけ呼ばれ、その時点で終了、購読を破棄
+
+これをコードでどう扱うかと言うと、次のように扱います
+
+```
+hogeSubject
+  .subscribe(onNext: { 
+    print("next")
+  }, onError: {
+    print("error")
+  }, onCompleted: {
+    print("completed")
+  })
+```
+
+コードを見てなんとなく予想できるかと思いますが、onNextイベントが流れてきたときはonNextのクロージャが実行され、onErrorイベントが流れてきたときはonErrorのクロージャーが実行されます。
+
+また、UIKitをsubscribeする場合はonErrorやonCompletedイベントが流れてこないので、onNextのクロージャ以外は省略できます。
+
+Tips: ObservableとObserver
+
+様々な資料に目を通していると、ObservableとObserverという表現が出てきますがどちらも違う意味です。イベント発生元がObservableでイベント処理がObserverです。ややこしいですね。
+コードで見てみましょう。
+
+```
+hogeObservable // Observable (イベント発生元)
+  .map { $0 * 2 } // Observable (イベント発生元)
+  .subscribe(onNext: { 
+    // Observer(イベント処理)
+  })
+  .disposed(by: disposeBag)
+```
+
+コードで見てみるとわかりやすいですね。名前は似てますが違う意味だというのを頭の隅に入れておくと理解がより進むかと思います。
 
 ### Dispose
 
-- DisposeBag
-- 購読をイイ感じに破棄してくれる
+ここまでコードを見てくると、なにやらsubscribeしたあとに必ずdisposed(by:)メソッドが呼ばれているのがわかるかと思います。さてこれは何でしょう？
+一言で説明すると、メモリリークを回避するための仕組みです。
+
+Disposeは購読を解除（破棄）するためのもので、dispose()メソッドを呼ぶことで購読を破棄できます。
+ただし、Observableセクションで記述した通りonErrorやonCompletedイベントが流れてくると購読が自動で破棄してくれるのでdispose()メソッドを呼ぶ必要はありません。
+
+しかし、onErrorやonCompletedイベントが全ての場合で必ず流れてくるわけではありません。
+とはいえ、購読を破棄するタイミング、難しいですよね？その画面がしばらく呼ばれなくなった時？インスタンスが破棄されたとき？いちいちそんなこと考えてられないしdeinitにつらつらと書くのも面倒ですね
+
+そこで活躍するのがDisposeBagという仕組みです。
+DisposeBagはDisposableを貯めておいて、自身が解放(deinit)されたときに管理している購読を全て自動で解放(unsubscribe)してくれます。楽ですね。
+
+コードで見てみましょう
+
+```
+class HogeViewController {
+  @IBOutlet weak var hogeButton: UIButton!
+  @IBOutlet weak var fooButton: UIButton!
+  private let disposeBag = DisposeBag()
+
+  override viewDidLoad() {
+    super.viewDidLoad()
+    hogeButton.rx.tap
+      .subscribe(onNext: { // .. })
+      .disposed(by: disposeBag)
+    
+    fooButton.rx.tap
+      .subscribe(onNext: { // .. })
+      .disposed(by: disposeBag)
+  }
+}
+```
+
+上記の場合だと、HogeViewControllerが解放(deinit)されるときに保持しているhogeButtonのsubscribeとfooButtonのsubscribeのDisposableをdisposeしてくれます。
+
+とりあえず購読したら必ずdisposed(by: disposeBag)しておけば大体間違いないです。
+
+Tips: シングルトンインスタンス内でDisposeBagを扱うときは注意！
+
+DisposeBagはとても便利な仕組みですが、シングルトンインスタンス内でDisposeBagを扱う時は注意が必要です。DisposeBagの仕組みはそのクラスが解放されたとき、管理してるDisposableをdisposeすると先程記述しましたね。
+つまりDisposeBagのライフサイクルは保持しているクラスのライフサイクルと同一のものになります。
+しかし、シングルトンインスタンスのライフサイクルはアプリのライフサイクルと同一のため、いつまでたってもdisposableされず、メモリリークになる可能性があります。
+回避策が全くないわけではありませんが、ここでは詳細を省きます。シングルトンインスタンスで扱う場合には注意が必要！ということだけ覚えておいてください。
 
 ### Subject
 
@@ -545,8 +638,9 @@ ObservableにもObserverにもなれるすごいやつです。種類は次の�
 
 ### bind
 
-「bind」と聞くと双方向データバインディングを想像しますが、RxSwiftでは単方向データバインディングです。
-それに、bindメソッドが独自でなにか難しいことをやっているわけではなく、実態はsubscribeしてデータをセットしているだけです。
+Observable/Observerに対してbindメソッドを使うと指定したObserverにイベントストリームを接続することができます。
+「bind」と聞くと双方向データバインディングを想像しますが、RxSwiftでは単方向データバインディングです。双方向データバインディングが不可能というわけではありませんが、筆者の観測範囲では使っている人は少ないです。
+bindメソッドが独自でなにか難しいことをやっているわけではなく、振る舞いはsubscribeと同じです。
 
 実際にコードを比較してみましょう。
 
@@ -573,7 +667,9 @@ nameTextField.rx.text
   .disposed(by: disposeBag)
 ```
 
-上記のコードでは①bindを利用した場合と②subscribeを利用した場合それぞれ定義しましたが、全く同じ動作をします。
+上記のコードでは①bindを利用した場合と②subscribeを利用した場合それぞれ定義しましたが、全く同じ動作をします。振る舞いが同じという意味が伝わったでしょうか？
+
+### Operator
 
 
 
@@ -581,3 +677,15 @@ nameTextField.rx.text
 - イベントストリームを抽象化
 - イベントとは？
   - ボタンのタップUISegmentControlの状態が変わった、UILabelのテキストが変わった
+
+- operator
+- 変換
+  - map, flatMap, scan, debounce
+- 絞り込み
+  - filter, take, skip, distinct
+- 組み合わせ
+  - zip, combineLatest, merge, sample, concat
+
+
+
+
