@@ -511,16 +511,16 @@ ViewModelはデータの変更をViewControllerに伝える必要がなくなる
 
 ### Observable
 
-Observableは翻訳すると観測可能という意味で文字通り観測可能なものを表現するクラスです。
+Observableは翻訳すると観測可能という意味で文字通り観測可能なものを表現するクラスで、イベントを検知できるクラスです。
 
-ここで次の図を見てください。
+まずは、次の図を見てください。
 
 image: what-observable.png
 
 RxSwift（ReactiveExtension）について少し調べた方は大体みたことあるような図ではないでしょうか？
 これがまさにObservableを表しています。
 
-Observableが流すイベントには次の種類あります。
+Observableに流れるイベントには次の種類あります。
 
 - onNext
   - デフォルトのイベント
@@ -611,16 +611,20 @@ DisposeBagはとても便利な仕組みですが、シングルトンインス�
 しかし、シングルトンインスタンスのライフサイクルはアプリのライフサイクルと同一のため、いつまでたってもdisposableされず、メモリリークになる可能性があります。
 回避策が全くないわけではありませんが、ここでは詳細を省きます。シングルトンインスタンスで扱う場合には注意が必要！ということだけ覚えておいてください。
 
-### Subject
+### Subject, Relay
 
-ObservableにもObserverにもなれるすごいやつです。種類は次の４種類が用意されています
+Subject、Relayは簡単に言うと、イベントの検知に加えてイベントの発生もできるすごいやつです。
+
+ここで少しObservableについて振り返ってみましょう。Observableとは、イベントを検知するためのクラスでしたね。Subject、Relayはそれに加えてイベントを発生させることもできるクラスです。
+
+代表的なSubject、Relayは次の４種類が用意されています
 
 - PublishSubject
 - BehaviorSubject
 - PublishRelay
 - BehaviorRelay
 
-それぞれの違いを下記のテーブル図にまとめました。
+それぞれの違いをざっくりとですが、下記のテーブル図にまとめました。
 
 | |流れるイベント|初期値|
 |:-:|:-:|:-:|
@@ -629,11 +633,61 @@ ObservableにもObserverにもなれるすごいやつです。種類は次の�
 |PublishRelay|onNext|持たない|
 |BehaviorRelay|onNext|持つ|
 
-初期値について
+- 初期値について
 
 初期値を持つ・持たないの違いは、Subject、RelayをObserverした瞬間にイベントが流れるか流れないかの違いです。やりたいことに合わせて使い分けましょう。
 
+- それぞれの使い分け
+
 とはいえ、最初はどう使い分けるかが難しいと思います。特にSubjectとRelayはどう使えばよいか困る人も多いと思います。簡単な使い分けを紹介すると、「通信処理やDB処理等」エラーが発生したときに分岐させたい場合はSubject、UIに値をBindするようなものはRelayを使いましょう。（RxSwiftのデメリットでも触れましたが、UIにBindしているObservableでonErrorやonCompleteが発生しまうと、購読が止まってしまう為、onNextのみが流れるRelayを使うのが適切です。）
+
+- Tips: internal(public)なSubject,Relay
+
+Subject, Relayはすごく便利でいろいろなことができます。便利なのは良いことですが、いろいろ出来すぎてしまうと逆にコードが複雑になってしまうことがあります。
+
+どういうことかというと、クラスの外からもイベントを発生させることができるためどのクラスがどこでイベント発生させているか段々わからなくなり、デバッグをするのがかなりしんどくなります。
+
+その解決策として、Subject、Relayはprivateとして定義して、外部用のObservableを用意するのが一般的に用いられています。
+
+次のコードのように定義します
+
+```
+private let items: BehaviorRelay<[Item]>(value: [])
+
+var itemsObservable: Observable<[Item]> {
+  return items
+}
+```
+
+- Tips: SubjectとRelay
+
+SubjectとRelay、それぞれ特徴が違うと書きましたが、コードを見てみると、実はRelayはSubjectの薄いラッパーとして定義されています。
+
+それぞれonNextイベントは流せますが、Relayの場合は呼び出すメソッドがSubjectと異なるので注意しましょう
+
+```
+let hogeSubject = PublishSubject<String>()
+let hogeRelay = PublishRelay<String>()
+
+hogeSubject.onNext("ほげ")
+hogeRelay.accept("ほげ")
+```
+
+呼び出すメソッドが違うからなにか特別なことしてるのかな？と思いきや内部的にはonNextを呼んでいるので、特別なことはしていないというのがわかります
+
+```
+public final class PublishRelay<Element>: ObservableType {
+  public typealias E = Element
+
+  private let _subject: PublishSubject<Element>
+  
+  // Accepts `event` and emits it to subscribers
+  public func accept(_ event: Element) {
+    _subject.onNext(event)
+  }
+  
+  // ...
+```
 
 
 ### bind
@@ -671,7 +725,7 @@ nameTextField.rx.text
 
 ### Operator
 
-
+RxSwiftを支える重要な概念はまだまだあります。ここではOperatorについて紹介します。ここまでコードでは、入力された値をそのままbindするコードが多く登場しました。ですが実際のプロダクションコードではそのままbindする場合は
 
 
 - イベントストリームを抽象化
