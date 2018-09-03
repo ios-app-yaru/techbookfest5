@@ -649,7 +649,7 @@ Subject, Relayはすごく便利でいろいろなことができます。便利
 
 その解決策として、Subject、Relayはprivateとして定義して、外部用のObservableを用意するのが一般的に用いられています。
 
-次のコードのように定義します
+次のコードのように定義します。
 
 ```
 private let items: BehaviorRelay<[Item]>(value: [])
@@ -725,21 +725,89 @@ nameTextField.rx.text
 
 ### Operator
 
-RxSwiftを支える重要な概念はまだまだあります。ここではOperatorについて紹介します。ここまでコードでは、入力された値をそのままbindするコードが多く登場しました。ですが実際のプロダクションコードではそのままbindする場合は
+ここまでコードでは、入力された値をそのままbindするコードが多く登場しました。ですが実際のプロダクションコードではそのままbindする場合はほぼ無く、何か加工してbindする場合が多いかと思います。
 
+そこで活躍するのがこのOperatorという概念です。
+ここでは、よく使われるOperatorを紹介します。
 
-- イベントストリームを抽象化
-- イベントとは？
-  - ボタンのタップUISegmentControlの状態が変わった、UILabelのテキストが変わった
-
-- operator
 - 変換
-  - map, flatMap, scan, debounce
+  - map
+    - 通常の高階関数と同じ動き
+  - flatMap
+    - 通常の高階関数と同じ動き
+  - reduce
+    - 通常の高階関数と同じ動き
+  - scan
+    - reduceに似ていて途中結果もイベント発行ができる
+  - debounce
+    - 指定時間イベントが発生しなかったら最後に流されたイベントを流す
 - 絞り込み
-  - filter, take, skip, distinct
+  - filter
+    - 通常の高階関数と同じ動き
+  - take
+    - 指定時間の間だけイベントを通知してonCompletedする
+  - skip
+    - 名前の通り、指定時間の間はイベントを無視する
+  - distinct
+    - 重複イベントを除外する
 - 組み合わせ
-  - zip, combineLatest, merge, sample, concat
+  - zip
+    - 複数のObservableを組み合わせる（異なる型でも可能）
+  - merge
+    - 複数のObservableを組み合わせる（異なる型では不可能）
+  - combineLatest
+    - 複数のObservableの最新値を組み合わせる（異なる型でも可能）
+  - sample
+    - 引数に渡したObservableのイベントが発生されたら元のObservableの最新イベントを通知
+  - concat
+    - 複数のObservableのイベントを順番に組み合わせる（異なる方では不可能）
+
+他にももっともっとたくさんのOperatorが用意されていますが、それだけで１冊の本が書けるレベルであるので省略させてください。
+RxSwiftを書き始めたばっかりの人はどれがどんな動きをするか全然わからないとは思いますが、やっていきながら段々と覚えていきましょう！
+
+とりあえずこれを覚えておけばオッケーみたいなOperator
 
 
 
+# HotなObservableとColdなObservable
 
+これまでObservableとそれらを支える仕組みについて記載してきましたが、ObservableといってもHotなObservableとColdなObservableと２つの種類があります。
+
+本書ではHotなObservableを主に扱いますが、ColdなObservableもあるということを頭の中に入れておきましょう。
+
+HotなObservableの特徴は次の通りです。
+
+- subscribeされなくても動作する
+- 複数の箇所でsubscribeしても全てのObservableで同じイベントが同時に流れる
+
+ColdなObservableの特徴は次の通りです。
+
+- subscribeしたときに動作する
+- 複数の箇所でsubscribeしたとき、それぞれのObservableでそれぞれのイベントが流れる
+
+ColdなObservableは主に非同期通信処理で使われます。
+試しにsubscribe時に１つの要素を返すObservableを作成する関数（ややこしい）を定義してみましょう
+
+```
+func myJust<E>(_ element: E) -> Observable<E> {
+  return Observable.create { observer in
+    observer.on(.next(element))
+    observer.on(.completed)
+    return Disposables.create()
+  }
+}
+
+myJust(100)
+  .subscribe(onNext: { value in
+    print(value)
+  })
+```
+
+余談ですが、このような１回通知してonCompletedするObservableのことは「just」と呼ばれてます
+Observableのcreate関数はコードを見てわかる通り、クロージャを使用してsubscribeメソッドを簡単に実装できる便利な関数です。
+subscribeメソッドと同様にobserverを引数にとり、disposableを返却します。
+
+振り返りTips: myJustはdisposed(by:)しなくても良い
+
+そうです、myJust関数はdisposed(by:)しなくても良いんです。コードをよく見てみましょう、onNextイベントを流したあとにonCompletedを流してますね
+ここで少し振り返ってみましょう。Observableの特徴としてonError、onCompletedイベントは１度しか流れず、その時点で購読を破棄するというのがありましたね、なのでdisposed(by:)しなくても良いということになります。
