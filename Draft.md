@@ -727,8 +727,12 @@ nameTextField.rx.text
 
 ここまでコードでは、入力された値をそのままbindするコードが多く登場しました。ですが実際のプロダクションコードではそのままbindする場合はほぼ無く、何か加工してbindする場合が多いかと思います。
 
-そこで活躍するのがこのOperatorという概念です。
-ここでは、よく使われるOperatorを紹介します。
+例えば、入力されたテキストの文字数を数えて「あとN文字」とラベルのテキストに反映する仕組みは代表的なパターンの１つだと思います。
+
+そこで活躍するのがOperatorという概念です。
+OperatorというはObservableのイベント値を途中で変換したり、絞り込んだりすることや、２つのObservableのイベントを合成したり結合したりすることを指します。
+
+Operatorは本当に沢山、色々なことができてそれだけで１冊の本が書けるレベルです。なので、ここではよく使われるOperatorを簡単に紹介します。
 
 - 変換
   - map
@@ -762,12 +766,45 @@ nameTextField.rx.text
   - concat
     - 複数のObservableのイベントを順番に組み合わせる（異なる方では不可能）
 
-他にももっともっとたくさんのOperatorが用意されていますが、それだけで１冊の本が書けるレベルであるので省略させてください。
-RxSwiftを書き始めたばっかりの人はどれがどんな動きをするか全然わからないとは思いますが、やっていきながら段々と覚えていきましょう！
+ここで一覧で紹介されてもおぼえきれねーよ！と思うかもしれませんがその通りです。すぐ覚えなくても良いので、こんなことできるのか〜とフワっと覚えていただければ良いです。
 
-とりあえずこれを覚えておけばオッケーみたいなOperator
+また、RxSwiftを書き始めたばっかりの人はどれがどんな動きをするか全然わからないとは思いますが、やっていきながら段々と覚えていきましょう！
 
+更にスコープを狭めて、割と簡単に使いやすくてよく使うものをサンプルコードを加えてさらにピックアップしてみました。
 
+- map
+
+```
+// hogeTextFieldのテキスト文字数を数えてfooTextLabelのテキストへ反映
+hogeTextField.rx.text
+  .map { return "あと\($0.count)文字 }
+  .bind(to: fooTextLabel.rx.text)
+  .disposed(by: disposeBag)
+```
+
+- filter
+
+```
+// 整数が流れるObservableから偶数のイベントのみに絞り込んでevenObservableに流す
+numberObservable
+  .filter { $0 % 2 == 0 }
+  .bind(to: evenObservable)
+  .disposed(by: disposeBag)
+```
+
+また、かならずObservableのイベントを使う必要はありません、次のようにクラス変数やメソッド内変数を取り入れてbindすることもできます
+
+```
+let user = User(name: "k0uhashi")
+
+showUserNameButton.rx.tap
+  .map { [weak self] in
+    return self?.user.name
+  }
+  .filterNil() // import RxOptionalが必要
+  .bind(nameLabel.rx.text)
+  .disposed(by: disposeBag)
+```
 
 # HotなObservableとColdなObservable
 
