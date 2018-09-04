@@ -122,7 +122,7 @@ Reactive Extensionsについては後述しますが非同期操作とイベン�
 ## Reactive Extensionsって何？
 
 ### 思想
-Reactive Extensionsとは、「Reactive Programming」を実現するための「デザイン」とその実装ができる「ライブラリ」のことを指します。
+Reactive Extensionsとは、「Reactive Programming」を実現するための「デザイン」とその実装ができる「ライブラリ」のことを指します。名前の通り、Reactive Programmingをするために既存のプラットフォームの機能を拡張します。
 
 ### 歴史
 元々は `Microsoft` が研究して開発した `.NET用のライブラリ` で、２００９年に「Reactive Extensions」という名前で公開しました。現在はオープンソース化され「ReactiveX」という名前に変更されています。
@@ -156,9 +156,11 @@ RxSwiftの特徴として、「値の変化が検知しやすい」「非同期�
 
 プロジェクトによってRxSwiftの有用性が変わるので、そのプロジェクトの特性とRxSwiftのメリット・デメリットを照らし合わせた上で検討しましょう。
 
-## RxSwiftで何が解決できる？
+## RxSwiftは何が解決できる？
 
-RxSwiftでは本当に色々なことができますが、１番わかりやすくて簡単なのは「DelegateやIBActionだと動作するところと処理が離れている」の解決だと思います。実際にコードを書いて見てみましょう。
+RxSwiftでは本当に色々なことができますが、１番わかりやすくて簡単なのは「DelegateやIBActionだと動作するところと処理が離れている」の解決だと思います。
+
+実際にコードを書いて見てみましょう。
 
 UIButtonとUILabelが画面に配置されていて、ボタンをタップすると文字列が変更されるという仕様のアプリを題材として作ります。
 
@@ -795,6 +797,7 @@ numberObservable
 また、かならずObservableのイベントを使う必要はありません、次のようにクラス変数やメソッド内変数を取り入れてbindすることもできます
 
 ```
+// ボタンをタップしたときにnameLabelにユーザの名前を表示する
 let user = User(name: "k0uhashi")
 
 showUserNameButton.rx.tap
@@ -803,6 +806,19 @@ showUserNameButton.rx.tap
   }
   .filterNil() // import RxOptionalが必要
   .bind(nameLabel.rx.text)
+  .disposed(by: disposeBag)
+```
+
+- zip
+
+複数のAPIにリクエストして同時に反映したい場合に使用します
+
+```
+Observable.zip(api1Observable, api2Observable)
+  .subscribe(onNext { (api1, api2) in 
+    // ↑タプルとして受け取ることができます
+    //...
+  })
   .disposed(by: disposeBag)
 ```
 
