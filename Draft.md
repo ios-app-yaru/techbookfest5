@@ -987,3 +987,25 @@ Pod installation complete! There are 2 dependencies from the Podfile and 2 total
 [!] Automatically assigning platform `ios` with version `11.4` on target `CounterApp` because no platform was specified. Please specify a platform for this target in your Podfile. See `https://guides.cocoapods.org/syntax/podfile.html#platform`.
 ```
 
+環境設定はこれで完了です。
+次回以降プロジェクトを開く時は、必ず "YOUR_PROJECT_NAME.xcworkspace" から開くようにしましょう
+（*.xcworkspaceから開かないと導入したライブラリが使えません）
+
+### 開発を加速させる設定
+
+この節では、節タイトルの通り開発を加速させる簡単な設定を行います。本書のテーマとは少しずれるので早足で進めます。
+具体的には、Storyboardを廃止して ViewController + Xib を使って開発する手法に切り替えます。
+
+#### Storyboardの廃止
+
+Storyboardは画面遷移の設定が簡単にできたり、パッと見るだけで画面がどう遷移していくかわかりやすくて良いのですが、
+反面としてアプリが大きくなってくると画面遷移が複雑で逆に見辛くなったり、小さなViewController（アラートやダイアログを出すものなど）の生成が面倒だったり、チーム人数が複数になると*.storyboardがconflictしまくるなど色々問題があるので、Storyboardを使うのをやめます。
+
+Storyboardを廃止するために、次のことを行います
+
+- Main.storyboardの削除
+- Info.plishの設定
+- AppDelegateの整理
+- ViewController.xibの作成
+
+##### Main.storyboardの削除
