@@ -70,16 +70,31 @@
 - 基本的な書き方
   - メソッドチェーンのように直感的に書ける
   - Hello world
-  - よく使われるクラス
+  - よく使われるクラス・メソッドについて
     - Observable
     - Dispose
-    - Subject
-- 応用
-- サンプルアプリのパターン比較
-  - ゴリゴリパターン
-  - delegateパターン
-  - KVOパターン
-  - RxSwiftパターン
+    - Subject, Relay
+    - bind
+    - Operator
+  - HotなObservableとColdなObservable
+- 簡単なアプリを作ってみよう！
+  - カウンターアプリ
+    - プロジェクトの作成
+    - 環境設定
+    - callback
+    - delegate
+    - RxSwift
+  - WKWebViewを使ったアプリ
+    - KVO
+    - RxSwift
+    - RxWebkit
+- Githubリポジトリ検索アプリを作ってみよう！
+  - アプリの概要
+    - 機能要件
+    - 画面イメージ
+  - リポジトリの作成
+  - xibで動くようにする
+  - APIモデルを作る
 - 次のステップ
   - 学習方法
   - コミュニティ
@@ -90,11 +105,11 @@
 
 # iOSアプリ開発とSwift
 
-iOSのアプリ開発において、いまではほぼSwift一択の状況ではないでしょうか？
-Swiftが登場したころからStoryboardの機能も充実し、UIと処理の分けてさらに書きやすくなりました。
+iOSのアプリ開発において、いまではほぼSwift一択の状況ではないでしょうか？
+Swiftが登場したころからStoryboardの機能も充実し、UIと処理の分けてさらに書きやすくなりました。
 Objective-Cを使っていたころよりもアプリ開発が楽になり、iOSアプリ開発初心者でもかなりとっつきやすくなったのがわかります。
 
-ですが、かなりとっつきやすくなったと言ってもまだ問題はいくつかあります。
+ですが、かなりとっつきやすくなったと言ってもまだ問題はいくつかあります。
 例えば、「非同期処理が実装しにくい、読みにくい」「通信処理の成功・失敗の制御」「DelegateやaddTarget, IBAction等、UIと処理が離れている」などあります。
 これを解決する１つの方法としてあるのが、RxSwift（リアクティブプログラミング）の導入です。
 
@@ -107,16 +122,18 @@ Objective-Cを使っていたころよりもアプリ開発が楽になり、iOS
 - Reactive Extensions
   - GoFのデザインパターンの１つ、 `オブザーバパターン` を表したインターフェース
 - RxSwift
-  - ReactiveExtensionsのSwift版のライブラリ
+  - ReactiveExtensionsをSwiftで扱えるように拡張されたライブラリ
 - RxCocoa
-  - UIKitでRxを使えるように様々なクラスをextensionで定義してくれているライブラリ
+  - UIKitでRxを使えるように様々なUIクラスをextension定義しているライブラリで、RxSwiftとにこいちでよく導入されます。
 - オブザーバパターン
   - プログラム内のオブジェクトのイベント（事象）を他のオブジェクトへ通知する処理で使われるデザインパターンの一種
 
 
 ## RxSwiftって何？
 
-RxSwift とは「ReactiveExtensions」のSwift版です
+RxSwift とは「ReactiveExtensions」をSwiftで扱えるように拡張されたライブラリのことを指します。
+github上でオープンソースライブラリと公開されていて様々な人が日々コントリビュートしています。
+
 Reactive Extensionsについては後述しますが非同期操作とイベント/データストリーム（時系列処理）の実装を容易にできるライブラリのことを指します
 
 ## Reactive Extensionsって何？
@@ -506,14 +523,14 @@ ViewModelはデータの変更をViewControllerに伝える必要がなくなる
 
 なんとなく処理の流れは掴めたでしょうか？ここで記載したHelloWorldのコードはRxSwiftの数ある機能の中ではほんの一部にしかすぎないので、やりながら覚えていきましょう！
 
-## よく使われるクラスについて
+## よく使われるクラス・メソッドについて
 
 さて、ここまで本書を読み進めてきていくつか気になるワードやメソッド、クラス名が出てきたのではないでしょうか？
 ここからようやくそれらのクラスとそれらを支える概念についてもう少し深く触れていきたいと思います。
 
 ### Observable
 
-Observableは翻訳すると観測可能という意味で文字通り観測可能なものを表現するクラスで、イベントを検知できるクラスです。
+Observableは翻訳すると観測可能という意味で文字通り観測可能なものを表現するクラスで、イベントを検知するためのものです。
 
 まずは、次の図を見てください。
 
@@ -579,7 +596,7 @@ Disposeは購読を解除（破棄）するためのもので、dispose()メソ�
 とはいえ、購読を破棄するタイミング、難しいですよね？その画面がしばらく呼ばれなくなった時？インスタンスが破棄されたとき？いちいちそんなこと考えてられないしdeinitにつらつらと書くのも面倒ですね
 
 そこで活躍するのがDisposeBagという仕組みです。
-DisposeBagはDisposableを貯めておいて、自身が解放(deinit)されたときに管理している購読を全て自動で解放(unsubscribe)してくれます。楽ですね。
+DisposeBagはDisposableインスタンスを貯めておいて、自身が解放(deinit)されたときに管理している購読を全て自動で解放(unsubscribe)してくれる便利なものです。楽ですね。
 
 コードで見てみましょう
 
@@ -619,7 +636,7 @@ Subject、Relayは簡単に言うと、イベントの検知に加えてイベ�
 
 ここで少しObservableについて振り返ってみましょう。Observableとは、イベントを検知するためのクラスでしたね。Subject、Relayはそれに加えてイベントを発生させることもできるクラスです。
 
-代表的なSubject、Relayは次の４種類が用意されています
+Subject、Relayは色々ありますが、代表としてよく使われる次の４種類を紹介します。
 
 - PublishSubject
 - BehaviorSubject
@@ -675,7 +692,7 @@ hogeSubject.onNext("ほげ")
 hogeRelay.accept("ほげ")
 ```
 
-呼び出すメソッドが違うからなにか特別なことしてるのかな？と思いきや内部的にはonNextを呼んでいるので、特別なことはしていないというのがわかります
+呼び出すメソッドが違うからなにか特別なことしてるのかな？と思うかもしれませんが、特別なことはしていません。PublishRelayのコードを見てみましょう。
 
 ```
 public final class PublishRelay<Element>: ObservableType {
@@ -691,6 +708,7 @@ public final class PublishRelay<Element>: ObservableType {
   // ...
 ```
 
+コードを見てみると、内部的にはonNextを呼んでいるので、特別なことはしていないというのがわかります。
 
 ### bind
 
@@ -822,7 +840,7 @@ Observable.zip(api1Observable, api2Observable)
   .disposed(by: disposeBag)
 ```
 
-# HotなObservableとColdなObservable
+## HotなObservableとColdなObservable
 
 これまでObservableとそれらを支える仕組みについて記載してきましたが、ObservableといってもHotなObservableとColdなObservableと２つの種類があります。
 
@@ -850,7 +868,7 @@ func myJust<E>(_ element: E) -> Observable<E> {
   }
 }
 
-myJust(100)
+_ = myJust(100)
   .subscribe(onNext: { value in
     print(value)
   })
@@ -862,5 +880,110 @@ subscribeメソッドと同様にobserverを引数にとり、disposableを返�
 
 振り返りTips: myJustはdisposed(by:)しなくても良い
 
-そうです、myJust関数はdisposed(by:)しなくても良いんです。コードをよく見てみましょう、onNextイベントを流したあとにonCompletedを流してますね
-ここで少し振り返ってみましょう。Observableの特徴としてonError、onCompletedイベントは１度しか流れず、その時点で購読を破棄するというのがありましたね、なのでdisposed(by:)しなくても良いということになります。
+あれ、そういえばdisposed関数呼んでないな？と思う方のために少し振り返ってみましょう。
+Observableの特徴としてonError、onCompletedイベントは１度しか流れず、その時点で購読を破棄するというのがありましたね。myJust関数内ではonNextイベントが送られたあと、onCompletedイベントを送っていますね。なのでdisposed(by:)しなくても良いということになります。
+
+# 簡単なアプリを作ってみよう！
+
+ここまではRxSwift/RxCocoaの概念や基本的な使い方について紹介してきましたが、ここからは実際にアプリを作りながら説明していきます。
+
+まずは簡単なアプリから作ってみましょう。
+とはいえ、いきなりRxSwiftでコードを書いても理解に時間がかかるかと思います。（自分はそうでした）
+
+なので、１つのテーマごとにcallbackやKVO、delegateで書かれたコードを最初に書いて、これをどうRxSwiftに置き換えるか？という観点でアプリを作っていきます。（本書のテーマである「比較して学ぶ」というのはこのことを指しています）
+
+では、作っていきましょう！テーマはこちら！
+
+## カウンターアプリ
+
+この節ではカウンターアプリをテーマにcallback、delegate、RxSwiftでどうかくかを書きます。
+まずはアプリの機能要件を決めます！
+
+### 機能要件
+
+- カウントの値が見れる
+- カウントアップができる
+- カウントダウンができる
+- リセットができる
+
+### アーキテクチャ
+
+- MVVM
+
+### 画面のイメージ
+
+image: counterappscreenshot.png
+
+### プロジェクトの作成
+
+まずはプロジェクトを作成します。ここは特別なことをやっていないのでサクサクといきます。
+
+image: create-project.png
+
+Xcodeを新規で起動して、 Create a new Xcode project を選択します。
+
+image: select-template.png
+
+テンプレートを選択します。 Single View App を選択
+
+image: project-name-settings.png
+
+プロジェクトの設定をします。 ここは各自好きなように設定してください。
+
+Nextボタンを押してプロジェクトの作成ができたら、一度Xcodeを終了します
+
+### 環境設定
+
+terminal.app を起動し、作成したプロジェクトのルートまで移動します
+
+```
+ryo-takahashi@~/CounterApp>
+```
+
+まず最初にRxSwift/RxCocoaライブラリの導入を行います。プロジェクト内で `pod init` を実行します。
+成功すると、ディレクトリ内に Podfile というファイルが生成されているのでこれを編集します。
+
+```
+vi Podfile
+```
+
+ファイルを開いたら、次のように編集してください。
+
+```
+# Uncomment the next line to define a global platform for your project          
+# platform :ios, '9.0'
+ 
+target 'CounterApp' do
+  # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
+  use_frameworks!
+ 
+  # Pods for CounterApp
+  pod 'RxSwift' # ★この行を追加
+  pod 'RxCocoa' # ★この行を追加
+ 
+end
+```
+
+編集して保存したら、導入のためインストール用コマンドを入力します。
+
+```
+pod install
+```
+
+次のような結果が出たら成功です。
+
+```
+Analyzing dependencies
+Downloading dependencies
+Installing RxCocoa (4.2.0)
+Installing RxSwift (4.2.0)
+Generating Pods project
+Integrating client project
+
+[!] Please close any current Xcode sessions and use `CounterApp.xcworkspace` for this project from now on.
+Sending stats
+Pod installation complete! There are 2 dependencies from the Podfile and 2 total pods installed.
+
+[!] Automatically assigning platform `ios` with version `11.4` on target `CounterApp` because no platform was specified. Please specify a platform for this target in your Podfile. See `https://guides.cocoapods.org/syntax/podfile.html#platform`.
+```
+
