@@ -988,6 +988,7 @@ Pod installation complete! There are 2 dependencies from the Podfile and 2 total
 ```
 
 環境設定はこれで完了です。
+
 次回以降プロジェクトを開く時は、必ず "YOUR_PROJECT_NAME.xcworkspace" から開くようにしましょう
 （*.xcworkspaceから開かないと導入したライブラリが使えません）
 
@@ -1004,8 +1005,82 @@ Storyboardは画面遷移の設定が簡単にできたり、パッと見るだ�
 Storyboardを廃止するために、次のことを行います
 
 - Main.storyboardの削除
-- Info.plishの設定
+- Info.plistの設定
 - AppDelegateの整理
 - ViewController.xibの作成
 
 ##### Main.storyboardの削除
+
+- CounterApp.xcworkspaceを開く
+- /CouterApp/Main.storyboardをDelete
+  - Move to Trashを選択
+
+##### Info.plist
+
+Info.plistにはデフォルトでMain.storyboardを使ってアプリを起動するような設定が書かれているので、それを削除します
+
+- Info.plistを開く
+- Main storyboard file base name の項目を削除する
+
+##### AppDelegateの整理
+
+Main.storyboardを削除したことによって、一番最初に起動するViewControllerの設定が失われ、アプリの起動が失敗するようになってしまったので、AppDelegateに一番最初に起動するViewControllerを設定します。
+
+- AppDelegate.swiftを開く
+
+```
+# AppDelegate.swift
+import UIKit
+
+@UIApplicationMain
+class AppDelegate: UIResponder, UIApplicationDelegate {
+    
+    var window: UIWindow?
+    
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        self.window = UIWindow(frame: UIScreen.main.bounds)
+        let navigationController = UINavigationController(rootViewController: ViewController())
+        self.window?.rootViewController = navigationController
+        self.window?.makeKeyAndVisible()
+        return true
+    }
+    
+}
+```
+
+##### ViewController.xibの作成
+
+Main.storyboardを削除してことによって一番最初に起動するViewControllerの画面のデータがなくなってしまったので作成します。
+
+- New File > View > Save As: ViewController.xib > Create
+- ViewController.xibを開く
+- Placeholders > File's Owner を選択
+- Class に ViewControllerを指定
+
+image: viewcontroller-filesowner.png
+
+- OutletsのviewとViewControllerのViewをつなげる
+
+image: viewcontroller-view-outlet.png
+
+これでアプリの起動ができるようになりました。Build & Run で確認してみましょう。
+
+次のような画面が出たら成功です。
+
+image: init-clearn-viewcontroller.png
+
+これで環境設定は終了です。
+今後画面を追加していくときは同様の手順で作成していきます。
+
+1. ViewController.swiftの作成
+2. ViewController.xibの作成
+3. ViewController.xibの設定
+  3-1. Classの指定
+  3-2. ViewのOutletの設定
+
+また、画面遷移をするときは非常に簡単で、次のように行えば遷移できます。
+
+```
+let viewController = ViewController()
+navigationController?.pushViewController(viewController, animated: true)
+```
