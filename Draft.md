@@ -1078,9 +1078,15 @@ image: init-clearn-viewcontroller.png
   3-1. Classの指定
   3-2. ViewのOutletの設定
 
-また、画面遷移をするときは非常に簡単で、次のように行えば遷移できます。
+Tips: 画面遷移
+
+ViewController.swift + ViewController.xib構成にしたことによって、ViewControllerの生成が楽になったことで画面遷移が少ない行で実装できるようになりました。次のコードで画面遷移を実装できます。
 
 ```
 let viewController = ViewController()
 navigationController?.pushViewController(viewController, animated: true)
 ```
+
+### CallBackで作るカウンターアプリ
+
+ようやくここから本題に入ります、
