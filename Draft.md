@@ -1089,4 +1089,134 @@ navigationController?.pushViewController(viewController, animated: true)
 
 ### CallBackで作るカウンターアプリ
 
-ようやくここから本題に入ります、
+ようやくここから本題に入ります、まずはViewController.swiftを整理しましょう
+
+- ViewController.swiftを開く
+- 次のように編集
+  - didReceiveMemoryWarningメソッドは特に使わないので削除します。
+
+```
+import UIKit
+
+class ViewController: UIViewController {
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+    }
+}
+```
+
+次に、画面を作成します。
+UIButton３つとUILabelを１つ配置しましょう
+
+image: counter-app-interfacebuilder.png
+
+UI部品の配置が終わったら、早速ViewControllerと繋げましょう。
+
+UILabelはIBOutlet、UIButtonはIBActionとして繋げます
+
+```
+import UIKit
+
+class ViewController: UIViewController {
+    
+    @IBOutlet weak var countLabel: UILabel!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+    }
+    
+    @IBAction func countUp(_ sender: Any) {
+    }
+    
+    @IBAction func countDown(_ sender: Any) {
+    }
+    
+    @IBAction func countReset(_ sender: Any) {
+    }
+}
+```
+
+次に、ViewModelを作ります。ViewModelには次の役割をもたせます
+
+- カウントデータの保持
+- カウントアップ、カウントダウン、カウントリセットの処理
+
+```
+class ViewModel {
+    private(set) var count = 0
+    
+    func incrementCount(callback: (Int) -> ()) {
+        count += 1
+        callback(count)
+    }
+    
+    func decrementCount(callback: (Int) -> ()) {
+        count -= 1
+        callback(count)
+    }
+    
+    func resetCount(callback: (Int) -> ()) {
+        count = 0
+        callback(count)
+    }
+}
+
+```
+
+ViewModelを作ったので、ViewControllerでViewModelを使うように修正と、IBActionの修正を行っていきます。
+
+```
+class ViewController: UIViewController {
+    
+    @IBOutlet weak var countLabel: UILabel!
+    
+    private var viewModel: ViewModel!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        viewModel = ViewModel()
+    }
+    
+    @IBAction func countUp(_ sender: Any) {
+        viewModel.incrementCount(callback: { [weak self] count in
+            self?.updateCountLabel(count)
+        })
+    }
+    
+    @IBAction func countDown(_ sender: Any) {
+        viewModel.decrementCount(callback: { [weak self] count in
+            self?.updateCountLabel(count)
+        })
+    }
+    
+    @IBAction func countReset(_ sender: Any) {
+        viewModel.resetCount(callback: { [weak self] count in
+            self?.updateCountLabel(count)
+        })
+    }
+    
+    private func updateCountLabel(_ count: Int) {
+        countLabel.text = String(count)
+    }
+}
+```
+
+これで、機能要件を満たすことができました。
+実際に Build & Run して確認してみましょう。
+
+callbackで書く場合の良いところと悪いところをまとめてみます。
+
+- 良い
+  - 記述が簡単
+- 悪い
+  - ボタンを増やすたびにボタンを押下時の処理メソッドが増えていく
+    - ラベルの場合も同様
+    - 画面が大きくなっていくにつれてメソッドが多くなり、コードが読みづらくなってくる
+  - ViewControllerとViewModelに分けたものの、完全にUIと処理の切り分けができているわけではない
+
+次に、delegateを使って実装してみましょう。
+
+delegateを使う場合、設計はMVPパターンのほうが実装しやすいので、
+MVPパターンに沿って実装していきます。
+
