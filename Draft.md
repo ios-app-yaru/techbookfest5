@@ -1080,7 +1080,8 @@ image: init-clearn-viewcontroller.png
 
 Tips: 画面遷移
 
-ViewController.swift + ViewController.xib構成にしたことによって、ViewControllerの生成が楽になったことで画面遷移が少ない行で実装できるようになりました。次のコードで画面遷移を実装できます。
+ViewController.swift + ViewController.xib構成にしたことによって、ViewControllerの生成が楽になりました。
+また、そのおかげで画面遷移が少ない行で実装できるようになりました。次のコードで画面遷移を実装できます。
 
 ```
 let viewController = ViewController()
@@ -1217,6 +1218,104 @@ callbackで書く場合の良いところと悪いところをまとめてみま
 
 次に、delegateを使って実装してみましょう。
 
-delegateを使う場合、設計はMVPパターンのほうが実装しやすいので、
+delegateを使う場合、設計はMVPパターンのほうが向いてるので、
 MVPパターンに沿って実装していきます。
 
+まずはDelegateを作ります
+
+```
+protocol CounterDelegate {
+    func updateCount(count: Int)
+}
+```
+
+次に、Presenterを作ります
+
+```
+class CounterPresenter {
+    private var count = 0 {
+        didSet {
+            delegate?.updateCount(count: count)
+        }
+    }
+    
+    private var delegate: CounterDelegate?
+    
+    func attachView(_ delegate: CounterDelegate) {
+        self.delegate = delegate
+    }
+    
+    func detachView() {
+        self.delegate = nil
+    }
+    
+    func incrementCount() {
+        count += 1
+    }
+    
+    func decrementCount() {
+        count -= 1
+    }
+    
+    func resetCount() {
+        count = 0
+    }
+}
+```
+
+最後に、ViewControllerを先程作成したPresenterを使うように修正するのと、Delegateをextensionするように修正しましょう
+
+```
+class ViewController: UIViewController {
+    
+    @IBOutlet weak var countLabel: UILabel!
+    
+    private let presenter = CounterPresenter()
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        presenter.attachView(self)
+    }
+    
+    @IBAction func countUp(_ sender: Any) {
+        presenter.incrementCount()
+    }
+    
+    @IBAction func countDown(_ sender: Any) {
+        presenter.decrementCount()
+    }
+    
+    @IBAction func countReset(_ sender: Any) {
+        presenter.resetCount()
+    }
+}
+
+extension ViewController: CounterDelegate {
+    func updateCount(count: Int) {
+        countLabel.text = String(count)
+    }
+}
+```
+
+Build ＆ Run してみましょう。callbackの場合と同じ動きをします。
+Delegateを使った書き方の良し悪しをまとめます。
+
+- 良い
+  - 処理を委譲できる
+  - incrementCount(), decrementCount(), resetCount()がデータの処理に集中できる
+    - callback(count)しなくてもよい
+- 悪い
+  - ボタンを増やすたびにメソッドが増えていく
+
+データを処理する関数が完全に処理に集中できるようになったのは良いことですが、まだボタンとメソッドの個数が１：１になっている問題が残っていて、このままアプリが大きくなっていくにつれてメソッドが多くなり、どのボタンの処理がどのメソッドの処理なのかパッと見た感じではわからなくなってしまいます。
+
+この問題はRxSwift/RxCocoaを使うことで解決できます。
+実際にRxSwiftを使って作ってみましょう。
+
+先程のPresenterとCounterProtocolはもう使わないので削除しても大丈夫です。
+
+まずはViewModelを作ります。
+
+```
+
+```
