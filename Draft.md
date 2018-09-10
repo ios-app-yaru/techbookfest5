@@ -1314,31 +1314,151 @@ Delegateを使った書き方の良し悪しをまとめます。
 
 先程のPresenterとCounterProtocolはもう使わないので削除しても大丈夫です。
 
-まずはViewModelを作ります。CallBackパターンでも作りましたが、紛らわしくならないように新しい名前で作り直します
+まずはViewModelを作るためのProtocolとInput用の構造体を作ります
 
 ```
-class RxViewModel {
-    let countRelay = BehaviorRelay<Int>(value: 0)
+// ViewModelと同じクラスファイルに定義したほうが良いかも（好みやチームの規約による）
+
+// ボタンの入力シーケンス
+struct RxViewModelInput {
+    let countUpButton: Observable<Void>
+    let countDownButton: Observable<Void>
+    let countResetButton: Observable<Void>
+}
+
+// ViewControllerに監視させる対象を定義
+protocol RxViewModelOutput {
+    var counterText: Driver<String> { get }
+}
+
+// ViewModelに継承させるprotocolを定義
+protocol RxViewModelType {
+    var outputs: RxViewModelOutput? { get }
+    init(input: RxViewModelInput)
+}
+```
+
+次にViewModelを作ります。CallBackパターンでも作りましたが、紛らわしくならないように新しい名前で作り直します
+
+```
+import RxSwift
+import RxCocoa
+
+class RxViewModel: RxViewModelType {
+    var outputs: RxViewModelOutput?
+    
+    private let countRelay = BehaviorRelay<Int>(value: 0)
     private let initialCount = 0
+    private let disposeBag = DisposeBag()
+    
+    required init(input: RxViewModelInput) {
+        self.outputs = self
+        resetCount()
 
-    init() {
-      resetCount()
+        input.countUpButton
+            .subscribe(onNext: { [weak self] in
+                self?.incrementCount()
+            })
+            .disposed(by: disposeBag)
+
+        input.countDownButton
+            .subscribe(onNext: { [weak self] in
+                self?.decrementCount()
+            })
+            .disposed(by: disposeBag)
+
+        input.countResetButton
+            .subscribe(onNext: { [weak self] in
+                self?.resetCount()
+            })
+            .disposed(by: disposeBag)
+        
     }
-
-    func incrementCount() {
+    
+    
+    private func incrementCount() {
         let count = countRelay.value + 1
         countRelay.accept(count)
     }
-
-    func decrementCount() {
+    
+    private func decrementCount() {
         let count = countRelay.value - 1
         countRelay.accept(count)
     }
-
-    func resetCount() {
+    
+    private func resetCount() {
         countRelay.accept(initialCount)
     }
-
+    
 }
 
+extension RxViewModel: RxViewModelOutput {
+    var counterText: SharedSequence<DriverSharingStrategy, String> {
+        let counterText = countRelay
+            .map {
+                "Rxパターン:\($0)"
+            }
+            .asDriver(onErrorJustReturn: "")
+        return counterText
+    }
+}
 ```
+
+ViewControllerも修正しましょう。全てのIBActionと接続を消してIBOutletを定義して接続しましょう。
+
+注意！！：ここでIBActionの接続解除・IBOutletの接続が正しくできていない場合、起動時にクラッシュするので、要注意！
+もしクラッシュしてしまう場合、ここを見直しましょう！
+
+```
+import RxSwift
+import RxCocoa
+
+class RxViewController: UIViewController {
+    
+    @IBOutlet weak var countLabel: UILabel!
+    @IBOutlet weak var countUpButton: UIButton!
+    @IBOutlet weak var countDownButton: UIButton!
+    @IBOutlet weak var countResetButton: UIButton!
+    
+    private let disposeBag = DisposeBag()
+    
+    var viewModel: RxViewModel!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupViewModel()
+    }
+    
+    private func setupViewModel() {
+        let input = RxViewModelInput(countUpButton: countUpButton.rx.tap.asObservable(), countDownButton: countDownButton.rx.tap.asObservable(), countResetButton: countResetButton.rx.tap.asObservable())
+        viewModel = RxViewModel(input: input)
+        
+        viewModel.outputs?.counterText
+            .drive(countLabel.rx.text)
+            .disposed(by: disposeBag)
+    }
+}
+```
+
+setupViewModel関数として切り出して定義してviewDidLoad()内で呼び出しています。
+ViewModelに完全に処理を任せたので、ViewControllerはIn/Outを木にするだけで良くなり、非常にシンプルになりました。
+
+この書き方についてまとめてみます。
+
+- 良い
+  - increment, decrement, resetがデータの処理に集中できる
+  - ViewModelはViewControllerのことを考えなくても良くなる
+    - 👉例: delegate?.updateCount(count: count) のようなデータの更新をViewControllerに伝えなくても良くなる
+      - データとUIを bind することでデータ更新時UI更新！を意識しなくても良くなる
+  - ViewControllerがIn/Outだけ気にすれば良くなった
+  - ViewModelに処理を集中
+  - ViewModelのInput,Outputからテストをかける
+- 悪い
+  - コード量が他パターンより多い
+  - 書き方に慣れるまで時間がかかる
+
+RxSwiftを使った場合の一番大きな良い点はやはり「ViewModelはViewControllerのことを考えなくてもよくなる」ところです。ViewControllerがViewModelの値を監視しているので、ViewControllerに値の変更を通知しなくても良くなります。
+
+次に、テストがかなりしやすくなりました。今まではViewControllerとViewModel（Presenter)が密になっていてテストが書きづらい状況でしたが、今回は完全に分離できたのでとても書きやすくなりました。
+やり方としてはViewModelをインスタンス化するときにInputを注入し、Outputを期待した通りになっているかテストするだけです。
+RxSwiftをうまーく使ってかけるようになると、更に開発を加速させることができます。
