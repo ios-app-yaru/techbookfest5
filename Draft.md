@@ -1314,8 +1314,31 @@ Delegateを使った書き方の良し悪しをまとめます。
 
 先程のPresenterとCounterProtocolはもう使わないので削除しても大丈夫です。
 
-まずはViewModelを作ります。
+まずはViewModelを作ります。CallBackパターンでも作りましたが、紛らわしくならないように新しい名前で作り直します
 
 ```
+class RxViewModel {
+    let countRelay = BehaviorRelay<Int>(value: 0)
+    private let initialCount = 0
+
+    init() {
+      resetCount()
+    }
+
+    func incrementCount() {
+        let count = countRelay.value + 1
+        countRelay.accept(count)
+    }
+
+    func decrementCount() {
+        let count = countRelay.value - 1
+        countRelay.accept(count)
+    }
+
+    func resetCount() {
+        countRelay.accept(initialCount)
+    }
+
+}
 
 ```
