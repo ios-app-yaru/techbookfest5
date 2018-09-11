@@ -994,6 +994,8 @@ Pod installation complete! There are 2 dependencies from the Podfile and 2 total
 
 ### 開発を加速させる設定
 
+★ このセクションは今後何度も使うので付箋やマーカーを引いておきましょう！
+
 この節では、節タイトルの通り開発を加速させる簡単な設定を行います。本書のテーマとは少しずれるので早足で進めます。
 具体的には、Storyboardを廃止して ViewController + Xib を使って開発する手法に切り替えます。
 
@@ -1216,6 +1218,8 @@ callbackで書く場合の良いところと悪いところをまとめてみま
     - 画面が大きくなっていくにつれてメソッドが多くなり、コードが読みづらくなってくる
   - ViewControllerとViewModelに分けたものの、完全にUIと処理の切り分けができているわけではない
 
+### Delegateで作るカウンターアプリ
+
 次に、delegateを使って実装してみましょう。
 
 delegateを使う場合、設計はMVPパターンのほうが向いてるので、
@@ -1311,6 +1315,8 @@ Delegateを使った書き方の良し悪しをまとめます。
 
 この問題はRxSwift/RxCocoaを使うことで解決できます。
 実際にRxSwiftを使って作ってみましょう。
+
+### RxSwiftで作るカウンターアプリ
 
 先程のPresenterとCounterProtocolはもう使わないので削除しても大丈夫です。
 
@@ -1441,24 +1447,120 @@ class RxViewController: UIViewController {
 ```
 
 setupViewModel関数として切り出して定義してviewDidLoad()内で呼び出しています。
-ViewModelに完全に処理を任せたので、ViewControllerはIn/Outを木にするだけで良くなり、非常にシンプルになりました。
 
 この書き方についてまとめてみます。
 
 - 良い
-  - increment, decrement, resetがデータの処理に集中できる
-  - ViewModelはViewControllerのことを考えなくても良くなる
-    - 👉例: delegate?.updateCount(count: count) のようなデータの更新をViewControllerに伝えなくても良くなる
-      - データとUIを bind することでデータ更新時UI更新！を意識しなくても良くなる
-  - ViewControllerがIn/Outだけ気にすれば良くなった
-  - ViewModelに処理を集中
-  - ViewModelのInput,Outputからテストをかける
+  - ViewController
+    - スッキリした
+    - Input/Outputだけ気にすれば良くなった
+  - ViewModel
+    - 処理を集中できた
+    - increment, decrement, resetがデータの処理に集中できた
+    - ViewControllerのことを意識しなくても良い
+      - 👉例: delegate?.updateCount(count: count) のようなデータの更新をViewControllerに伝えなくても良い
+  - テストがかきやすくなった
 - 悪い
   - コード量が他パターンより多い
   - 書き方に慣れるまで時間がかかる
 
-RxSwiftを使った場合の一番大きな良い点はやはり「ViewModelはViewControllerのことを考えなくてもよくなる」ところです。ViewControllerがViewModelの値を監視しているので、ViewControllerに値の変更を通知しなくても良くなります。
+RxSwiftを使った場合の一番大きな良い点はやはり「ViewModelはViewControllerのことを考えなくてもよくなる」ところです。ViewControllerがViewModelの値を監視して変更があったらUIを自動で変更するため、ViewModel側から値が変わったよ！と通知する必要がなくなるのです。
 
-次に、テストがかなりしやすくなりました。今まではViewControllerとViewModel（Presenter)が密になっていてテストが書きづらい状況でしたが、今回は完全に分離できたのでとても書きやすくなりました。
-やり方としてはViewModelをインスタンス化するときにInputを注入し、Outputを期待した通りになっているかテストするだけです。
-RxSwiftをうまーく使ってかけるようになると、更に開発を加速させることができます。
+次に、テストが書きやすくなりました。今まではViewControllerとViewModel（Presenter)が密になっていてテストが書きづらい状況でしたが、今回は分離ができたのでとても書きやすくなりました。
+やり方としてはViewModelをインスタンス化するときにInputを注入し、Outputを期待した通りになっているかのテストを書く感じになります。
+
+ですが、この方法は慣れるまで時間がかかるかと思います。まずはUIButton.rx.tapだけ使う、PublishSubject系だけを使う・・・など小さく始めるのもありかと思います。
+個人開発のアプリであれば全リプレースにチャレンジしてみても面白いかもしれませんが、業務で使うアプリでチームメンバーのほとんどがRxSwiftに慣れていない場合、キャッチアップで手一杯になって逆に開発効率が落ちることもありえるのでちゃんとチームメンバーと相談しましょう！
+
+## WKWebViewを使ったアプリ
+
+この章ではKVOの実装パターンをRxSwiftに置き換える方法について学びます。
+
+### この章のストーリー
+
+- WKWebView+KVOを使ったアプリを作る
+- WKWebView+RxSwiftに書き換える
+
+### 作るアプリのイメージ
+
+image: wkwebview1.png
+image: wkwebview2.png
+image: wkwebview3.png
+
+### WKWebView+KVOで作るWebViewアプリ
+
+設定はサクサクと進んでいきましょう、まずはプロジェクトを新しく作ります。
+
+- プロジェクトの作成
+  - Template: Single View App
+  - Product Name: WebViewExample
+- 一度Xcodeを閉じる
+- Terminal.appでプロジェクトのディレクトリへ移動する
+- `pod init`
+- `Podfile` に `RxSwift`と`RxCocoa`を追加する
+- `pod install`
+- `WebViewExample.xcworkspace`を開く
+
+開発を加速させる設定をする
+
+- Info.plishの編集
+  - Main storyboard file base name項目を削除
+- Main.storyboardの削除
+- AppDelegateの修正
+
+```
+import UIKit
+
+@UIApplicationMain
+class AppDelegate: UIResponder, UIApplicationDelegate {
+    
+    var window: UIWindow?
+    
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        self.window = UIWindow(frame: UIScreen.main.bounds)
+        let navigationController = UINavigationController(rootViewController: ViewController())
+        self.window?.rootViewController = navigationController
+        self.window?.makeKeyAndVisible()
+        return true
+    }
+    
+}
+```
+
+- ViewController.xibの作成
+- １度 Build & Run で実行できるか確認
+
+ここまでで設定完了です。
+次に画面の雛形と遷移だけ先に実装しておきます。
+
+- ここで作るものまとめ
+  - KVOExampleViewController.swift
+  - KVOExampleViewController.xib
+  - RxExampleViewController.swift
+  - RxExampleViewController.xib
+
+- KVOExampleViewController.swiftの作成
+
+```
+import UIKit
+class KVOExampleViewController: UIViewController {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+    }
+}
+```
+
+- KVOExampleViewController.xibの作成
+- RxExampleViewController.swiftの作成
+
+```
+import UIKit
+class RxExampleViewController: UIViewController {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+    }
+}
+```
+
+- RxExampleViewController.xibの作成
+
