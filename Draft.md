@@ -1478,89 +1478,82 @@ RxSwiftを使った場合の一番大きな良い点はやはり「ViewModelはV
 
 ### この章のストーリー
 
-- WKWebView+KVOを使ったアプリを作る
+- WKWebView+KVOを使ったWebViewアプリを作成
 - WKWebView+RxSwiftに書き換える
 
-### 作るアプリのイメージ
+### イメージ
 
 image: wkwebview1.png
 image: wkwebview2.png
 image: wkwebview3.png
 
-### WKWebView+KVOで作るWebViewアプリ
+WebViewとProgressViewを配置して、Webページの読み込みに合わせてゲージ、インジケータ、Navigationタイトルを変更する機能を作ります。
 
-設定はサクサクと進んでいきましょう、まずはプロジェクトを新しく作ります。
-
-- プロジェクトの作成
-  - Template: Single View App
-  - Product Name: WebViewExample
-- 一度Xcodeを閉じる
-- Terminal.appでプロジェクトのディレクトリへ移動する
-- `pod init`
-- `Podfile` に `RxSwift`と`RxCocoa`を追加する
-- `pod install`
-- `WebViewExample.xcworkspace`を開く
-
-開発を加速させる設定をする
-
-- Info.plishの編集
-  - Main storyboard file base name項目を削除
-- Main.storyboardの削除
-- AppDelegateの修正
+サクっといきましょう。KVOで実装した場合、次のコードになります。
 
 ```
 import UIKit
+import WebKit
 
-@UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
-    
-    var window: UIWindow?
-    
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        self.window = UIWindow(frame: UIScreen.main.bounds)
-        let navigationController = UINavigationController(rootViewController: ViewController())
-        self.window?.rootViewController = navigationController
-        self.window?.makeKeyAndVisible()
-        return true
+class WKWebViewController: UIViewController {
+  @IBOutlet weak var webView: WKWebView!
+  @IBOutlet weak var progressView: UIProgressView!
+
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    setupWebView()
+  }
+
+  private func setupWebView() {
+    // webView.isLoadingの値の変化を監視
+    webView.addObserver(self, forKeyPath: "loading", options: .new, context: nil)
+    // webView.estimatedProgressの値の変化を監視
+    webView.addObserver(self, forKeyPath: "estimatedProgress", options: .new, context: nil)
+
+    let url = URL(string: "https://www.google.com/")
+    let urlRequest = URLRequest(url: url!)
+    webView.load(urlRequest)
+    progressView.setProgress(0.1, animated: true)
+  }
+
+  deinit {
+    // 監視を解除
+    webView?.removeObserver(self, forKeyPath: "loading")
+    webView?.removeObserver(self, forKeyPath: "estimatedProgress")
+  }
+
+  override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+    if keyPath == "loading" {
+      UIApplication.shared.isNetworkActivityIndicatorVisible = webView.isLoading
+      if !webView.isLoading {
+        // ロード完了時にProgressViewの進捗を0.0(非表示)にする
+        progressView.setProgress(0.0, animated: false)
+        // ロード完了時にNavigationTitleに読み込んだページのタイトルをセット
+        navigationItem.title = webView.title
+      }
     }
-    
+    if keyPath == "estimatedProgress" {
+      // ProgressViewの進捗状態を更新
+      progressView.setProgress(Float(webView.estimatedProgress), animated: true)
+    }
+  }
 }
 ```
 
-- ViewController.xibの作成
-- １度 Build & Run で実行できるか確認
+KVO（Key-Value Observing:キー値監視）とは、特定のオブジェクトのプロパティ値の変化を監視する仕組みです。KVOをSwiftで使うためにはそのオブジェクトのプロパティに @objc属性とdynamicをつけなくてはいけません。
 
-ここまでで設定完了です。
-次に画面の雛形と遷移だけ先に実装しておきます。
+ですが、WKWebViewにはtitle, url, estimatedProgressなどKVOに対応したプロパティがあるので今回はそれを使っています。
 
-- ここで作るものまとめ
-  - KVOExampleViewController.swift
-  - KVOExampleViewController.xib
-  - RxExampleViewController.swift
-  - RxExampleViewController.xib
+では実際コード内で何をしているかというと、viewDidLoad()時にwebViewの値を監視させて、値が変更されたときにUIを更新させています。
 
-- KVOExampleViewController.swiftの作成
+addObserverの引数にプロパティ名を渡すとその値が変化された時に `observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?)` が呼ばれるようになります。
 
-```
-import UIKit
-class KVOExampleViewController: UIViewController {
-    override func viewDidLoad() {
-        super.viewDidLoad()
-    }
-}
-```
+observeValueのkeyPathにはaddObserverで設定したforKeyPathの値が流れてくるので、その値で条件分岐してUIを更新します。
 
-- KVOExampleViewController.xibの作成
-- RxExampleViewController.swiftの作成
+ただ、全ての通知をobserveValueで受け取って条件分岐するため、段々とobserveValueメソッドが肥大化していく問題があります。
 
-```
-import UIKit
-class RxExampleViewController: UIViewController {
-    override func viewDidLoad() {
-        super.viewDidLoad()
-    }
-}
-```
+KVOを使った場合の注意点として、addObserverした場合、deinit時にremoveObserverを呼ばないとアプリが強制終了する可能性があります。忘れずにremoveObserverを呼びましょう。
 
-- RxExampleViewController.xibの作成
+とはいえ、removeObserverを呼ぼうと注意していても人間は忘れます、それにクラスが大きくなってくるとなおさらremoveObserverを呼ぶのを忘れます。
 
+こういった問題はRxSwiftがまるまるっと解決してくれます！！
