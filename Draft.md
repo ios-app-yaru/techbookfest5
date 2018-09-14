@@ -1681,12 +1681,89 @@ Observable<String?>
 文章で説明するより、まずは次のコードを見てください。
 
 ```
+    let text = textField.rx.text
+        .map { text -> String in
+            print("call")
+            return "☆☆\(text)☆☆"
+        }
 
+    text
+        .bind(to: label1.rx.text)
+        .disposed(by: disposeBag)
+
+    text
+        .bind(to: label2.rx.text)
+        .disposed(by: disposeBag)
+
+    text
+        .bind(to: label3.rx.text)
+        .disposed(by: disposeBag)
 ```
 
-通常のObservableはsubscribeした時点で計算リソースが割当られるため、複数回subscribeするとその都度ストリームが生成される仕組みになっています。
+上記のコードはUITextFieldであるtextFieldへのテキスト入力を監視し、値を複数のLabelへbind、リアルタイムで入力したテキストをラベルへ反映する仕組みを実装するコードです。
 
-３回subscribeした場合、３個のストリームが生成されます。するとどうなるかというと、subscribeしている値が１回変更されたとき、それぞれのsubscribe
+ここでtextFieldへ「123」と入力した場合、print("call")は何回呼ばれるか予想してみましょう。
+パッと見た感じだと、3回入力するので3回出力するのでは？と思いがちですが実際は違います。実行して試してみましょう！
+
+```
+call
+call
+call
+call
+call
+call
+call
+call
+call
+```
+
+callは９回呼ばれます。なるほど？
+値を入力するたびにmap関数が３回呼ばれてますね。これはいけない。
+今回のように値を変換したりprint出力するだけならそれほどパフォーマンスに影響はありませんが、データベースアクセスするものや、通信処理が発生するものではこの動作は好ましくありません。
+
+では、なぜこの現象が起こるのか？
+その前に、textField.rx.textが何なのかを紐解いて見ましょう。
+
+textField.rx.textはRxCocoaでextension定義されているプロパティで、Observable<String?>ではなく、ControlProperty<String?>として定義されています。（が、実態はObservableです）
+ControlPropertyは主にUI要素のプロパティで使われていて、メインスレッドで値が購読されることを保証しています。
+また、これはColdなObservableです。
+ColdなObservableの仕様として、subscribeした時点で計算リソースが割当られ、複数回subscribeするとその都度ストリームが生成されるという仕組みがあります。
+
+今回の場合、３回subscribe(bind)したので、３個のストリームが生成されます。
+するとどうなるかというと、値が変更されたときにOperatorが３回実行されてしまうようになります。
+
+このままではまずいので、どうにかして何回購読してもOperatorを１回実行で済むように実装したいです。
+では、どうすればよいのかというと、HotなObservableに変換してあげると良いです。
+
+やりかたはいくつかあるのですが、今回は share() というOperatorを使います。実際のコードは次の通りです。
+
+```
+// これを
+let text = textField.rx.text
+    .map { text -> String in
+        print("call")
+        return "☆☆\(text)☆☆"
+    }
+// こうしましょう
+let text = textField.rx.text
+    .map { text -> String in
+        print("call")
+        return "☆☆\(text)☆☆"
+    }
+    .share() // ☆追加
+```
+
+Build & Run を実行してもう一度「１２３」とテキストに入力してみましょう。
+出力結果が次のようになっていたら成功です。
+
+```
+call
+call
+call
+```
 
 - observeOn
+
+
+
 - MainScheduler.instance
