@@ -1764,6 +1764,135 @@ call
 
 - observeOn
 
-
+subscribe内で処理を行うスレッドを指定するOperatorです。
+引数には「ImmediateSchedulerType」プロトコルに準拠したクラスを指定します。
 
 - MainScheduler.instance
+
+MainSchedulerのシングルトンインスタンスを指定しています。
+observeOnの引数にMainSchedulerのシングルトンインスタンスを渡してあげると、その先のOperatorはメインスレッドで処理してくれるようになります。
+
+説明が長くなりましたが、本題に戻りましょう。
+KVOで書いた処理をRxSwiftに置き換えてみた結果、かなり読みやすくなりましたね。
+
+特に、removeObserverを気にしなくてもよくなるのはだいぶ安全になりますね。
+というよりは、RxSwiftの場合はremoveObserverの役割が「.disposed(by:)」に変わったイメージのほうがわかりやすいかもしれません。
+disposed(by:) を結局呼ばないといけないのなら、そんなに変わらなくね？と思うかもしれませんが、RxSwiftではWarningが出るのでremoveObserverだったころより忘れる確率は低くなります。
+
+しかし、この方法ではKey値がベタ書きになっていることと、値の型を指定してあげないといけないという問題も残っています。
+もっと使いやすくするように自分でextensionを定義するのもアリですが、
+実はもっと便利にWKWebViewを扱える「RxWebKit」というRxSwift拡張ライブラリがあるので、それを使ってみましょう。
+
+Podfileを編集します
+
+```
+  pod 'RxSwift'
+  pod 'RxCocoa'
+  pod 'RxOptional'
+  pod 'RxWebKit'
+```
+
+ライブラリをインストールします。
+
+```
+pod install
+```
+
+先程書いたRxSwiftパターンのコードを次のコードに書き換えてみましょう！
+
+```
+import UIKit
+import WebKit
+import RxSwift
+import RxCocoa
+import RxOptional
+import RxWebKit
+
+class RxWebkitViewController: UIViewController {
+    @IBOutlet weak var webView: WKWebView!
+    @IBOutlet weak var progressView: UIProgressView!
+
+    private let disposeBag = DisposeBag()
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupWebView()
+    }
+
+    private func setupWebView() {
+
+        // プログレスバーの表示制御、ゲージ制御、アクティビティインジケータ表示制御で使うため、一旦オブザーバを定義
+        let loadingObservable = webView.rx.loading
+            .share()
+
+        // プログレスバーの表示・非表示
+        loadingObservable
+            .map { return !$0 }
+            .observeOn(MainScheduler.instance)
+            .bind(to: progressView.rx.isHidden)
+            .disposed(by: disposeBag)
+
+        // iPhoneの上部の時計のところのバーの（名称不明）アクティビティインジケータ表示制御
+        loadingObservable
+            .bind(to: UIApplication.shared.rx.isNetworkActivityIndicatorVisible)
+            .disposed(by: disposeBag)
+
+        // NavigationControllerのタイトル表示
+        webView.rx.title
+            .filterNil()
+            .observeOn(MainScheduler.instance)
+            .bind(to: navigationItem.rx.title)
+            .disposed(by: disposeBag)
+
+        // プログレスバーのゲージ制御
+        webView.rx.estimatedProgress
+            .map { return Float($0) }
+            .observeOn(MainScheduler.instance)
+            .bind(to: progressView.rx.progress)
+            .disposed(by: disposeBag)
+
+
+        let url = URL(string: "https://www.google.com/")
+        let urlRequest = URLRequest(url: url!)
+        webView.load(urlRequest)
+    }
+}
+```
+
+Build & Run で実行してみましょう。全く同じ動作であれば成功です。
+RxWebKitを使ったことで更に可動性がよくなりました。
+
+RxWebKitはその名前の通り、WebKitをRxSwiftで使いやすくしてくれるように拡張定義しているラッパーライブラリです。
+これを使うことで、「Keyのべた書き」と「値の型指定」問題がなくなりました。感謝です。
+
+RxWebKitには他にもcanGoBack()、canGoForward()に対してsubscribeすることもできるので、色々な用途に使えそうですね。
+
+## Github Search サンプルアプリ
+
+# 次のステップ
+
+- RxSwiftを使って何かアプリを作ってみる
+- 技術書を書く
+- ブログやQiita等にアウトプットする
+- 仕事で使っているアプリに導入してみる
+
+## 学習方法
+
+- 自分の勉強方法を書く
+  - アプリを作った
+  - 仕事でRxSwift+MVVMのコードを書いた
+- アウトプットが大事
+  - この本を書きはじめた時はフワっとした理解だったけど本として体系的にまとめているうちに知識が定着してきた
+  - 深いところも少し知ることができた
+
+## コミュニティ
+
+- RxSwift Slack
+- iOSアプリ開発がんばるぞ！！の会
+- iOSDC
+- try! Swift
+
+# 様々なRxSwift系ライブラリ
+## RxOptional
+## RxWebkit
+## RxDataSources
