@@ -1,3 +1,67 @@
+
+# 目次
+
+- はじめに 01-getting-started
+  - 対象読者
+  - 必須知識
+  - 推奨知識
+  - 想定環境
+  - お問い合わせ先
+  - 免責事項
+- iOSアプリ開発とSwift 02-ios-dev-swift
+- RxSwift入門 03-rxswift-description
+  - 覚えておきたい用語と１業概要
+  - RxSwiftって何？
+  - ReactiveExtensionって何？
+    - 思想
+    - 歴史
+  - iOSアプリ開発とSwift
+  - RxSwiftとは　概要
+  - RxSwiftの特徴
+  - RxSwiftで何が解決できる？
+  - 導入事例
+- RxSwiftの導入 04-rxswift-install
+  - 導入要件
+  - 導入方法
+- 基本的な書き方 05-rxswift-documents
+  - メソッドチェーンのように直感的に書ける
+  - Hello world
+  - よく使われるクラス・メソッドについて
+    - Observable
+    - Dispose
+    - Subject, Relay
+    - bind
+    - Operator
+  - HotなObservableとColdなObservable
+- 簡単なアプリを作ってみよう！ 06-rxswift-tutorial
+  - カウンターアプリ
+    - プロジェクトの作成
+    - 環境設定
+    - callback
+    - delegate
+    - RxSwift
+  - WKWebViewを使ったアプリ
+    - KVO
+    - RxSwift
+    - RxWebkit
+- Githubリポジトリ検索アプリを作ってみよう！ 07-rxswift-hyper-example
+  - アプリの概要
+    - 機能要件
+    - 画面イメージ
+  - リポジトリの作成
+  - xibで動くようにする
+  - APIモデルを作る
+- 次のステップ 08-next-step
+  - 学習方法
+  - コミュニティ
+- 様々なRxSwift系ライブラリ 09-other-extensions-library
+  - RxOptional
+  - RxWebkit
+  - RxDataSources
+- 補足＆Tips 10-rxswift-tips
+  - 参考URL・ドキュメント
+
+
 # はじめに
 
 この本を手にとって頂き、ありがとうございます。本書では、「比較して学ぶ」をテーマにしてCallBack、Delegate、KVOパターン等と比較しながら、RxSwiftの基礎知識、アプリのパーツとしてどう書くかについて解説していきます。
@@ -12,7 +76,7 @@ RxSwiftについて学ぶ時、Google検索で調べて技術ブログやQiita�
 
 ## 対象読者
 
-本書は次の読者を対象として作成しています。 
+本書は次の読者を対象として作成しています。
 
 - プログラミング歴1年以上（種類問わず）
 - Swift による iOS アプリの開発経験が少しだけある（3ヶ月〜1年未満）
@@ -62,66 +126,6 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 
-# 目次
-
-- はじめに
-  - 対象読者
-  - 必須知識
-  - 推奨知識
-  - 想定環境
-  - お問い合わせ先
-  - 免責事項
-- 目次
-- iOSアプリ開発とSwift
-- RxSwift入門
-  - 覚えておきたい用語と１業概要
-  - RxSwiftって何？
-  - ReactiveExtensionって何？
-    - 思想
-    - 歴史
-  - iOSアプリ開発とSwift
-  - RxSwiftとは　概要
-  - RxSwiftの特徴
-  - RxSwiftで何が解決できる？
-  - 導入事例
-- RxSwiftの導入
-  - 導入要件
-  - 導入方法
-- 基本的な書き方
-  - メソッドチェーンのように直感的に書ける
-  - Hello world
-  - よく使われるクラス・メソッドについて
-    - Observable
-    - Dispose
-    - Subject, Relay
-    - bind
-    - Operator
-  - HotなObservableとColdなObservable
-- 簡単なアプリを作ってみよう！
-  - カウンターアプリ
-    - プロジェクトの作成
-    - 環境設定
-    - callback
-    - delegate
-    - RxSwift
-  - WKWebViewを使ったアプリ
-    - KVO
-    - RxSwift
-    - RxWebkit
-- Githubリポジトリ検索アプリを作ってみよう！
-  - アプリの概要
-    - 機能要件
-    - 画面イメージ
-  - リポジトリの作成
-  - xibで動くようにする
-  - APIモデルを作る
-- 次のステップ
-  - 学習方法
-  - コミュニティ
-- 様々なRxSwift系ライブラリ
-  - RxOptional
-  - RxWebkit
-  - RxDataSources
 
 # iOSアプリ開発とSwift
 
@@ -212,9 +216,9 @@ simpletap2.png
 
 ```
 class SimpleTapViewController: UIViewController {
-    
+
     @IBOutlet weak var messageLabel: UILabel!
-    
+
     @IBAction func buttonTap(_ sender: Any) {
         messageLabel.text = "Changed!!"
     }
@@ -234,12 +238,12 @@ import RxSwift
 import RxCocoa
 
 class SimpleTapViewController: UIViewController {
-    
+
     @IBOutlet weak var tapButton: UIButton!
     @IBOutlet weak var messageLabel: UILabel!
-    
+
     private let disposeBag = DisposeBag()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         tapButton.rx.tap
@@ -270,20 +274,20 @@ simpletextfieldlabelexample1.png
 
 ```
 class ExampleViewController: UIViewController {
-    
+
     @IBOutlet weak var nameField: UITextField!
     @IBOutlet weak var nameLabel: UILabel!
-    
+
     @IBOutlet weak var addressField: UITextField!
     @IBOutlet weak var addressLabel: UILabel!
 
     let maxNameFieldSize = 10
     let maxAddressFieldSize = 50
-    
+
     let limitText: (Int) -> String = {
         return "あと\($0)文字"
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         nameField.addTarget(self, action: #selector(nameFieldEditingChanged(sender:)), for: .editingChanged)
@@ -295,7 +299,7 @@ class ExampleViewController: UIViewController {
         let limitCount = maxNameFieldSize - changedText.count
         nameLabel.text = limitText(limitCount)
     }
-    
+
     @objc func addressFieldEditingChanged(sender: UITextField) {
         guard let changedText = sender.text else { return }
         let limitCount = maxAddressFieldSize - changedText.count
@@ -316,14 +320,14 @@ import RxSwift
 import RxCocoa
 
 class RxExampleViewController: UIViewController {
-    
+
     // フィールド宣言は全く同じなので省略
-    
+
     private let disposeBag = DisposeBag()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         nameField.rx.text
             .map { [weak self] text -> String? in
                 guard let text = text else { return nil }
@@ -335,7 +339,7 @@ class RxExampleViewController: UIViewController {
             .observeOn(MainScheduler.instance)
             .bind(to: nameLabel.rx.text)
             .disposed(by: disposeBag)
-        
+
         addressField.rx.text
             .map { [weak self] text -> String? in
                 guard let text = text else { return nil }
@@ -439,7 +443,7 @@ RxSwift/RxCocoaは、メソッドチェーンのように直感的に書くこ�
 
 ```
 hogeButton.rx.tap
-  .subscribe(onNext: { [weak self] in 
+  .subscribe(onNext: { [weak self] in
     // 処理
   })
   .disposed(by: disposeBag)
@@ -501,22 +505,22 @@ Subjectを使った書き方はよく使われます。例えば、ViewControlle
 
 ```
 class HogeViewController: UIViewController {
-    
+
   private let disposeBag = DisposeBag()
-  
+
   var viewModel: HogeViewModel!
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    
+
     viewModel = HogeViewModel()
-    
+
     viewModel.helloWorldSubject
       .subscribe(onNext: { [weak self] value in
         print("value = \(value)")
       })
       .disposed(by: disposeBag)
-    
+
     viewModel.updateItem()
   }
 
@@ -524,7 +528,7 @@ class HogeViewController: UIViewController {
 
 class HogeViewModel {
   let helloWorldSubject = PublishSubject<String>()
-  
+
   func updateItem() {
     helloWorldSubject.onNext("Hello World!")
     helloWorldSubject.onNext("Hello World!!")
@@ -575,7 +579,7 @@ Observableに流れるイベントには次の種類あります。
 
 ```
 hogeSubject
-  .subscribe(onNext: { 
+  .subscribe(onNext: {
     print("next")
   }, onError: {
     print("error")
@@ -596,7 +600,7 @@ Tips: ObservableとObserver
 ```
 hogeObservable // Observable (イベント発生元)
   .map { $0 * 2 } // Observable (イベント発生元)
-  .subscribe(onNext: { 
+  .subscribe(onNext: {
     // Observer(イベント処理)
   })
   .disposed(by: disposeBag)
@@ -631,7 +635,7 @@ class HogeViewController {
     hogeButton.rx.tap
       .subscribe(onNext: { // .. })
       .disposed(by: disposeBag)
-    
+
     fooButton.rx.tap
       .subscribe(onNext: { // .. })
       .disposed(by: disposeBag)
@@ -719,12 +723,12 @@ public final class PublishRelay<Element>: ObservableType {
   public typealias E = Element
 
   private let _subject: PublishSubject<Element>
-  
+
   // Accepts `event` and emits it to subscribers
   public func accept(_ event: Element) {
     _subject.onNext(event)
   }
-  
+
   // ...
 ```
 
@@ -755,7 +759,7 @@ nameTextField.rx.text
 
 // ②subscribeを利用
 nameTextField.rx.text
-  .subscribe(onNext: { [weak self] text in 
+  .subscribe(onNext: { [weak self] text in
     nameLabel.text = text
   })
   .disposed(by: disposeBag)
@@ -853,7 +857,7 @@ showUserNameButton.rx.tap
 
 ```
 Observable.zip(api1Observable, api2Observable)
-  .subscribe(onNext { (api1, api2) in 
+  .subscribe(onNext { (api1, api2) in
     // ↑タプルとして受け取ることができます
     //...
   })
@@ -972,15 +976,15 @@ vi Podfile
 ```
 # Uncomment the next line to define a global platform for your project          
 # platform :ios, '9.0'
- 
+
 target 'CounterApp' do
   # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
   use_frameworks!
- 
+
   # Pods for CounterApp
   pod 'RxSwift' # ★この行を追加
   pod 'RxCocoa' # ★この行を追加
- 
+
 end
 ```
 
@@ -1056,9 +1060,9 @@ import UIKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    
+
     var window: UIWindow?
-    
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         self.window = UIWindow(frame: UIScreen.main.bounds)
         let navigationController = UINavigationController(rootViewController: ViewController())
@@ -1066,7 +1070,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window?.makeKeyAndVisible()
         return true
     }
-    
+
 }
 ```
 
@@ -1142,19 +1146,19 @@ UILabelはIBOutlet、UIButtonはIBActionとして繋げます
 import UIKit
 
 class ViewController: UIViewController {
-    
+
     @IBOutlet weak var countLabel: UILabel!
 
     override func viewDidLoad() {
         super.viewDidLoad()
     }
-    
+
     @IBAction func countUp(_ sender: Any) {
     }
-    
+
     @IBAction func countDown(_ sender: Any) {
     }
-    
+
     @IBAction func countReset(_ sender: Any) {
     }
 }
@@ -1168,17 +1172,17 @@ class ViewController: UIViewController {
 ```
 class ViewModel {
     private(set) var count = 0
-    
+
     func incrementCount(callback: (Int) -> ()) {
         count += 1
         callback(count)
     }
-    
+
     func decrementCount(callback: (Int) -> ()) {
         count -= 1
         callback(count)
     }
-    
+
     func resetCount(callback: (Int) -> ()) {
         count = 0
         callback(count)
@@ -1191,34 +1195,34 @@ ViewModelを作ったので、ViewControllerでViewModelを使うように修正
 
 ```
 class ViewController: UIViewController {
-    
+
     @IBOutlet weak var countLabel: UILabel!
-    
+
     private var viewModel: ViewModel!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         viewModel = ViewModel()
     }
-    
+
     @IBAction func countUp(_ sender: Any) {
         viewModel.incrementCount(callback: { [weak self] count in
             self?.updateCountLabel(count)
         })
     }
-    
+
     @IBAction func countDown(_ sender: Any) {
         viewModel.decrementCount(callback: { [weak self] count in
             self?.updateCountLabel(count)
         })
     }
-    
+
     @IBAction func countReset(_ sender: Any) {
         viewModel.resetCount(callback: { [weak self] count in
             self?.updateCountLabel(count)
         })
     }
-    
+
     private func updateCountLabel(_ count: Int) {
         countLabel.text = String(count)
     }
@@ -1262,25 +1266,25 @@ class CounterPresenter {
             delegate?.updateCount(count: count)
         }
     }
-    
+
     private var delegate: CounterDelegate?
-    
+
     func attachView(_ delegate: CounterDelegate) {
         self.delegate = delegate
     }
-    
+
     func detachView() {
         self.delegate = nil
     }
-    
+
     func incrementCount() {
         count += 1
     }
-    
+
     func decrementCount() {
         count -= 1
     }
-    
+
     func resetCount() {
         count = 0
     }
@@ -1291,24 +1295,24 @@ class CounterPresenter {
 
 ```
 class ViewController: UIViewController {
-    
+
     @IBOutlet weak var countLabel: UILabel!
-    
+
     private let presenter = CounterPresenter()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         presenter.attachView(self)
     }
-    
+
     @IBAction func countUp(_ sender: Any) {
         presenter.incrementCount()
     }
-    
+
     @IBAction func countDown(_ sender: Any) {
         presenter.decrementCount()
     }
-    
+
     @IBAction func countReset(_ sender: Any) {
         presenter.resetCount()
     }
@@ -1372,11 +1376,11 @@ import RxCocoa
 
 class RxViewModel: RxViewModelType {
     var outputs: RxViewModelOutput?
-    
+
     private let countRelay = BehaviorRelay<Int>(value: 0)
     private let initialCount = 0
     private let disposeBag = DisposeBag()
-    
+
     required init(input: RxViewModelInput) {
         self.outputs = self
         resetCount()
@@ -1398,24 +1402,24 @@ class RxViewModel: RxViewModelType {
                 self?.resetCount()
             })
             .disposed(by: disposeBag)
-        
+
     }
-    
-    
+
+
     private func incrementCount() {
         let count = countRelay.value + 1
         countRelay.accept(count)
     }
-    
+
     private func decrementCount() {
         let count = countRelay.value - 1
         countRelay.accept(count)
     }
-    
+
     private func resetCount() {
         countRelay.accept(initialCount)
     }
-    
+
 }
 
 extension RxViewModel: RxViewModelOutput {
@@ -1440,25 +1444,25 @@ import RxSwift
 import RxCocoa
 
 class RxViewController: UIViewController {
-    
+
     @IBOutlet weak var countLabel: UILabel!
     @IBOutlet weak var countUpButton: UIButton!
     @IBOutlet weak var countDownButton: UIButton!
     @IBOutlet weak var countResetButton: UIButton!
-    
+
     private let disposeBag = DisposeBag()
-    
+
     var viewModel: RxViewModel!
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViewModel()
     }
-    
+
     private func setupViewModel() {
         let input = RxViewModelInput(countUpButton: countUpButton.rx.tap.asObservable(), countDownButton: countDownButton.rx.tap.asObservable(), countResetButton: countResetButton.rx.tap.asObservable())
         viewModel = RxViewModel(input: input)
-        
+
         viewModel.outputs?.counterText
             .drive(countLabel.rx.text)
             .disposed(by: disposeBag)
@@ -1933,7 +1937,7 @@ RxSwiftを今後学んでいく上で、開発者コミュニティは非常に�
 
 # 補足 Tips
 
-# 参考URL・ドキュメント・文献
+## 参考URL・ドキュメント・文献
 
 - Apple Developer Documentation
   - https://developer.apple.com/documentation/
