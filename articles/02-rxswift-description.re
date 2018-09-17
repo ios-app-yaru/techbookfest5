@@ -3,42 +3,44 @@
 == 覚えておきたい用語と１行概要
 
   * Reactive Extensions
-  ** GoFのデザインパターンの１つ、 「オブザーバパターン」 を表したインターフェース
-  * RxSwift
-  ** ReactiveExtensionsをSwiftで扱えるように拡張されたライブラリ
-  * RxCocoa
-  ** UIKitでRxを使えるようにさまざまなUIクラスをextension定義しているライブラリで、よくRxSwiftと一緒に導入されます。
+  ** GoFのデザインパターンの１つ、 「オブザーバパターン」 を実装したインターフェース
   * オブザーバパターン
   ** プログラム内のオブジェクトのイベント（事象）を他のオブジェクトへ通知する処理で使われるデザインパターンの一種
+  * RxSwift
+  ** ReactiveExtensionsの概念をSwiftで扱えるようにした拡張ライブラリ
+  * RxCocoa
+  ** ReactiveExtensionsの概念をUIKitで扱えるようにした拡張ライブラリ　主にRxSwiftと一緒に導入される
 
 == RxSwiftって何？
 
-RxSwift とは「ReactiveExtensions」をSwiftで扱えるように拡張されたライブラリのことを指します。
-
+RxSwift とは.NET Frameworkに向けて提供されている「Reactive Extensions」の概念をSwiftで扱えるように拡張されたライブラリのことを指します。@<br>{}
 GitHub上でオープンソースライブラリと公開されていてさまざまな人が日々コントリビュートしています。
 
-Reactive Extensionsについては後述しますが非同期操作とイベント/データストリーム（時系列処理）の実装を容易にできるライブラリのことを指します。
+同じく、Reactive Extensionsの概念を取り入れた「ReactiveSwift」というライブラリも存在します。@<br>{}
+本書では、ReactiveSwiftについてはまったく触れず、RxSwiftにのみ焦点を当てて解説していきます。
+
+Reactive Extensionsについては後述しますが、RxSwiftを導入することによって非同期操作とイベント/データストリーム（時系列処理）の実装が用意にできるようになります。
 
 == Reactive Extensionsって何？
 
 === 思想
 
-Reactive Extensionsとは、「Reactive Programming」を実現するための「デザイン」とその実装ができる「ライブラリ」のことを指します。名前のとおり、Reactive Programmingをするために既存のプラットフォームの機能を拡張します。
+Reactive Extensionsとは、概念的には「リアクティブプログラミング」を用いて実装ができるライブラリのことを指します。@<br>{}
+リアクティブプログラミングを実現するために、既存のプラットフォームの機能をライブラリ上で拡張しています。
 
 === 歴史
 
-元々は Microsoftが研究して開発した.NET用のライブラリで、２００９年に「Reactive Extensions」という名前で公開しました。現在はオープンソース化され「ReactiveX」という名前に変更されています。
+元々は Microsoftが研究して開発した.NET用のライブラリで、２００９年に「Reactive Extensions」という名前で公開しました。現在はオープンソース化され「ReactiveX」という名前に変更されています。@<br>{}
+この「Reactive Extensions」の考え方がとても有用だったため、色々な言語へと移植されています。@<br>{}
+たとえば、JavaであればRxJava、JavaScriptであればRxJSと、静的型付け・動的型付けなど関係なしに、さまざまな言語に垣根を超えて移植されています。@<br>{}
+その中の１つが本書で紹介する「RxSwift」です。
 
-この「ReactiveExtensions」の考え方がとても有用だったため JavaScriptやJava、Swiftなど、垣根を越えてさまざまな言語に移植されていて、その中の１つが本書で紹介する「RxSwift」です。
-
-本書では RxSwiftと関連するライブラリ群についてのみ解説しますが世の中には 「RxJava」、「RxJS」、「RxScala」などさまざまなライブラリがあります。
-
+本書では RxSwiftと関連するライブラリ群についてのみ解説しますが世の中にはさきほど挙げたものの以外に「RxRuby」、「RxScala」などさまざまな言語向けのライブラリがあります。@<br>{}
 どのライブラリも概念はおおまかな考え方は一緒です。概念だけでも１度覚えておくと他の言語でもすぐに扱えるようになるためこの機会にぜひ覚えてみましょう！
 
 == RxSwiftの特徴
 
-RxSwiftの特徴として、「値の変化が検知しやすい」「非同期処理を簡潔に書ける」等が挙げられます。
-
+RxSwiftの特徴として、「値の変化が検知しやすい」「非同期処理を簡潔に書ける」等が挙げられます。@<br>{}
 これは主にUIの検知（タップや文字入力の検知）や通信処理等で使われ、RxSwiftを用いるとdelegateやcallbackを用いたコードよりもスッキリと見やすいコードを書けるようになります。
 
 その他のメリットとしては次のものが挙げられます。
