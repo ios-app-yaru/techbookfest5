@@ -3,11 +3,11 @@
 == 覚えておきたい用語と１行概要
 
   * Reactive Extensions
-  ** GoFのデザインパターンの１つ、 `オブザーバパターン` を表したインターフェース
+  ** GoFのデザインパターンの１つ、 「オブザーバパターン」 を表したインターフェース
   * RxSwift
   ** ReactiveExtensionsをSwiftで扱えるように拡張されたライブラリ
   * RxCocoa
-  ** UIKitでRxを使えるようにさまざまなUIクラスをextension定義しているライブラリで、RxSwiftとにこいちでよく導入されます。
+  ** UIKitでRxを使えるようにさまざまなUIクラスをextension定義しているライブラリで、よくRxSwiftと一緒に導入されます。
   * オブザーバパターン
   ** プログラム内のオブジェクトのイベント（事象）を他のオブジェクトへ通知する処理で使われるデザインパターンの一種
 
@@ -15,7 +15,7 @@
 
 RxSwift とは「ReactiveExtensions」をSwiftで扱えるように拡張されたライブラリのことを指します。
 
-github上でオープンソースライブラリと公開されていてさまざまな人が日々コントリビュートしています。
+GitHub上でオープンソースライブラリと公開されていてさまざまな人が日々コントリビュートしています。
 
 Reactive Extensionsについては後述しますが非同期操作とイベント/データストリーム（時系列処理）の実装を容易にできるライブラリのことを指します。
 
@@ -31,7 +31,7 @@ Reactive Extensionsとは、「Reactive Programming」を実現するための�
 
 この「ReactiveExtensions」の考え方がとても有用だったため JavaScriptやJava、Swiftなど、垣根を越えてさまざまな言語に移植されていて、その中の１つが本書で紹介する「RxSwift」です。
 
-本書では RxSwiftと関連するライブラリ群についてのみ解説しますが世の中には `RxJava`, `RxJS`, `RxScala` などさまざまなライブラリがあります。
+本書では RxSwiftと関連するライブラリ群についてのみ解説しますが世の中には 「RxJava」、「RxJS」、「RxScala」などさまざまなライブラリがあります。
 
 どのライブラリも概念はおおまかな考え方は一緒です。概念だけでも１度覚えておくと他の言語でもすぐに扱えるようになるためこの機会にぜひ覚えてみましょう！
 
@@ -56,8 +56,6 @@ RxSwiftの特徴として、「値の変化が検知しやすい」「非同期�
 
 その他のデメリットとしては次のものが挙げられます。
 
-  * 一度errorが発生すると止まってしまう
-  ** UIとバインドするような時は止まってしまうと困るので、errorが流れないものを使う
   * 簡単な処理で使うと長くなりがち
 
 プロジェクトによってRxSwiftの有用性が変わるので、そのプロジェクトの特性とRxSwiftのメリット・デメリットを照らし合わせた上で検討しましょう。
@@ -70,12 +68,8 @@ RxSwiftでは本当に色々なことができますが、１番わかりやす�
 
 UIButtonとUILabelが画面に配置されていて、ボタンをタップすると文字列が変更されるという仕様のアプリを題材として作ります。
 
-//image[simpletap1][イメージ１][scale=0.3]{
-  simpletap1
-//}
-
-//image[simpletap2][イメージ２][scale=0.3]{
-  simpletap2
+//image[simpletap][画面のイメージ]{
+  simpletap
 //}
 
 まずは従来のIBActionを使った方法で作ってみましょう。
@@ -143,39 +137,41 @@ UILabel, UITextFieldを画面に２つずつ配置し、入力したテキスト
 
 
 //listnum[addtarget][addTarget を用いたコード][swift]{
+
 class ExampleViewController: UIViewController {
 
-    @IBOutlet weak var nameField: UITextField!
-    @IBOutlet weak var nameLabel: UILabel!
+  @IBOutlet weak var nameField: UITextField!
+  @IBOutlet weak var nameLabel: UILabel!
 
-    @IBOutlet weak var addressField: UITextField!
-    @IBOutlet weak var addressLabel: UILabel!
+  @IBOutlet weak var addressField: UITextField!
+  @IBOutlet weak var addressLabel: UILabel!
 
-    let maxNameFieldSize = 10
-    let maxAddressFieldSize = 50
+  let maxNameFieldSize = 10
+  let maxAddressFieldSize = 50
 
-    let limitText: (Int) -> String = {
-        return "あと\($0)文字"
-    }
+  let limitText: (Int) -> String = {
+    return "あと\($0)文字"
+  }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        nameField.addTarget(self, action: =selector(nameFieldEditingChanged(sender:)), for: .editingChanged)
-        addressField.addTarget(self, action: =selector(addressFieldEditingChanged(sender:)), for: .editingChanged)
-    }
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    nameField.addTarget(self, action: #selector(nameFieldEditingChanged(sender:)), for: .editingChanged)
+    addressField.addTarget(self, action: #selector(addressFieldEditingChanged(sender:)), for: .editingChanged)
+  }
 
-    @objc func nameFieldEditingChanged(sender: UITextField) {
-        guard let changedText = sender.text else { return }
-        let limitCount = maxNameFieldSize - changedText.count
-        nameLabel.text = limitText(limitCount)
-    }
+  @objc func nameFieldEditingChanged(sender: UITextField) {
+    guard let changedText = sender.text else { return }
+    let limitCount = maxNameFieldSize - changedText.count
+    nameLabel.text = limitText(limitCount)
+  }
 
-    @objc func addressFieldEditingChanged(sender: UITextField) {
-        guard let changedText = sender.text else { return }
-        let limitCount = maxAddressFieldSize - changedText.count
-        addressLabel.text = limitText(limitCount)
-    }
+  @objc func addressFieldEditingChanged(sender: UITextField) {
+    guard let changedText = sender.text else { return }
+    let limitCount = maxAddressFieldSize - changedText.count
+    addressLabel.text = limitText(limitCount)
+  }
 }
+
 //}
 
 UIと処理のコードが離れているので、パッとじゃ処理のイメージがしにくいですね。

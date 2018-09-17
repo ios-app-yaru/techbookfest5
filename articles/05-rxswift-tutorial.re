@@ -10,7 +10,7 @@
 
 では、作っていきましょう！テーマはこちら！
 
-== カウンターアプリ
+== カウンターアプリを作ってみよう！
 
 この節ではカウンターアプリをテーマにcallback、delegate、RxSwiftでどうかくかを書きます。
 
@@ -37,19 +37,19 @@
 
 まずはプロジェクトを作成します。ここは特別なことをやっていないのでサクサクといきます。
 
-//image[create-project][プロジェクトの作成][scale=0.3]{
+//image[create-project][プロジェクトの作成][scale=0.6]{
   プロジェクトの作成
 //}
 
 Xcodeを新規で起動して、 Create a new Xcode project を選択します。
 
-//image[select-template][テンプレートの選択][scale=0.3]{
+//image[select-template][テンプレートの選択][scale=0.6]{
   テンプレートの選択
 //}
 
 テンプレートを選択します。 Single View App を選択
 
-//image[project-name-settings][プロジェクトの設定][scale=0.3]{
+//image[project-name-settings][プロジェクトの設定][scale=0.6]{
   プロジェクトの設定
 //}
 
@@ -65,7 +65,11 @@ terminal.app を起動し、作成したプロジェクトのルートまで移�
 ryo-takahashi@~/CounterApp>
 //}
 
-まず最初にRxSwift/RxCocoaライブラリの導入を行います。プロジェクト内で `pod init` を実行します。
+まず最初にRxSwift/RxCocoaライブラリの導入を行います。プロジェクト内でCocoapodsの初期化を行いましょう
+
+//cmd{
+pod init
+//}
 
 成功すると、ディレクトリ内に Podfile というファイルが生成されているのでこれを編集します。
 
@@ -76,16 +80,13 @@ vi Podfile
 ファイルを開いたら、次のように編集してください。
 
 //listnum[podfile-rxswift-rxcocoa][Podfileの編集][ruby]{
-# Uncomment the next line to define a global platform for your project
 # platform :ios, '9.0'
 
 target 'CounterApp' do
-  = Comment the next line if you're not using Swift and don't want to use dynamic frameworks
   use_frameworks!
 
-  = Pods for CounterApp
-  pod 'RxSwift' = ★この行を追加
-  pod 'RxCocoa' = ★この行を追加
+  pod 'RxSwift' # ★この行を追加
+  pod 'RxCocoa' # ★この行を追加
 
 end
 //}
@@ -115,13 +116,15 @@ Pod installation complete! There are 2 dependencies from the Podfile and 2 total
 
 環境設定はこれで完了です。
 
-次回以降プロジェクトを開く時は、必ず "YOUR_PROJECT_NAME.xcworkspace" から開くようにしましょう
+次回以降プロジェクトを開く時は、必ず 「YOUR_PROJECT_NAME.xcworkspace」 から開くようにしましょう
 
 （*.xcworkspaceから開かないと導入したライブラリが使えません）
 
 === 開発を加速させる設定
 
-★ このセクションは今後何度も使うので付箋やマーカーを引いておきましょう！
+//lead{
+  ★このセクションは今後何度も使うので付箋やマーカーを引いておきましょう！
+//}
 
 この節では、節タイトルのとおり開発を加速させる簡単な設定を行います。本書のテーマとは少しずれるので早足で進めます。
 
@@ -147,16 +150,15 @@ Storyboardを廃止するために、次のことを行います
   ** Move to Trashを選択
 
 ===== Info.plist
-
+@<br>{}
 Info.plistにはデフォルトでMain.storyboardを使ってアプリを起動するような設定が書かれているので、それを削除します
 
   * Info.plistを開く
   * Main storyboard file base name の項目を削除する
 
 ===== AppDelegateの整理
-
+@<br>{}
 Main.storyboardを削除したことによって、一番最初に起動するViewControllerの設定が失われ、アプリの起動が失敗するようになってしまったので、AppDelegateに一番最初に起動するViewControllerを設定します。
-
 
 //listnum[appdelegate][AppDelegate.swiftを開く][swift]{
 //AppDelegate.swift
@@ -187,13 +189,13 @@ Main.storyboardを削除してことによって一番最初に起動するViewC
   * Placeholders > File's Owner を選択
   * Class に ViewControllerを指定
 
-//image[viewcontroller-filesowner][ViewController.xibの設定１][scale=0.3]{
+//image[viewcontroller-filesowner][ViewController.xibの設定１][scale=0.8]{
   ViewController.xibの設定
 //}
 
 OutletsのviewとViewControllerのViewをつなげる
 
-//image[viewcontroller-view-outlet][ViewController.xibの設定２][scale=0.3]{
+//image[viewcontroller-view-outlet][ViewController.xibの設定２][scale=0.8]{
   ViewController.xibの設定２
 //}
 
@@ -214,7 +216,7 @@ OutletsのviewとViewControllerのViewをつなげる
   4. Classの指定
   5. ViewのOutletの設定
 
-Tips: 画面遷移
+===== Tips: 画面遷移
 
 ViewController.swift + ViewController.xib構成にしたことによって、ViewControllerの生成が楽になりました。
 
@@ -248,7 +250,7 @@ class ViewController: UIViewController {
 
 UIButton３つとUILabelを１つ配置しましょう
 
-//image[counter-app-interfacebuilder][部品の設置][scale=0.3]{
+//image[counter-app-interfacebuilder][部品の設置][scale=0.8]{
   部品の設置
 //}
 
@@ -584,9 +586,13 @@ class RxViewController: UIViewController {
 
 Build & Run で実行してみましょう。まったく同じ動作をしていたら成功です。
 
-注意！！：ここでIBActionの接続解除・IBOutletの接続が正しくできていない場合、起動時にクラッシュするので、要注意！
+==== Tips: あれ？コード間違っていないのにクラッシュする？そんな時は
 
-もしクラッシュしてしまう場合、ViewController.xibのIBAction・IBOutletの設定を見直しましょう！
+//lead{
+新しい画面を作成・既存の画面をいじっていて、ふとBuild＆Runを実行したとき、あれ？コードに手を加えてないのにクラッシュするようになった？？と不思議になる場面は初心者の頃はあるあるな問題かと思います。
+
+そんなときは、１度いじっていたxib/storyboardのIBActionの接続・接続解除、IBOutletの接続・接続解除が正しくできているか確認してみましょう。
+//}
 
 setupViewModel関数として切り出して定義してviewDidLoad()内で呼び出しています。
 
@@ -629,15 +635,8 @@ ViewControllerがViewModelの値を監視して変更があったらUIを自動�
 
 === イメージ
 
-//image[wkwebview1][アプリのイメージ１][scale=0.3]{
-  アプリのイメージ１
-//}
-
-//image[wkwebview2][アプリのイメージ２][scale=0.3]{
-  アプリのイメージ２
-//}
-//image[wkwebview3][アプリのイメージ３][scale=0.3]{
-  アプリのイメージ３
+//image[wkwebview][アプリのイメージ][scale=0.8]{
+  アプリのイメージ
 //}
 
 WebViewとProgressViewを配置して、Webページの読み込みに合わせてゲージ、インジケータ、Navigationタイトルを変更する機能を作ります。
@@ -693,7 +692,7 @@ class WKWebViewController: UIViewController {
 }
 //}
 
-KVO（Key-Value Observing:キー値監視）とは、特定のオブジェクトのプロパティ値の変化を監視する仕組みです。Objective−Cのメカニズムを使っていて、NSValueクラスに大きく依存しています。
+KVO（Key-Value Observing:キー値監視）とは、特定のオブジェクトのプロパティ値の変化を監視する仕組みです。ObjectiveーCのメカニズムを使っていて、NSValueクラスに大きく依存しています。
 また、構造体（struct）はNSObjectを継承できないためKVOの仕組みは使えません。
 
 KVOをSwiftで使うためにはオブジェクトをクラスで定義し、プロパティに @objc属性とdynamicをつけます。
@@ -720,7 +719,7 @@ KVOを使った場合の注意点として、addObserverした場合、deinit時
 
 Podfileにライブラリを追加しましょう
 
-//listnum[add-lib-rxoptional][Podfileの修正][ruby]{
+//list[add-lib-rxoptional][Podfileの修正][ruby]{
 pod 'RxSwift'
 pod 'RxCocoa'
 pod 'RxOptional' = New!
@@ -819,7 +818,7 @@ RxOptionalで定義されているOperator
 
 わかりやすく、コードで比較してみましょう。次のコードはどちらもまったく同じ動作をします。
 
-//listnum[operator-filternil-example][filterNil()の比較][swift]{
+//list[operator-filternil-example][filterNil()の比較][swift]{
 // RxSwift
 Observable<String?>
   .of("One",nil,"Three")
@@ -838,7 +837,7 @@ Observable<String?>
 
 文章で説明するより、まずは次のコードを見てください。
 
-//listnum[operator-share-example][share()がない場合][swift]{
+//list[operator-share-example][share()がない場合][swift]{
     let text = textField.rx.text
         .map { text -> String in
             print("call")
@@ -886,7 +885,7 @@ callは９回呼ばれます。なるほど？
 
 その前に、textField.rx.textが何なのかを紐解いて見ましょう。
 
-textField.rx.textはRxCocoaでextension定義されているプロパティで、Observable<String?>ではなく、ControlProperty<String?>として定義されています。（が、実態はObservableです）
+textField.rx.textはRxCocoaでextension定義されているプロパティで、@<code>{Observable<String?>}ではなく、@<code>{ControlProperty<String?>}として定義されています。（が、実態はObservableです）
 
 ControlPropertyは主にUI要素のプロパティで使われていて、メインスレッドで値が購読されることを保証しています。
 
@@ -904,7 +903,7 @@ ColdなObservableの仕様として、subscribeした時点で計算リソース
 
 やりかたはいくつかあるのですが、今回は @<code>{share()} というOperatorを使います。実際のコードは次のとおりです。
 
-//listnum[use-share-example][share()を使う][swift]{
+//list[use-share-example][share()を使う][swift]{
 // これを
 let text = textField.rx.text
     .map { text -> String in
@@ -960,7 +959,7 @@ KVOで書いた処理をRxSwiftに置き換えてみた結果、かなり読み�
 
 Podfileを編集します
 
-//listnum[add-rxwebkit-on-podfile][Podfileの編集][ruby]{
+//list[add-rxwebkit-on-podfile][Podfileの編集][ruby]{
   pod 'RxSwift'
   pod 'RxCocoa'
   pod 'RxOptional'

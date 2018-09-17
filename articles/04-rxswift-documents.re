@@ -113,7 +113,7 @@ class HogeViewModel {
 
 このコードを図で表してみましょう。
 
-//image[helloworldsubject][Subject イメージ図][scale=0.3]{
+//image[helloworldsubject][Subject イメージ図]{
   Subject イメージ図
 //}
 
@@ -135,7 +135,7 @@ Observableは翻訳すると観測可能という意味で文字どおり観測�
 
 まずは、次の図を見てください。
 
-//image[what-observable][Observable][scale=0.3]{
+//image[what-observable][Observable]{
   Observable
 //}
 
@@ -172,7 +172,7 @@ hogeSubject
 
 また、UIKitをsubscribeする場合はonErrorやonCompletedイベントが流れてこないので、onNextのクロージャ以外は省略できます。
 
-Tips: ObservableとObserver
+==== Tips: ObservableとObserver
 
 さまざまな資料に目を通していると、ObservableとObserverという表現が出てきますがどちらも違う意味です。イベント発生元がObservableでイベント処理がObserverです。ややこしいですね。
 
@@ -195,7 +195,7 @@ hogeObservable // Observable (イベント発生元)
 
 一言で説明すると、メモリリークを回避するための仕組みです。
 
-Disposeは購読を解除（破棄）するためのもので、dispose()メソッドを呼ぶことで購読を破棄できます。
+Disposeは購読を解除（破棄）するためのもので、@<code>{dispose()}メソッドを呼ぶことで購読を破棄できます。
 
 ただし、Observableセクションで記述したとおり、onErrorやonCompletedイベントが流れてくると購読が自動で破棄してくれるのでdispose()メソッドを呼ぶ必要はありません。
 
@@ -232,7 +232,7 @@ class HogeViewController {
 
 とりあえず購読したら必ず@<code>{disposed(by: disposeBag)}しておけば大体間違いないです。
 
-Tips: シングルトンインスタンス内でDisposeBagを扱うときは注意！
+==== Tips: シングルトンインスタンス内でDisposeBagを扱うときは注意！
 
 DisposeBagはとても便利な仕組みですが、シングルトンインスタンス内でDisposeBagを扱う時は注意が必要です。DisposeBagの仕組みはそのクラスが解放されたとき、管理してるDisposableをdisposeするとさきほど記述しましたね。
 
@@ -258,12 +258,12 @@ Subject、Relayは色々ありますが、代表としてよく使われる次�
 それぞれの違いをざっくりとですが、次のテーブル図にまとめました。
 
 //table[kind-of-subject-relay][SubjectとRelayの主な種類]{
-. 流れるイベント 初期値
+.                 流れるイベント                   初期値
 -------------
-PublishSubject  onNext, onError, onComplete 持たない
-BehaviorSubject onNext, onError, onComplete 持つ
-PublishRelay  onNext  持たない
-BehaviorRelay onNext  持つ
+PublishSubject    onNext, onError, onComplete   持たない
+BehaviorSubject   onNext, onError, onComplete   持つ
+PublishRelay      onNext                        持たない
+BehaviorRelay     onNext                        持つ
 //}
 
 === 初期値について
@@ -278,7 +278,7 @@ BehaviorRelay onNext  持つ
 
 （RxSwiftのデメリットでも触れましたが、UIにBindしているObservableでonErrorやonCompleteが発生しまうと、購読が止まってしまう為、onNextのみが流れるRelayを使うのが適切です。）
 
-=== Tips: internal（public）なSubject,Relay
+==== Tips: internal（public）なSubject,Relay
 
 Subject, Relayはすごく便利でいろいろなことができます。便利なのはよいことですが、いろいろ出来すぎてしまうと逆にコードが複雑になってしまうことがあります。
 
@@ -296,7 +296,7 @@ var itemsObservable: Observable<[Item]> {
 }
 //}
 
-=== Tips: SubjectとRelay
+==== Tips: SubjectとRelay
 
 SubjectとRelay、それぞれ特徴が違うと書きましたが、コードを見てみると、実はRelayはSubjectの薄いラッパーとして定義されています。
 
@@ -407,7 +407,7 @@ Operatorは本当に沢山、色々なことができてそれだけで１冊の
   ** concat
   *** 複数のObservableのイベントを順番に組み合わせる（異なる方では不可能）
 
-ここで一覧で紹介されてもおぼえきれねーよ！と思うかもしれませんがそのとおりです。すぐ覚えなくてもよいので、こんなことできるのか〜とフワっと覚えていただければ良いです。
+ここで一覧で紹介されてもおぼえきれねーよ！と思うかもしれませんがそのとおりです。すぐ覚えなくてもよいので、こんなことできるのか〜とフワっと覚えていただければよいです。
 
 また、RxSwiftを書き始めたばっかりの人はどれがどんな動きをするか全然わからないとは思いますが、やっていきながら段々と覚えていきましょう！
 
@@ -503,7 +503,7 @@ Observableのcreate関数はコードを見て分かるとおり、クロージ�
 
 subscribeメソッドと同様にobserverを引数にとり、disposableを返却します。
 
-=== 振り返りTips: myJustはdisposed（by:）しなくてもよい
+==== 振り返りTips: myJustはdisposed（by:）しなくてもよい
 
 あれ、そういえばdisposed関数呼んでないな？と思う方のために少し振り返ってみましょう。
 Observableの特徴としてonError、onCompletedイベントは１度しか流れず、その時点で購読を破棄するというのがありましたね。myJust関数内ではonNextイベントが送られたあと、onCompletedイベントを送っていますね。なので@<code>{disposed(by:)}しなくてもよいということになります。

@@ -35,7 +35,7 @@ RxSwiftを今後学んでいく上で、開発者コミュニティは非常に�
 
 定期的に開催しているので、見かけたら気軽に参加してください！iOSアプリ開発に関わるものだったらなにやってもOKです！
 
-  * swift*developers-japan
+  * swift-developers-japan
   ** https://medium.com/swift-column/discord-ios-20d586e373c0
   * iOSアプリ開発がんばるぞ！！の会
   ** https://ios-app-yaru.connpass.com/

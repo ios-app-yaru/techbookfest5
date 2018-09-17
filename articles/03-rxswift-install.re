@@ -2,7 +2,8 @@
 
 == 導入要件
 
-  * RxSwiftリポジトリより引用（２０１８年８月３１日現在）
+RxSwiftリポジトリより引用（２０１８年８月３１日現在）
+
   * Xcode 9.0
   * Swift 4
   * Swift 3.x （rxswift-3.0 ブランチを指定)
@@ -31,7 +32,7 @@ gem install -v 1.5.3 cocoapods = バージョンを本書と同じにしたい�
 
   1. Podfileというファイルを作成
   2. Podfileに導入したいライブラリを定義
-  3. ターミナルで pod install と入力
+  3. コマンドラインで pod install と入力
 
 では、実際にやってみましょう。
 
@@ -57,8 +58,8 @@ end
 pod install
 //}
 
-`Pod installation complete!` というメッセージが出力されたら導入成功です！
+@<code>{Pod installation complete!} というメッセージが出力されたら導入成功です！
 
 もし導入できていなさそうな出力であれば、書き方やtypoをもう一度確認してみてください。
 
-Tips: PodfileはRubyとまったく同じ構文で定義されています
+==== Tips: PodfileはRubyとまったく同じ構文で定義されています

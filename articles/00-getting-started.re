@@ -31,7 +31,7 @@ RxSwiftについて学ぶ時、Google検索で調べて技術ブログやQiita�
   ** mapやfilterなどの高階関数の扱い
   * Xcode の基本的な操作
   * よく使われる UIKitの仕様
-  ** UILabel UITextView UITableView UICollectionView
+  ** UILabel, UITextView, UITableView, UICollectionView
 
 == 推奨知識
 
