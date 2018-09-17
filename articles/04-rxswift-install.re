@@ -14,7 +14,7 @@ RxSwiftの導入方法はCocoaPodsやCarthage、SwiftPackageManager等いくつ�
 
 CocoaPodsとは、iOS/Mac向けのアプリを開発する際のライブラリ管理をしてくれるツールのことで、これを使うと外部ライブラリが簡単に導入できます
 
-CocoaPodsを導入するにはRubyが端末にインストールされてる必要があります。（Macではデフォルトで入っているのであまり気にしなくても良いですが）
+CocoaPodsを導入するにはRubyが端末にインストールされてる必要があります。（Macではデフォルトで入っているのであまり気にしなくても良いですが）
 
 次のコマンドでCocoaPodsを導入できます
 

@@ -18,7 +18,7 @@
 
 RxSwiftを今後学んでいく上で、開発者コミュニティは非常に重要な存在です。日本国内ではRxSwift専用のコミュニティは筆者の観測内では見つけられませんでしたが、RxSwift Community（Github Project) のSlackワークスペースがあるので、興味がある人は覗いてみてください。URLはRxSwift Repository内のREADMEに記載されています。
 
-他にも、RxSwift専用ではありませんが、Swiftの国内コミュニティであればいくつかあります。
+他にも、RxSwift専用ではありませんが、Swiftの国内コミュニティであればいくつかあります。
 オンラインであれば、Discord上で作られているswift-developers-japanや
 オフラインであれば、年に１回行われる大規模カンファレンスの「iOSDC」や「try! Swift」などですね。
 

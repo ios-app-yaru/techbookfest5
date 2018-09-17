@@ -24,13 +24,13 @@ hogeButtonのタップイベントを購読し、タップされたときにsubs
 まとめると、次の流れで定義しています。
 
 1. イベントの購読
-2. イベントが流れてきたときの処理
+2. イベントが流れてきたときの処理
 3. クラスが破棄と同時に購読を破棄
 
 == Hello World
 
 RxSwiftでのHello World的な書き方を書いてみます。
-公式なHelloWorldな書き方ではありませんが、なんとなく概念は掴めるかと思います
+公式なHelloWorldな書き方ではありませんが、なんとなく概念は掴めるかと思います
 
 //listnum[ストリームを定義し、好きなタイミングで値を流し、購読する][subject-example][swift]{
 import RxSwift
@@ -131,7 +131,7 @@ Observableは翻訳すると観測可能という意味で文字通り観測可�
   Observable
 //}
 
-RxSwift（ReactiveExtension）について少し調べた方は大体みたことあるような図ではないでしょうか？
+RxSwift（ReactiveExtension）について少し調べた方は大体みたことあるような図ではないでしょうか？
 これがまさにObservableを表しています。
 
 Observableに流れるイベントには次の種類あります。
@@ -309,8 +309,8 @@ public final class PublishRelay<Element>: ObservableType {
 
 === bind
 
-Observable/Observerに対してbindメソッドを使うと指定したObserverにイベントストリームを接続することができます。
-「bind」と聞くと双方向データバインディングを想像しますが、RxSwiftでは単方向データバインディングです。双方向データバインディングが不可能というわけではありませんが、筆者の観測範囲では使っている人は少ないです。
+Observable/Observerに対してbindメソッドを使うと指定したObserverにイベントストリームを接続することができます。
+「bind」と聞くと双方向データバインディングを想像しますが、RxSwiftでは単方向データバインディングです。双方向データバインディングが不可能というわけではありませんが、筆者の観測範囲では使っている人は少ないです。
 bindメソッドが独自でなにか難しいことをやっているわけではなく、振る舞いはsubscribeと同じです。
 
 実際にコードを比較してみましょう。
@@ -338,7 +338,7 @@ nameTextField.rx.text
   .disposed(by: disposeBag)
 //}
 
-上記のコードでは①bindを利用した場合と②subscribeを利用した場合それぞれ定義しましたが、全く同じ動作をします。振る舞いが同じという意味が伝わったでしょうか？
+上記のコードでは①bindを利用した場合と②subscribeを利用した場合それぞれ定義しましたが、全く同じ動作をします。振る舞いが同じという意味が伝わったでしょうか？
 
 === Operator
 
@@ -379,9 +379,9 @@ Operatorは本当に沢山、色々なことができてそれだけで１冊の
 ** combineLatest
 *** 複数のObservableの最新値を組み合わせる（異なる型でも可能）
 ** sample
-*** 引数に渡したObservableのイベントが発生されたら元のObservableの最新イベントを通知
+*** 引数に渡したObservableのイベントが発生されたら元のObservableの最新イベントを通知
 ** concat
-*** 複数のObservableのイベントを順番に組み合わせる（異なる方では不可能）
+*** 複数のObservableのイベントを順番に組み合わせる（異なる方では不可能）
 
 ここで一覧で紹介されてもおぼえきれねーよ！と思うかもしれませんがその通りです。すぐ覚えなくても良いので、こんなことできるのか〜とフワっと覚えていただければ良いです。
 
@@ -410,7 +410,7 @@ numberObservable
   .disposed(by: disposeBag)
 //}
 
-また、かならずObservableのイベントを使う必要はありません、次のようにクラス変数やメソッド内変数を取り入れてbindすることもできます
+また、かならずObservableのイベントを使う必要はありません、次のようにクラス変数やメソッド内変数を取り入れてbindすることもできます
 
 //listnum[operator-filter-2-example][Operator - filter サンプル2][swift]{
 // ボタンをタップしたときにnameLabelにユーザの名前を表示する

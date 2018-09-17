@@ -691,7 +691,7 @@ addObserverの引数にプロパティ名を渡すとその値が変化された
 
 observeValueのkeyPathにはaddObserverで設定したforKeyPathの値が流れてくるので、その値で条件分岐してUIを更新します。
 
-ただ、全ての通知をobserveValueで受け取って条件分岐するため、段々とobserveValueメソッドが肥大化していく問題があります。
+ただ、全ての通知をobserveValueで受け取って条件分岐するため、段々とobserveValueメソッドが肥大化していく問題があります。
 
 また、KVOはObjective-Cのメカニズムであるため、型の安全性が考慮されているわけではありません。
 
@@ -788,7 +788,7 @@ self.から始まるパスと、子オブジェクトだけ監視できます。
 
 ただし、プロパティに対して強参照するため、循環参照を引き起こし最悪アプリがクラッシュする可能性があります。弱参照したい場合は、rx.observeWeaklyを使いましょう。
 
-KVOはObjective-Cの仕組みで動いていると書きましたが、RxCocoaでは実は構造体であるCGRect、CGSize、CGPointに対してKVOを行う仕組みが実装されています。
+KVOはObjective-Cの仕組みで動いていると書きましたが、RxCocoaでは実は構造体であるCGRect、CGSize、CGPointに対してKVOを行う仕組みが実装されています。
 他の構造体を購読したいときはNSValueから手動で抽出する仕組みを実装することでできます。
 RxCocoaのKVORepresentable+CoreGraphics.swiftにKVORepresentableプロトコルを使って抽出する実装コードが書かれているので、独自で作りたい場合はここを参照しましょう。
 
@@ -863,7 +863,7 @@ callは９回呼ばれます。なるほど？
 その前に、textField.rx.textが何なのかを紐解いて見ましょう。
 
 textField.rx.textはRxCocoaでextension定義されているプロパティで、Observable<String?>ではなく、ControlProperty<String?>として定義されています。（が、実態はObservableです）
-ControlPropertyは主にUI要素のプロパティで使われていて、メインスレッドで値が購読されることを保証しています。
+ControlPropertyは主にUI要素のプロパティで使われていて、メインスレッドで値が購読されることを保証しています。
 また、これはColdなObservableです。
 ColdなObservableの仕様として、subscribeした時点で計算リソースが割当られ、複数回subscribeするとその都度ストリームが生成されるという仕組みがあります。
 
