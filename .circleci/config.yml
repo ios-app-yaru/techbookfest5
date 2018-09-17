@@ -7,7 +7,7 @@ jobs:
       - checkout
       - run:
           name: Build PDF
-          command: cd /book && ./setup.sh && npm run pdf
+          command: ./setup.sh && npm run pdf
       - store_artifacts:
           path: ./articles/book.pdf
           destination: book.pdf
