@@ -11,3 +11,6 @@ jobs:
       - store_artifacts:
           path: ./articles/book.pdf
           destination: book.pdf
+      - run:
+          name: Upload to Dropbox
+          command: ./upload_dropbox.sh ./articles/book.pdf ${DROPBOX_TOKEN}
