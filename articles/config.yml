@@ -27,7 +27,7 @@ booktitle: 比較して学ぶRxSwift4入門
 
 # 著者名。「, 」で区切って複数指定できる
 # 読みを入れる例 aut: [{name: "青木峰郎", file-as: "アオキミネロウ"}, {name: "武藤健志", file-as: "ムトウケンシ"}, {name: "高橋征義", file-as: "タカハシマサヨシ"}, {name: "角征典", file-as: "カドマサノリ"}]
-aut: [{name:"髙橋凌", file-as: "タカハシリョウ"}]
+aut: ["Ryo Takahashi"]
 
 # 以下はオプション
 # 以下はオプション(autと同じように配列書式で複数指定可能)。
@@ -90,7 +90,7 @@ rights: (C) 2018 Ryo Takahashi
 debug: null
 
 # 固有IDに使用するドメイン。省略した場合は時刻に基づくランダムUUIDが入る
-urnid: urn:uid:https://twitter.com/k0uhashi
+urnid: urn:uid:https://twitter.com.
 #
 # ISBN。省略した場合はurnidが入る
 # isbn: null
