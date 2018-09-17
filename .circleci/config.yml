@@ -1,0 +1,13 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: vvakame/review
+    steps:
+      - checkout
+      - run:
+          name: Build PDF
+          command: ./build-in-docker.sh
+      - store_artifacts:
+          path: ./articles/book.pdf
+          destination: book.pdf
