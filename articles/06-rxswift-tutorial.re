@@ -3,6 +3,7 @@
 ここまではRxSwift/RxCocoaの概念や基本的な使い方について紹介してきましたが、ここからは実際にアプリを作りながら説明していきます。
 
 まずは簡単なアプリから作ってみましょう。
+
 とはいえ、いきなりRxSwiftでコードを書いても理解に時間がかかるかと思います。（自分はそうでした）
 
 なので、１つのテーマごとにcallbackやKVO、delegateで書かれたコードを最初に書いて、これをどうRxSwiftに置き換えるか？という観点でアプリを作っていきます。（本書のテーマである「比較して学ぶ」というのはこのことを指しています）
@@ -12,6 +13,7 @@
 == カウンターアプリ
 
 この節ではカウンターアプリをテーマにcallback、delegate、RxSwiftでどうかくかを書きます。
+
 まずはアプリの機能要件を決めます！
 
 === 機能要件
@@ -64,6 +66,7 @@ ryo-takahashi@~/CounterApp>
 //}
 
 まず最初にRxSwift/RxCocoaライブラリの導入を行います。プロジェクト内で `pod init` を実行します。
+
 成功すると、ディレクトリ内に Podfile というファイルが生成されているのでこれを編集します。
 
 //cmd{
@@ -113,6 +116,7 @@ Pod installation complete! There are 2 dependencies from the Podfile and 2 total
 環境設定はこれで完了です。
 
 次回以降プロジェクトを開く時は、必ず "YOUR_PROJECT_NAME.xcworkspace" から開くようにしましょう
+
 （*.xcworkspaceから開かないと導入したライブラリが使えません）
 
 === 開発を加速させる設定
@@ -120,11 +124,13 @@ Pod installation complete! There are 2 dependencies from the Podfile and 2 total
 ★ このセクションは今後何度も使うので付箋やマーカーを引いておきましょう！
 
 この節では、節タイトルのとおり開発を加速させる簡単な設定を行います。本書のテーマとは少しずれるので早足で進めます。
+
 具体的には、Storyboardを廃止して ViewController + Xib を使って開発する手法に切り替えます。
 
 ==== Storyboardの廃止
 
 Storyboardは画面遷移の設定が簡単にできたり、パッと見るだけで画面がどう遷移していくかわかりやすくてよいのですが、
+
 反面としてアプリが大きくなってくると画面遷移が複雑で逆に見辛くなったり、小さなViewController（アラートやダイアログを出すものなど）の生成が面倒だったり、チーム人数が複数になると*.storyboardがconflictしまくるなど色々問題があるので、Storyboardを使うのをやめます。
 
 Storyboardを廃止するために、次のことを行います
@@ -202,15 +208,16 @@ OutletsのviewとViewControllerのViewをつなげる
 これで環境設定は終了です。
 今後画面を追加していくときは同様の手順で作成していきます。
 
-1. ViewController.swiftの作成
-2. ViewController.xibの作成
-3. ViewController.xibの設定
-4. Classの指定
-5. ViewのOutletの設定
+  1. ViewController.swiftの作成
+  2. ViewController.xibの作成
+  3. ViewController.xibの設定
+  4. Classの指定
+  5. ViewのOutletの設定
 
 Tips: 画面遷移
 
 ViewController.swift + ViewController.xib構成にしたことによって、ViewControllerの生成が楽になりました。
+
 また、そのおかげで画面遷移が少ない行で実装できるようになりました。次のコードで画面遷移を実装できます。
 
 //listnum[pushviewcontroller][画面遷移の実装][swift]{
@@ -238,6 +245,7 @@ class ViewController: UIViewController {
 //}
 
 次に、画面を作成します。
+
 UIButton３つとUILabelを１つ配置しましょう
 
 //image[counter-app-interfacebuilder][部品の設置]{
@@ -335,6 +343,7 @@ class ViewController: UIViewController {
 //}
 
 これで、機能要件を満たすことができました。
+
 実際に Build & Run して確認してみましょう。
 
 callbackで書く場合のメリット・デメリットをまとめてみます。
@@ -351,8 +360,7 @@ callbackで書く場合のメリット・デメリットをまとめてみます
 
 次に、delegateを使って実装してみましょう。
 
-delegateを使う場合、設計はMVPパターンのほうが向いてるので、
-MVPパターンに沿って実装していきます。
+delegateを使う場合、設計はMVPパターンのほうが向いてるので、MVPパターンに沿って実装していきます。
 
 まずはDelegateを作ります
 
@@ -431,6 +439,7 @@ extension ViewController: CounterDelegate {
 //}
 
 Build ＆ Run してみましょう。callbackの場合と同じ動きをします。
+
 Delegateを使った書き方のメリット・デメリットをまとめます。
 
   * メリット
@@ -443,6 +452,7 @@ Delegateを使った書き方のメリット・デメリットをまとめます
 データを処理する関数が完全に処理に集中できるようになったのはよいことですが、まだボタンとメソッドの個数が１：１になっている問題が残っていて、このままアプリが大きくなっていくにつれてメソッドが多くなり、どのボタンの処理がどのメソッドの処理なのかパッと見た感じではわからなくなってしまいます。
 
 この問題はRxSwift/RxCocoaを使うことで解決できます。
+
 実際にRxSwiftを使って作ってみましょう。
 
 === RxSwiftで作るカウンターアプリ
@@ -575,6 +585,7 @@ class RxViewController: UIViewController {
 Build & Run で実行してみましょう。まったく同じ動作をしていたら成功です。
 
 注意！！：ここでIBActionの接続解除・IBOutletの接続が正しくできていない場合、起動時にクラッシュするので、要注意！
+
 もしクラッシュしてしまう場合、ViewController.xibのIBAction・IBOutletの設定を見直しましょう！
 
 setupViewModel関数として切り出して定義してviewDidLoad()内で呼び出しています。
@@ -595,12 +606,16 @@ setupViewModel関数として切り出して定義してviewDidLoad()内で呼�
   ** コード量が他パターンより多い
   ** 書き方に慣れるまで時間がかかる
 
-RxSwiftを使った場合の一番大きなよい点はやはり「ViewModelはViewControllerのことを考えなくてもよくなる」ところです。ViewControllerがViewModelの値を監視して変更があったらUIを自動で変更するため、ViewModel側から値が変わったよ！と通知する必要がなくなるのです。
+RxSwiftを使った場合の一番大きなよい点はやはり「ViewModelはViewControllerのことを考えなくてもよくなる」ところです。
+
+ViewControllerがViewModelの値を監視して変更があったらUIを自動で変更するため、ViewModel側から値が変わったよ！と通知する必要がなくなるのです。
 
 次に、テストが書きやすくなりました。今まではViewControllerとViewModel（Presenter)が密になっていてテストが書きづらい状況でしたが、今回は分離ができたのでとても書きやすくなりました。
+
 やり方としてはViewModelをインスタンス化するときにInputを注入し、Outputを期待したとおりになっているかのテストを書く感じになります。
 
 ですが、この方法は慣れるまで時間がかかるかと思います。まずはUIButton.rx.tapだけ使う、PublishSubject系だけを使う・・・など小さく始めるのもありかと思います。
+
 個人開発のアプリであれば全リプレースにチャレンジしてみても面白いかもしれませんが、業務で使うアプリでチームメンバーのほとんどがRxSwiftに慣れていない場合、キャッチアップで手一杯になって逆に開発効率が落ちることもありえるのでちゃんとチームメンバーと相談しましょう！
 
 == WKWebViewを使ったアプリ
@@ -701,7 +716,7 @@ KVOを使った場合の注意点として、addObserverした場合、deinit時
 
 こういった問題はRxSwiftがまるまるっと解決してくれます！！RxSwiftに書き換えてみましょう。
 
-と、その前にRxOptionalというRxSwiftの拡張ライブラリを導入します。理由は後述しますが、簡単にいうとOptionalな値を流すストリームに対して様々なことができるようにするライブラリです。
+と、その前にRxOptionalというRxSwiftの拡張ライブラリを導入します。理由は後述しますが、簡単にいうとOptionalな値を流すストリームに対してさまざまなことができるようにするライブラリです。
 
 Podfileにライブラリを追加しましょう
 
@@ -773,6 +788,7 @@ class WKWebViewController: UIViewController {
 //}
 
 どうでしょうか？ネストも浅くなり、かなり読みやすくなってのではないでしょうか。
+
 色々説明するところはありますが、この章ではじめてでてきたメソッドについて説明していきます。
 
 ==== import RxOptional
@@ -784,17 +800,21 @@ class WKWebViewController: UIViewController {
 rx.observeはKVOを取り巻く単純なラッパーです。単純であるため、パフォーマンスが優れていますが、用途は限られています。
 
 self.から始まるパスと、子オブジェクトだけ監視できます。
+
 たとえば、self.view.frameを監視したい場合、第二引数に"view.frame"を指定します。
 
 ただし、プロパティに対して強参照するため、循環参照を引き起こし最悪アプリがクラッシュする可能性があります。弱参照したい場合は、rx.observeWeaklyを使いましょう。
 
 KVOはObjective-Cの仕組みで動いていると書きましたが、RxCocoaでは実は構造体であるCGRect、CGSize、CGPointに対してKVOを行う仕組みが実装されています。
+
 他の構造体を購読したいときはNSValueから手動で抽出する仕組みを実装することでできます。
+
 RxCocoaのKVORepresentable+CoreGraphics.swiftにKVORepresentableプロトコルを使って抽出する実装コードが書かれているので、独自で作りたい場合はここを参照しましょう。
 
 ==== filterNil()
 
 RxOptionalで定義されているOperator
+
 名前でなんとなくイメージできるかもしれませんが、nilの場合は値を流さず、nilじゃない場合はunwrapして値を流すOperatorです。
 
 わかりやすく、コードで比較してみましょう。次のコードはどちらもまったく同じ動作をします。
@@ -841,6 +861,7 @@ Observable<String?>
 上記のコードはUITextFieldであるtextFieldへのテキスト入力を監視し、値を複数のLabelへbind、リアルタイムで入力したテキストをラベルへ反映する仕組みを実装するコードです。
 
 ここでtextFieldへ「123」と入力した場合、@<code>{print("call")}は何回呼ばれるか予想してみましょう。
+
 パッと見た感じだと、3回入力するので3回出力するのでは？と思いがちですが実際は違います。実行して試してみましょう！
 
 //emlist[]{
@@ -856,21 +877,29 @@ call
 //}
 
 callは９回呼ばれます。なるほど？
+
 値を入力するたびにmap関数が３回呼ばれてますね。これはいけない。
+
 今回のように値を変換したりprint出力するだけならそれほどパフォーマンスに影響はありませんが、データベースアクセスするものや、通信処理が発生するものではこの動作は好ましくありません。
 
 では、なぜこの現象が起こるのか？
+
 その前に、textField.rx.textが何なのかを紐解いて見ましょう。
 
 textField.rx.textはRxCocoaでextension定義されているプロパティで、Observable<String?>ではなく、ControlProperty<String?>として定義されています。（が、実態はObservableです）
+
 ControlPropertyは主にUI要素のプロパティで使われていて、メインスレッドで値が購読されることを保証しています。
+
 また、これはColdなObservableです。
+
 ColdなObservableの仕様として、subscribeした時点で計算リソースが割当られ、複数回subscribeするとその都度ストリームが生成されるという仕組みがあります。
 
 今回の場合、３回@<code>{subscribe(bind)}したので、３個のストリームが生成されます。
+
 するとどうなるかというと、値が変更されたときにOperatorが３回実行されてしまうようになります。
 
 このままではまずいので、どうにかして何回購読してもOperatorを１回実行で済むように実装したいです。
+
 では、どうすればよいのかというと、HotなObservableに変換してあげるとよいです。
 
 やりかたはいくつかあるのですが、今回は @<code>{share()} というOperatorを使います。実際のコードは次のとおりです。
@@ -892,6 +921,7 @@ let text = textField.rx.text
 //}
 
 Build & Run を実行してもう一度「１２３」とテキストに入力してみましょう。
+
 出力結果が次のようになっていたら成功です。
 
 //emlist[]{
@@ -903,22 +933,29 @@ call
 ==== observeOn
 
 ストリームの実行スレッドを決めるオペレータで、このオペレータよりあとに書かれているストリームに対して適用されます
+
 引数には「ImmediateSchedulerType」プロトコルに準拠したクラスを指定します。
 
 ==== MainScheduler.instance
 
 MainSchedulerのシングルトンインスタンスを指定しています。
+
 observeOnの引数にMainSchedulerのシングルトンインスタンスを渡してあげると、その先のOperatorはメインスレッドで処理してくれるようになります。
 
 説明が長くなりましたが、本題に戻りましょう。
+
 KVOで書いた処理をRxSwiftに置き換えてみた結果、かなり読みやすくなりましたね。
 
 特に、removeObserverを気にしなくてもよくなるのはだいぶ安全になりますね。
+
 というよりは、RxSwiftの場合はremoveObserverの役割が@<code>{.disposed(by:)}に変わったイメージのほうがわかりやすいかもしれません。
+
 @<code>{disposed(by:)} を結局呼ばないといけないのなら、そんなに変わらなくね？と思うかもしれませんが、RxSwiftではWarningが出るのでremoveObserverだったころより忘れる確率は低くなります。
 
 しかし、この方法ではKey値がベタ書きになっていることと、値の型を指定してあげないといけないという問題も残っています。
+
 もっと使いやすくするように自分でextensionを定義するのもアリですが、
+
 実はもっと便利にWKWebViewを扱える「RxWebKit」というRxSwift拡張ライブラリがあるので、それを使ってみましょう。
 
 Podfileを編集します
@@ -998,9 +1035,11 @@ class RxWebkitViewController: UIViewController {
 //}
 
 Build & Run で実行してみましょう。まったく同じ動作であれば成功です。
+
 RxWebKitを使ったことでさらに可動性がよくなりました。
 
 RxWebKitはその名前のとおり、WebKitをRxSwiftで使いやすくしてくれるように拡張定義しているラッパーライブラリです。
+
 これを使うことで、「Keyのべた書き」と「値の型指定」問題がなくなりました。感謝です。
 
 RxWebKitには他にも@<code>{canGoBack()}、@<code>{canGoForward()}に対してsubscribeすることもできるので、色々な用途に使えそうですね。

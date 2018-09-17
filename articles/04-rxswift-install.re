@@ -24,13 +24,14 @@ gem install -v 1.5.3 cocoapods = バージョンを本書と同じにしたい�
 //}
 
 これでCocoaPodsを端末に導入することができました。
+
 次に、CocoaPodsを用いて、プロジェクトに外部ライブラリを導入してみます。
 
 大まかな流れは次のとおりです。
 
-1. Podfileというファイルを作成
-2. Podfileに導入したいライブラリを定義
-3. ターミナルで pod install と入力
+  1. Podfileというファイルを作成
+  2. Podfileに導入したいライブラリを定義
+  3. ターミナルで pod install と入力
 
 では、実際にやってみましょう。
 
@@ -57,6 +58,7 @@ pod install
 //}
 
 `Pod installation complete!` というメッセージが出力されたら導入成功です！
+
 もし導入できていなさそうな出力であれば、書き方やtypoをもう一度確認してみてください。
 
 Tips: PodfileはRubyとまったく同じ構文で定義されています
