@@ -113,7 +113,7 @@ class HogeViewModel {
 
 このコードを図で表してみましょう。
 
-//image[helloworldsubject][Subject イメージ図]{
+//image[helloworldsubject][Subject イメージ図][scale=0.3]{
   Subject イメージ図
 //}
 
@@ -135,7 +135,7 @@ Observableは翻訳すると観測可能という意味で文字どおり観測�
 
 まずは、次の図を見てください。
 
-//image[what-observable][Observable]{
+//image[what-observable][Observable][scale=0.3]{
   Observable
 //}
 

@@ -70,11 +70,11 @@ RxSwiftでは本当に色々なことができますが、１番わかりやす�
 
 UIButtonとUILabelが画面に配置されていて、ボタンをタップすると文字列が変更されるという仕様のアプリを題材として作ります。
 
-//image[simpletap1][イメージ１]{
+//image[simpletap1][イメージ１][scale=0.3]{
   simpletap1
 //}
 
-//image[simpletap2][イメージ２]{
+//image[simpletap2][イメージ２][scale=0.3]{
   simpletap2
 //}
 
@@ -137,7 +137,7 @@ addTargetを利用する場合のコードも見てみましょう
 
 UILabel, UITextFieldを画面に２つずつ配置し、入力したテキストをバリデーションして「あとN文字」とUILabelに反映するよくある仕組みのアプリを作ってみます
 
-//image[simpletextfieldlabelexample1][画面のイメージ]{
+//image[simpletextfieldlabelexample1][画面のイメージ][scale=0.3]{
   画面のイメージ
 //}
 

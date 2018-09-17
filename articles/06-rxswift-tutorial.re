@@ -29,7 +29,7 @@
 
 === 画面のイメージ
 
-//image[counterappscreenshot][作成するアプリのイメージ]{
+//image[counterappscreenshot][作成するアプリのイメージ][scale=0.3]{
   作成するアプリのイメージ
 //}
 
@@ -37,19 +37,19 @@
 
 まずはプロジェクトを作成します。ここは特別なことをやっていないのでサクサクといきます。
 
-//image[create-project][プロジェクトの作成]{
+//image[create-project][プロジェクトの作成][scale=0.3]{
   プロジェクトの作成
 //}
 
 Xcodeを新規で起動して、 Create a new Xcode project を選択します。
 
-//image[select-template][テンプレートの選択]{
+//image[select-template][テンプレートの選択][scale=0.3]{
   テンプレートの選択
 //}
 
 テンプレートを選択します。 Single View App を選択
 
-//image[project-name-settings][プロジェクトの設定]{
+//image[project-name-settings][プロジェクトの設定][scale=0.3]{
   プロジェクトの設定
 //}
 
@@ -187,13 +187,13 @@ Main.storyboardを削除してことによって一番最初に起動するViewC
   * Placeholders > File's Owner を選択
   * Class に ViewControllerを指定
 
-//image[viewcontroller-filesowner][ViewController.xibの設定１]{
+//image[viewcontroller-filesowner][ViewController.xibの設定１][scale=0.3]{
   ViewController.xibの設定
 //}
 
 OutletsのviewとViewControllerのViewをつなげる
 
-//image[viewcontroller-view-outlet][ViewController.xibの設定２]{
+//image[viewcontroller-view-outlet][ViewController.xibの設定２][scale=0.3]{
   ViewController.xibの設定２
 //}
 
@@ -201,7 +201,7 @@ OutletsのviewとViewControllerのViewをつなげる
 
 次のような画面が出たら成功です。
 
-//image[init-clearn-viewcontroller][起動したアプリの画面]{
+//image[init-clearn-viewcontroller][起動したアプリの画面][scale=0.3]{
   起動したアプリの画面
 //}
 
@@ -248,7 +248,7 @@ class ViewController: UIViewController {
 
 UIButton３つとUILabelを１つ配置しましょう
 
-//image[counter-app-interfacebuilder][部品の設置]{
+//image[counter-app-interfacebuilder][部品の設置][scale=0.3]{
   部品の設置
 //}
 
@@ -629,14 +629,14 @@ ViewControllerがViewModelの値を監視して変更があったらUIを自動�
 
 === イメージ
 
-//image[wkwebview1][アプリのイメージ１]{
+//image[wkwebview1][アプリのイメージ１][scale=0.3]{
   アプリのイメージ１
 //}
 
-//image[wkwebview2][アプリのイメージ２]{
+//image[wkwebview2][アプリのイメージ２][scale=0.3]{
   アプリのイメージ２
 //}
-//image[wkwebview3][アプリのイメージ３]{
+//image[wkwebview3][アプリのイメージ３][scale=0.3]{
   アプリのイメージ３
 //}
 
