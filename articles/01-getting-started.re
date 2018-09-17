@@ -14,43 +14,43 @@ RxSwiftについて学ぶ時、Google検索で調べて技術ブログやQiita�
 
 本書は次の読者を対象として作成しています。
 
-- プログラミング歴1年以上（種類問わず）
-- Swift による iOS アプリの開発経験が少しだけある（3ヶ月〜1年未満）
-- RxSwiftライブラリを使った開発をしたことが全くない・ほんの少しだけある
+* プログラミング歴1年以上（種類問わず）
+* Swift による iOS アプリの開発経験が少しだけある（3ヶ月〜1年未満）
+* RxSwiftライブラリを使った開発をしたことが全くない・ほんの少しだけある
 
 == 必須知識
-- Swiftの基本的な言語仕様
-  - if, for, switch, enum, class, struct
-  - mapやfilterなどの高階関数の扱い
-- Xcode の基本的な操作
-- よく使われる UIKitの仕様
-  - UILabel UITextView UITableView UICollectionView
+* Swiftの基本的な言語仕様
+** if, for, switch, enum, class, struct
+** mapやfilterなどの高階関数の扱い
+* Xcode の基本的な操作
+* よく使われる UIKitの仕様
+** UILabel UITextView UITableView UICollectionView
 
 == 推奨知識
 
-- 設計パターン
-  - MVVMアーキテクチャ
-- デザインパターン
-  - delegateパターン
-  - KVOパターン
-  - Observerパターン
+* 設計パターン
+** MVVMアーキテクチャ
+* デザインパターン
+** delegateパターン
+** KVOパターン
+** Observerパターン
 
 == 想定環境
-- OSX High Sierra
-- Xcode 9.4
-- Swift 4.1
-- cocoapods 1.5.3
+* OSX High Sierra
+* Xcode 9.4
+* Swift 4.1
+* cocoapods 1.5.3
 
 == お問い合わせ先
 
-- Twitter
-  - @k0uhashi
+* Twitter
+** @k0uhashi
 
 == 免責事項
 
 本書は有志によって作成されているもので、米Apple社とは一切関係がありません。
 
-```
+//emlist[]{
 RxSwift License
 
 The MIT License Copyright © 2015 Krunoslav Zaher All rights reserved.
@@ -60,4 +60,4 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-```
+//}

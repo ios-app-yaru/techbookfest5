@@ -1,5 +1,4 @@
-
-# 次のステップ
+= 次のステップ
 
 ここまででRxSwiftとその周辺についての解説は終わりです。お疲れ様でした。
 ここでは、次のステップについて紹介します。この本を読んでなるほど・・・で終わってはいけません！
@@ -15,7 +14,7 @@
 まとめると、趣味や仕事のアプリで導入して実際に書いてインプット、
 わかってきたこと・気になることをアウトプットすることを継続していくのが一番良い方法かと思っているので、やっていきましょう！！
 
-## コミュニティ
+== コミュニティ
 
 RxSwiftを今後学んでいく上で、開発者コミュニティは非常に重要な存在です。日本国内ではRxSwift専用のコミュニティは筆者の観測内では見つけられませんでしたが、RxSwift Community（Github Project) のSlackワークスペースがあるので、興味がある人は覗いてみてください。URLはRxSwift Repository内のREADMEに記載されています。
 
@@ -27,11 +26,11 @@ RxSwiftを今後学んでいく上で、開発者コミュニティは非常に�
 リモートもくもく会、（というかリモート勉強会）良いソリューションだと思うんですがいまいち活発じゃないんですよね〜〜・・・インフラ勉強会はめちゃめちゃ活発なので、この動きが全体に広まって欲しい気持ちはあります。
 定期的に開催しているので、見かけたら気軽に参加してください！iOSアプリ開発に関わるものだったらなにやってもOKです！
 
-- swift-developers-japan
-  - https://medium.com/swift-column/discord-ios-20d586e373c0
-- iOSアプリ開発がんばるぞ！！の会
-  - https://ios-app-yaru.connpass.com/
-- iOSDC
-  - https://iosdc.jp/2018/
-- try! Swift
-  - https://www.tryswift.co/
+* swift*developers-japan
+** https://medium.com/swift-column/discord-ios-20d586e373c0
+* iOSアプリ開発がんばるぞ！！の会
+** https://ios-app-yaru.connpass.com/
+* iOSDC
+** https://iosdc.jp/2018/
+* try! Swift
+** https://www.tryswift.co/

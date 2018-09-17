@@ -1,5 +1,4 @@
-
-# 簡単なアプリを作ってみよう！
+= 簡単なアプリを作ってみよう！
 
 ここまではRxSwift/RxCocoaの概念や基本的な使い方について紹介してきましたが、ここからは実際にアプリを作りながら説明していきます。
 
@@ -10,85 +9,93 @@
 
 では、作っていきましょう！テーマはこちら！
 
-## カウンターアプリ
+== カウンターアプリ
 
 この節ではカウンターアプリをテーマにcallback、delegate、RxSwiftでどうかくかを書きます。
 まずはアプリの機能要件を決めます！
 
-### 機能要件
+=== 機能要件
 
-- カウントの値が見れる
-- カウントアップができる
-- カウントダウンができる
-- リセットができる
+* カウントの値が見れる
+* カウントアップができる
+* カウントダウンができる
+* リセットができる
 
-### アーキテクチャ
+=== アーキテクチャ
 
-- MVVM
+* MVVM
 
-### 画面のイメージ
+=== 画面のイメージ
 
-image: counterappscreenshot.png
+//image[counterappscreenshot][作成するアプリのイメージ]{
+  作成するアプリのイメージ
+//}
 
-### プロジェクトの作成
+=== プロジェクトの作成
 
 まずはプロジェクトを作成します。ここは特別なことをやっていないのでサクサクといきます。
 
-image: create-project.png
+//image[create-project][プロジェクトの作成]{
+  プロジェクトの作成
+//}
 
 Xcodeを新規で起動して、 Create a new Xcode project を選択します。
 
-image: select-template.png
+//image[select-template][テンプレートの選択]{
+  テンプレートの選択
+//}
 
 テンプレートを選択します。 Single View App を選択
 
-image: project-name-settings.png
+//image[project-name-settings][プロジェクトの設定]{
+  プロジェクトの設定
+//}
 
 プロジェクトの設定をします。 ここは各自好きなように設定してください。
 
 Nextボタンを押してプロジェクトの作成ができたら、一度Xcodeを終了します
 
-### 環境設定
+=== 環境設定
 
 terminal.app を起動し、作成したプロジェクトのルートまで移動します
 
-```
+//cmd{
 ryo-takahashi@~/CounterApp>
-```
+//}
 
 まず最初にRxSwift/RxCocoaライブラリの導入を行います。プロジェクト内で `pod init` を実行します。
 成功すると、ディレクトリ内に Podfile というファイルが生成されているのでこれを編集します。
 
-```
+//cmd{
 vi Podfile
-```
+//}
 
 ファイルを開いたら、次のように編集してください。
 
-```
+//listnum[podfile-rxswift-rxcocoa][Podfileの編集][ruby]{
 # Uncomment the next line to define a global platform for your project
 # platform :ios, '9.0'
 
 target 'CounterApp' do
-  # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
+  = Comment the next line if you're not using Swift and don't want to use dynamic frameworks
   use_frameworks!
 
-  # Pods for CounterApp
-  pod 'RxSwift' # ★この行を追加
-  pod 'RxCocoa' # ★この行を追加
+  = Pods for CounterApp
+  pod 'RxSwift' = ★この行を追加
+  pod 'RxCocoa' = ★この行を追加
 
 end
-```
+//}
 
 編集して保存したら、導入のためインストール用コマンドを入力します。
 
-```
+//cmd{
 pod install
-```
+//}
 
 次のような結果が出たら成功です。
 
-```
+//cmd{
 Analyzing dependencies
 Downloading dependencies
 Installing RxCocoa (4.2.0)
@@ -100,54 +107,53 @@ Integrating client project
 Sending stats
 Pod installation complete! There are 2 dependencies from the Podfile and 2 total pods installed.
 
-[!] Automatically assigning platform `ios` with version `11.4` on target `CounterApp` because no platform was specified. Please specify a platform for this target in your Podfile. See `https://guides.cocoapods.org/syntax/podfile.html#platform`.
-```
+[!] Automatically assigning platform `ios` with version `11.4` on target `CounterApp` because no platform was specified. Please specify a platform for this target in your Podfile. See `https://guides.cocoapods.org/syntax/podfile.html=platform`.
+//}
 
 環境設定はこれで完了です。
 
 次回以降プロジェクトを開く時は、必ず "YOUR_PROJECT_NAME.xcworkspace" から開くようにしましょう
 （*.xcworkspaceから開かないと導入したライブラリが使えません）
 
-### 開発を加速させる設定
+=== 開発を加速させる設定
 
 ★ このセクションは今後何度も使うので付箋やマーカーを引いておきましょう！
 
 この節では、節タイトルの通り開発を加速させる簡単な設定を行います。本書のテーマとは少しずれるので早足で進めます。
 具体的には、Storyboardを廃止して ViewController + Xib を使って開発する手法に切り替えます。
 
-#### Storyboardの廃止
+==== Storyboardの廃止
 
 Storyboardは画面遷移の設定が簡単にできたり、パッと見るだけで画面がどう遷移していくかわかりやすくて良いのですが、
 反面としてアプリが大きくなってくると画面遷移が複雑で逆に見辛くなったり、小さなViewController（アラートやダイアログを出すものなど）の生成が面倒だったり、チーム人数が複数になると*.storyboardがconflictしまくるなど色々問題があるので、Storyboardを使うのをやめます。
 
 Storyboardを廃止するために、次のことを行います
 
-- Main.storyboardの削除
-- Info.plistの設定
-- AppDelegateの整理
-- ViewController.xibの作成
+* Main.storyboardの削除
+* Info.plistの設定
+* AppDelegateの整理
+* ViewController.xibの作成
 
-##### Main.storyboardの削除
+===== Main.storyboardの削除
 
-- CounterApp.xcworkspaceを開く
-- /CouterApp/Main.storyboardをDelete
-  - Move to Trashを選択
+* CounterApp.xcworkspaceを開く
+* /CouterApp/Main.storyboardをDelete
+** Move to Trashを選択
 
-##### Info.plist
+===== Info.plist
 
 Info.plistにはデフォルトでMain.storyboardを使ってアプリを起動するような設定が書かれているので、それを削除します
 
-- Info.plistを開く
-- Main storyboard file base name の項目を削除する
+* Info.plistを開く
+* Main storyboard file base name の項目を削除する
 
-##### AppDelegateの整理
+===== AppDelegateの整理
 
 Main.storyboardを削除したことによって、一番最初に起動するViewControllerの設定が失われ、アプリの起動が失敗するようになってしまったので、AppDelegateに一番最初に起動するViewControllerを設定します。
 
-- AppDelegate.swiftを開く
 
-```
-# AppDelegate.swift
+//listnum[appdelegate][AppDelegate.swiftを開く][swift]{
+//AppDelegate.swift
 import UIKit
 
 @UIApplicationMain
@@ -164,28 +170,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
 }
-```
+//}
 
-##### ViewController.xibの作成
+===== ViewController.xibの作成
 
 Main.storyboardを削除してことによって一番最初に起動するViewControllerの画面のデータがなくなってしまったので作成します。
 
-- New File > View > Save As: ViewController.xib > Create
-- ViewController.xibを開く
-- Placeholders > File's Owner を選択
-- Class に ViewControllerを指定
+* New File > View > Save As: ViewController.xib > Create
+* ViewController.xibを開く
+* Placeholders > File's Owner を選択
+* Class に ViewControllerを指定
 
-image: viewcontroller-filesowner.png
+//image[viewcontroller-filesowner][ViewController.xibの設定１]{
+  ViewController.xibの設定
+//}
 
-- OutletsのviewとViewControllerのViewをつなげる
+OutletsのviewとViewControllerのViewをつなげる
 
-image: viewcontroller-view-outlet.png
+//image[viewcontroller-view-outlet][ViewController.xibの設定２]{
+  ViewController.xibの設定２
+//}
 
 これでアプリの起動ができるようになりました。Build & Run で確認してみましょう。
 
 次のような画面が出たら成功です。
 
-image: init-clearn-viewcontroller.png
+//image[init-clearn-viewcontroller][起動したアプリの画面]{
+  起動したアプリの画面
+//}
 
 これで環境設定は終了です。
 今後画面を追加していくときは同様の手順で作成していきます。
@@ -193,28 +205,28 @@ image: init-clearn-viewcontroller.png
 1. ViewController.swiftの作成
 2. ViewController.xibの作成
 3. ViewController.xibの設定
-  3-1. Classの指定
-  3-2. ViewのOutletの設定
+4. Classの指定
+5. ViewのOutletの設定
 
 Tips: 画面遷移
 
 ViewController.swift + ViewController.xib構成にしたことによって、ViewControllerの生成が楽になりました。
 また、そのおかげで画面遷移が少ない行で実装できるようになりました。次のコードで画面遷移を実装できます。
 
-```
+//listnum[pushviewcontroller][画面遷移の実装][swift]{
 let viewController = ViewController()
 navigationController?.pushViewController(viewController, animated: true)
-```
+//}
 
-### CallBackで作るカウンターアプリ
+=== CallBackで作るカウンターアプリ
 
 ようやくここから本題に入ります、まずはViewController.swiftを整理しましょう
 
-- ViewController.swiftを開く
-- 次のように編集
-  - didReceiveMemoryWarningメソッドは特に使わないので削除します。
+* ViewController.swiftを開く
+* 次のように編集
+** didReceiveMemoryWarningメソッドは特に使わないので削除します。
 
-```
+//listnum[viewcontroller-arrangement][ViewControllerの整理][swift]{
 import UIKit
 
 class ViewController: UIViewController {
@@ -223,18 +235,20 @@ class ViewController: UIViewController {
         super.viewDidLoad()
     }
 }
-```
+//}
 
 次に、画面を作成します。
 UIButton３つとUILabelを１つ配置しましょう
 
-image: counter-app-interfacebuilder.png
+//image[counter-app-interfacebuilder][部品の設置]{
+  部品の設置
+//}
 
 UI部品の配置が終わったら、早速ViewControllerと繋げましょう。
 
 UILabelはIBOutlet、UIButtonはIBActionとして繋げます
 
-```
+//listnum[viewcontroller-add-ibaction][IBActionの作成][swift]{
 import UIKit
 
 class ViewController: UIViewController {
@@ -254,14 +268,14 @@ class ViewController: UIViewController {
     @IBAction func countReset(_ sender: Any) {
     }
 }
-```
+//}
 
 次に、ViewModelを作ります。ViewModelには次の役割をもたせます
 
-- カウントデータの保持
-- カウントアップ、カウントダウン、カウントリセットの処理
+* カウントデータの保持
+* カウントアップ、カウントダウン、カウントリセットの処理
 
-```
+//listnum[create-callback-pattern-viewmodel][ViewModelの作成][swift]{
 class ViewModel {
     private(set) var count = 0
 
@@ -280,12 +294,11 @@ class ViewModel {
         callback(count)
     }
 }
-
-```
+//}
 
 ViewModelを作ったので、ViewControllerでViewModelを使うように修正と、IBActionの修正を行っていきます。
 
-```
+//listnum[fix-callback-viewcontroller-viewmodel][ViewControllerの修正][swift]{
 class ViewController: UIViewController {
 
     @IBOutlet weak var countLabel: UILabel!
@@ -319,22 +332,22 @@ class ViewController: UIViewController {
         countLabel.text = String(count)
     }
 }
-```
+//}
 
 これで、機能要件を満たすことができました。
 実際に Build & Run して確認してみましょう。
 
 callbackで書く場合の良いところと悪いところをまとめてみます。
 
-- 良い
-  - 記述が簡単
-- 悪い
-  - ボタンを増やすたびにボタンを押下時の処理メソッドが増えていく
-    - ラベルの場合も同様
-    - 画面が大きくなっていくにつれてメソッドが多くなり、コードが読みづらくなってくる
-  - ViewControllerとViewModelに分けたものの、完全にUIと処理の切り分けができているわけではない
+* 良い
+** 記述が簡単
+* 悪い
+** ボタンを増やすたびにボタンを押下時の処理メソッドが増えていく
+*** ラベルの場合も同様
+*** 画面が大きくなっていくにつれてメソッドが多くなり、コードが読みづらくなってくる
+** ViewControllerとViewModelに分けたものの、完全にUIと処理の切り分けができているわけではない
 
-### Delegateで作るカウンターアプリ
+=== Delegateで作るカウンターアプリ
 
 次に、delegateを使って実装してみましょう。
 
@@ -343,15 +356,15 @@ MVPパターンに沿って実装していきます。
 
 まずはDelegateを作ります
 
-```
+//listnum[create-counter-delegate-protocol][Delegateの作成][swift]{
 protocol CounterDelegate {
     func updateCount(count: Int)
 }
-```
+//}
 
 次に、Presenterを作ります
 
-```
+//listnum[create-counter-presenter][Presenterの作成][swift]{
 class CounterPresenter {
     private var count = 0 {
         didSet {
@@ -381,11 +394,11 @@ class CounterPresenter {
         count = 0
     }
 }
-```
+//}
 
 最後に、ViewControllerを先程作成したPresenterを使うように修正するのと、Delegateをextensionするように修正しましょう
 
-```
+//listnum[fix-viewcontroller-presenter][ViewControllerの修正][swift]{
 class ViewController: UIViewController {
 
     @IBOutlet weak var countLabel: UILabel!
@@ -415,30 +428,30 @@ extension ViewController: CounterDelegate {
         countLabel.text = String(count)
     }
 }
-```
+//}
 
 Build ＆ Run してみましょう。callbackの場合と同じ動きをします。
 Delegateを使った書き方の良し悪しをまとめます。
 
-- 良い
-  - 処理を委譲できる
-  - incrementCount(), decrementCount(), resetCount()がデータの処理に集中できる
-    - callback(count)しなくてもよい
-- 悪い
-  - ボタンを増やすたびにメソッドが増えていく
+* 良い
+** 処理を委譲できる
+** incrementCount(), decrementCount(), resetCount()がデータの処理に集中できる
+** callback(count)しなくてもよい
+* 悪い
+** ボタンを増やすたびにメソッドが増えていく
 
 データを処理する関数が完全に処理に集中できるようになったのは良いことですが、まだボタンとメソッドの個数が１：１になっている問題が残っていて、このままアプリが大きくなっていくにつれてメソッドが多くなり、どのボタンの処理がどのメソッドの処理なのかパッと見た感じではわからなくなってしまいます。
 
 この問題はRxSwift/RxCocoaを使うことで解決できます。
 実際にRxSwiftを使って作ってみましょう。
 
-### RxSwiftで作るカウンターアプリ
+=== RxSwiftで作るカウンターアプリ
 
 先程のPresenterとCounterProtocolはもう使わないので削除しても大丈夫です。
 
 まずはViewModelを作るためのProtocolとInput用の構造体を作ります
 
-```
+//listnum[create-protocol-struct-rxswift-pattern][ProtocolとStructの作成][swift]{
 // ViewModelと同じクラスファイルに定義したほうが良いかも（好みやチームの規約による）
 
 // ボタンの入力シーケンス
@@ -458,11 +471,11 @@ protocol RxViewModelType {
     var outputs: RxViewModelOutput? { get }
     init(input: RxViewModelInput)
 }
-```
+//}
 
 次にViewModelを作ります。CallBackパターンでも作りましたが、紛らわしくならないように新しい名前で作り直します
 
-```
+//listnum[create-viewmodel-rxswift-pattern][swift]{
 import RxSwift
 import RxCocoa
 
@@ -524,14 +537,11 @@ extension RxViewModel: RxViewModelOutput {
         return counterText
     }
 }
-```
+//}
 
 ViewControllerも修正しましょう。全てのIBActionと接続を消してIBOutletを定義して接続しましょう。
 
-注意！！：ここでIBActionの接続解除・IBOutletの接続が正しくできていない場合、起動時にクラッシュするので、要注意！
-もしクラッシュしてしまう場合、ここを見直しましょう！
-
-```
+//listnum[fix-viewcontroller-rxswift-pattern][ViewControllerの修正][swift]{
 import RxSwift
 import RxCocoa
 
@@ -560,25 +570,30 @@ class RxViewController: UIViewController {
             .disposed(by: disposeBag)
     }
 }
-```
+//}
+
+Build & Run で実行してみましょう。全く同じ動作をしていたら成功です。
+
+注意！！：ここでIBActionの接続解除・IBOutletの接続が正しくできていない場合、起動時にクラッシュするので、要注意！
+もしクラッシュしてしまう場合、ViewController.xibのIBAction・IBOutletの設定を見直しましょう！
 
 setupViewModel関数として切り出して定義してviewDidLoad()内で呼び出しています。
 
 この書き方についてまとめてみます。
 
-- 良い
-  - ViewController
-    - スッキリした
-    - Input/Outputだけ気にすれば良くなった
-  - ViewModel
-    - 処理を集中できた
-    - increment, decrement, resetがデータの処理に集中できた
-    - ViewControllerのことを意識しなくても良い
-      - 👉例: delegate?.updateCount(count: count) のようなデータの更新をViewControllerに伝えなくても良い
-  - テストがかきやすくなった
-- 悪い
-  - コード量が他パターンより多い
-  - 書き方に慣れるまで時間がかかる
+* 良い
+** ViewController
+*** スッキリした
+*** Input/Outputだけ気にすれば良くなった
+** ViewModel
+*** 処理を集中できた
+*** increment, decrement, resetがデータの処理に集中できた
+*** ViewControllerのことを意識しなくても良い
+**** 👉例: delegate?.updateCount(count: count) のようなデータの更新をViewControllerに伝えなくても良い
+** テストがかきやすくなった
+* 悪い
+** コード量が他パターンより多い
+** 書き方に慣れるまで時間がかかる
 
 RxSwiftを使った場合の一番大きな良い点はやはり「ViewModelはViewControllerのことを考えなくてもよくなる」ところです。ViewControllerがViewModelの値を監視して変更があったらUIを自動で変更するため、ViewModel側から値が変わったよ！と通知する必要がなくなるのです。
 
@@ -588,26 +603,33 @@ RxSwiftを使った場合の一番大きな良い点はやはり「ViewModelはV
 ですが、この方法は慣れるまで時間がかかるかと思います。まずはUIButton.rx.tapだけ使う、PublishSubject系だけを使う・・・など小さく始めるのもありかと思います。
 個人開発のアプリであれば全リプレースにチャレンジしてみても面白いかもしれませんが、業務で使うアプリでチームメンバーのほとんどがRxSwiftに慣れていない場合、キャッチアップで手一杯になって逆に開発効率が落ちることもありえるのでちゃんとチームメンバーと相談しましょう！
 
-## WKWebViewを使ったアプリ
+== WKWebViewを使ったアプリ
 
 この章ではKVOの実装パターンをRxSwiftに置き換える方法について学びます。
 
-### この章のストーリー
+=== この章のストーリー
 
-- WKWebView+KVOを使ったWebViewアプリを作成
-- WKWebView+RxSwiftに書き換える
+* WKWebView+KVOを使ったWebViewアプリを作成
+* WKWebView+RxSwiftに書き換える
 
-### イメージ
+=== イメージ
 
-image: wkwebview1.png
-image: wkwebview2.png
-image: wkwebview3.png
+//image[wkwebview1][アプリのイメージ１]{
+  アプリのイメージ１
+//}
+
+//image[wkwebview2][アプリのイメージ２]{
+  アプリのイメージ２
+//}
+//image[wkwebview3][アプリのイメージ３]{
+  アプリのイメージ３
+//}
 
 WebViewとProgressViewを配置して、Webページの読み込みに合わせてゲージ、インジケータ、Navigationタイトルを変更する機能を作ります。
 
 サクっといきましょう。KVOで実装した場合、次のコードになります。
 
-```
+//listnum[kvo-webview][KVOで実装する][swift]{
 import UIKit
 import WebKit
 
@@ -654,7 +676,7 @@ class WKWebViewController: UIViewController {
     }
   }
 }
-```
+//}
 
 KVO（Key-Value Observing:キー値監視）とは、特定のオブジェクトのプロパティ値の変化を監視する仕組みです。Objective−Cのメカニズムを使っていて、NSValueクラスに大きく依存しています。
 また、構造体(struct)はNSObjectを継承できないためKVOの仕組みは使えません。
@@ -683,15 +705,15 @@ KVOを使った場合の注意点として、addObserverした場合、deinit時
 
 Podfileにライブラリを追加しましょう
 
-```
+//listnum[add-lib-rxoptional][Podfileの修正][ruby]{
 pod 'RxSwift'
 pod 'RxCocoa'
-pod 'RxOptional' # New!
-```
+pod 'RxOptional' = New!
+//}
 
 では、導入したライブラリも使いつつ、KVOで書かれた実装をRxSwiftを使うようにリプレースしていきます。
 
-```
+//list[fix-kvo-webview-to-rxswift-pattern][RxSwiftでリプレース][swift]{
 import UIKit
 import WebKit
 import RxSwift
@@ -748,16 +770,16 @@ class WKWebViewController: UIViewController {
         webView.load(urlRequest)
     }
 }
-```
+//}
 
 どうでしょうか？ネストも浅くなり、かなり読みやすくなってのではないでしょうか。
 色々説明するところはありますが、この章で初めてでてきたメソッドについて説明していきます。
 
-- import RxOptional
+==== import RxOptional
 
 導入したRxOptionalライブラリをswiftファイル内で使用するために宣言
 
-- rx.observe
+==== rx.observe
 
 rx.observeはKVOを取り巻く単純なラッパーです。単純であるため、パフォーマンスが優れていますが、用途は限られています。
 
@@ -770,14 +792,14 @@ KVOはObjective-Cの仕組みで動いていると書きましたが、RxCocoa�
 他の構造体を購読したいときはNSValueから手動で抽出する仕組みを実装することでできます。
 RxCocoaのKVORepresentable+CoreGraphics.swiftにKVORepresentableプロトコルを使って抽出する実装コードが書かれているので、独自で作りたい場合はここを参照しましょう。
 
-- filterNil()
+==== filterNil()
 
 RxOptionalで定義されているOperator
 名前でなんとなくイメージできるかもしれませんが、nilの場合は値を流さず、nilじゃない場合はunwrapして値を流すOperatorです。
 
 わかりやすく、コードで比較してみましょう。次のコードはどちらも全く同じ動作をします。
 
-```
+//listnum[operator-filternil-example][filterNil()の比較][swift]{
 // RxSwift
 Observable<String?>
   .of("One",nil,"Three")
@@ -790,13 +812,13 @@ Observable<String?>
     .of("One", nil, "Three")
     .filterNil()
     .subscribe { print($0) }
-```
+//}
 
-- share()
+==== share()
 
 文章で説明するより、まずは次のコードを見てください。
 
-```
+//listnum[operator-share-example][share()がない場合][swift]{
     let text = textField.rx.text
         .map { text -> String in
             print("call")
@@ -814,14 +836,14 @@ Observable<String?>
     text
         .bind(to: label3.rx.text)
         .disposed(by: disposeBag)
-```
+//}
 
 上記のコードはUITextFieldであるtextFieldへのテキスト入力を監視し、値を複数のLabelへbind、リアルタイムで入力したテキストをラベルへ反映する仕組みを実装するコードです。
 
 ここでtextFieldへ「123」と入力した場合、print("call")は何回呼ばれるか予想してみましょう。
 パッと見た感じだと、3回入力するので3回出力するのでは？と思いがちですが実際は違います。実行して試してみましょう！
 
-```
+//emlist[]{
 call
 call
 call
@@ -831,7 +853,7 @@ call
 call
 call
 call
-```
+//}
 
 callは９回呼ばれます。なるほど？
 値を入力するたびにmap関数が３回呼ばれてますね。これはいけない。
@@ -853,7 +875,7 @@ ColdなObservableの仕様として、subscribeした時点で計算リソース
 
 やりかたはいくつかあるのですが、今回は share() というOperatorを使います。実際のコードは次の通りです。
 
-```
+//listnum[use-share-example][share()を使う][swift]{
 // これを
 let text = textField.rx.text
     .map { text -> String in
@@ -867,23 +889,23 @@ let text = textField.rx.text
         return "☆☆\(text)☆☆"
     }
     .share() // ☆追加
-```
+//}
 
 Build & Run を実行してもう一度「１２３」とテキストに入力してみましょう。
 出力結果が次のようになっていたら成功です。
 
-```
+//emlist[]{
 call
 call
 call
-```
+//}
 
-- observeOn
+==== observeOn
 
 ストリームの実行スレッドを決めるオペレータで、このオペレータよりあとに書かれているストリームに対して適用されます
 引数には「ImmediateSchedulerType」プロトコルに準拠したクラスを指定します。
 
-- MainScheduler.instance
+==== MainScheduler.instance
 
 MainSchedulerのシングルトンインスタンスを指定しています。
 observeOnの引数にMainSchedulerのシングルトンインスタンスを渡してあげると、その先のOperatorはメインスレッドで処理してくれるようになります。
@@ -901,22 +923,22 @@ disposed(by:) を結局呼ばないといけないのなら、そんなに変わ
 
 Podfileを編集します
 
-```
+//listnum[add-rxwebkit-on-podfile][Podfileの編集][ruby]{
   pod 'RxSwift'
   pod 'RxCocoa'
   pod 'RxOptional'
   pod 'RxWebKit'
-```
+//}
 
 ライブラリをインストールします。
 
-```
+//cmd{
 pod install
-```
+//}
 
 先程書いたRxSwiftパターンのコードを次のコードに書き換えてみましょう！
 
-```
+//listnum[use-rxwebkit][RxWebKitを用いる][swift]{
 import UIKit
 import WebKit
 import RxSwift
@@ -973,7 +995,7 @@ class RxWebkitViewController: UIViewController {
         webView.load(urlRequest)
     }
 }
-```
+//}
 
 Build & Run で実行してみましょう。全く同じ動作であれば成功です。
 RxWebKitを使ったことで更に可動性がよくなりました。

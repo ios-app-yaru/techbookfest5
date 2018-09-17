@@ -1,3 +1,1 @@
-
-
-## Github Search サンプルアプリ
+= Github Search サンプルアプリ
