@@ -116,7 +116,7 @@ Pod installation complete! There are 2 dependencies from the Podfile and 2 total
 
 環境設定はこれで完了です。
 
-次回以降プロジェクトを開く時は、必ず 「YOUR_PROJECT_NAME.xcworkspace」 から開くようにしましょう
+次回以降プロジェクトを開く時は、必ず「YOUR_PROJECT_NAME.xcworkspace」 から開くようにしましょう
 
 （*.xcworkspaceから開かないと導入したライブラリが使えません）
 
@@ -149,15 +149,15 @@ Storyboardを廃止するために、次のことを行います
   * /CouterApp/Main.storyboardをDelete
   ** Move to Trashを選択
 
-===== Info.plist
-@<br>{}
+===== Info.plist@<br>{}
+
 Info.plistにはデフォルトでMain.storyboardを使ってアプリを起動するような設定が書かれているので、それを削除します
 
   * Info.plistを開く
   * Main storyboard file base name の項目を削除する
 
 ===== AppDelegateの整理
-@<br>{}
+
 Main.storyboardを削除したことによって、一番最初に起動するViewControllerの設定が失われ、アプリの起動が失敗するようになってしまったので、AppDelegateに一番最初に起動するViewControllerを設定します。
 
 //listnum[appdelegate][AppDelegate.swiftを開く][swift]{
