@@ -14,3 +14,6 @@ jobs:
       - run:
           name: Upload to Dropbox
           command: ./upload_dropbox.sh ./articles/book.pdf ${DROPBOX_TOKEN}
+      - run:
+          name: Post PDF URL to Slack
+          command: ./post-pdf-url-to-slack.sh ${SLACK_TOKEN}
