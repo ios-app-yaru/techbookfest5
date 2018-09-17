@@ -2,11 +2,11 @@
 
 == 導入要件
 
-* RxSwiftリポジトリより引用（２０１８年８月３１日現在）
-* Xcode 9.0
-* Swift 4
-* Swift 3.x （rxswift-3.0 ブランチを指定)
-* Swift 2.3 （rxswift-2.0 ブランチを指定)
+  * RxSwiftリポジトリより引用（２０１８年８月３１日現在）
+  * Xcode 9.0
+  * Swift 4
+  * Swift 3.x （rxswift-3.0 ブランチを指定)
+  * Swift 2.3 （rxswift-2.0 ブランチを指定)
 
 == 導入方法
 

@@ -14,37 +14,39 @@ RxSwiftについて学ぶ時、Google検索で調べて技術ブログやQiita�
 
 本書は次の読者を対象として作成しています。
 
-* プログラミング歴1年以上（種類問わず）
-* Swift による iOS アプリの開発経験が少しだけある（3ヶ月〜1年未満）
-* RxSwiftライブラリを使った開発をしたことが全くない・ほんの少しだけある
+  * プログラミング歴1年以上（種類問わず）
+  * Swift による iOS アプリの開発経験が少しだけある（3ヶ月〜1年未満）
+  * RxSwiftライブラリを使った開発をしたことが全くない・ほんの少しだけある
 
 == 必須知識
-* Swiftの基本的な言語仕様
-** if, for, switch, enum, class, struct
-** mapやfilterなどの高階関数の扱い
-* Xcode の基本的な操作
-* よく使われる UIKitの仕様
-** UILabel UITextView UITableView UICollectionView
+
+  * Swiftの基本的な言語仕様
+  ** if, for, switch, enum, class, struct
+  ** mapやfilterなどの高階関数の扱い
+  * Xcode の基本的な操作
+  * よく使われる UIKitの仕様
+  ** UILabel UITextView UITableView UICollectionView
 
 == 推奨知識
 
-* 設計パターン
-** MVVMアーキテクチャ
-* デザインパターン
-** delegateパターン
-** KVOパターン
-** Observerパターン
+  * 設計パターン
+  ** MVVMアーキテクチャ
+  * デザインパターン
+  ** delegateパターン
+  ** KVOパターン
+  ** Observerパターン
 
 == 想定環境
-* OSX High Sierra
-* Xcode 9.4
-* Swift 4.1
-* cocoapods 1.5.3
+
+  * OSX High Sierra
+  * Xcode 9.4
+  * Swift 4.1
+  * cocoapods 1.5.3
 
 == お問い合わせ先
 
-* Twitter
-** @k0uhashi
+  * Twitter
+  ** @k0uhashi
 
 == 免責事項
 

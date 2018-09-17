@@ -16,14 +16,14 @@
 
 === 機能要件
 
-* カウントの値が見れる
-* カウントアップができる
-* カウントダウンができる
-* リセットができる
+  * カウントの値が見れる
+  * カウントアップができる
+  * カウントダウンができる
+  * リセットができる
 
 === アーキテクチャ
 
-* MVVM
+  * MVVM
 
 === 画面のイメージ
 
@@ -129,23 +129,23 @@ Storyboardは画面遷移の設定が簡単にできたり、パッと見るだ�
 
 Storyboardを廃止するために、次のことを行います
 
-* Main.storyboardの削除
-* Info.plistの設定
-* AppDelegateの整理
-* ViewController.xibの作成
+  * Main.storyboardの削除
+  * Info.plistの設定
+  * AppDelegateの整理
+  * ViewController.xibの作成
 
 ===== Main.storyboardの削除
 
-* CounterApp.xcworkspaceを開く
-* /CouterApp/Main.storyboardをDelete
-** Move to Trashを選択
+  * CounterApp.xcworkspaceを開く
+  * /CouterApp/Main.storyboardをDelete
+  ** Move to Trashを選択
 
 ===== Info.plist
 
 Info.plistにはデフォルトでMain.storyboardを使ってアプリを起動するような設定が書かれているので、それを削除します
 
-* Info.plistを開く
-* Main storyboard file base name の項目を削除する
+  * Info.plistを開く
+  * Main storyboard file base name の項目を削除する
 
 ===== AppDelegateの整理
 
@@ -176,10 +176,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 Main.storyboardを削除してことによって一番最初に起動するViewControllerの画面のデータがなくなってしまったので作成します。
 
-* New File > View > Save As: ViewController.xib > Create
-* ViewController.xibを開く
-* Placeholders > File's Owner を選択
-* Class に ViewControllerを指定
+  * New File > View > Save As: ViewController.xib > Create
+  * ViewController.xibを開く
+  * Placeholders > File's Owner を選択
+  * Class に ViewControllerを指定
 
 //image[viewcontroller-filesowner][ViewController.xibの設定１]{
   ViewController.xibの設定
@@ -222,9 +222,9 @@ navigationController?.pushViewController(viewController, animated: true)
 
 ようやくここから本題に入ります、まずはViewController.swiftを整理しましょう
 
-* ViewController.swiftを開く
-* 次のように編集
-** didReceiveMemoryWarningメソッドは特に使わないので削除します。
+  * ViewController.swiftを開く
+  * 次のように編集
+  ** didReceiveMemoryWarningメソッドは特に使わないので削除します。
 
 //listnum[viewcontroller-arrangement][ViewControllerの整理][swift]{
 import UIKit
@@ -272,8 +272,8 @@ class ViewController: UIViewController {
 
 次に、ViewModelを作ります。ViewModelには次の役割をもたせます
 
-* カウントデータの保持
-* カウントアップ、カウントダウン、カウントリセットの処理
+  * カウントデータの保持
+  * カウントアップ、カウントダウン、カウントリセットの処理
 
 //listnum[create-callback-pattern-viewmodel][ViewModelの作成][swift]{
 class ViewModel {
@@ -339,13 +339,13 @@ class ViewController: UIViewController {
 
 callbackで書く場合の良いところと悪いところをまとめてみます。
 
-* 良い
-** 記述が簡単
-* 悪い
-** ボタンを増やすたびにボタンを押下時の処理メソッドが増えていく
-*** ラベルの場合も同様
-*** 画面が大きくなっていくにつれてメソッドが多くなり、コードが読みづらくなってくる
-** ViewControllerとViewModelに分けたものの、完全にUIと処理の切り分けができているわけではない
+  * 良い
+  ** 記述が簡単
+  * 悪い
+  ** ボタンを増やすたびにボタンを押下時の処理メソッドが増えていく
+  *** ラベルの場合も同様
+  *** 画面が大きくなっていくにつれてメソッドが多くなり、コードが読みづらくなってくる
+  ** ViewControllerとViewModelに分けたものの、完全にUIと処理の切り分けができているわけではない
 
 === Delegateで作るカウンターアプリ
 
@@ -433,12 +433,12 @@ extension ViewController: CounterDelegate {
 Build ＆ Run してみましょう。callbackの場合と同じ動きをします。
 Delegateを使った書き方の良し悪しをまとめます。
 
-* 良い
-** 処理を委譲できる
-** incrementCount(), decrementCount(), resetCount()がデータの処理に集中できる
-** callback(count)しなくてもよい
-* 悪い
-** ボタンを増やすたびにメソッドが増えていく
+  * 良い
+  ** 処理を委譲できる
+  ** incrementCount(), decrementCount(), resetCount()がデータの処理に集中できる
+  ** callback(count)しなくてもよい
+  * 悪い
+  ** ボタンを増やすたびにメソッドが増えていく
 
 データを処理する関数が完全に処理に集中できるようになったのは良いことですが、まだボタンとメソッドの個数が１：１になっている問題が残っていて、このままアプリが大きくなっていくにつれてメソッドが多くなり、どのボタンの処理がどのメソッドの処理なのかパッと見た感じではわからなくなってしまいます。
 
@@ -581,19 +581,19 @@ setupViewModel関数として切り出して定義してviewDidLoad()内で呼�
 
 この書き方についてまとめてみます。
 
-* 良い
-** ViewController
-*** スッキリした
-*** Input/Outputだけ気にすれば良くなった
-** ViewModel
-*** 処理を集中できた
-*** increment, decrement, resetがデータの処理に集中できた
-*** ViewControllerのことを意識しなくても良い
-**** 👉例: delegate?.updateCount(count: count) のようなデータの更新をViewControllerに伝えなくても良い
-** テストがかきやすくなった
-* 悪い
-** コード量が他パターンより多い
-** 書き方に慣れるまで時間がかかる
+  * 良い
+  ** ViewController
+  *** スッキリした
+  *** Input/Outputだけ気にすれば良くなった
+  ** ViewModel
+  *** 処理を集中できた
+  *** increment, decrement, resetがデータの処理に集中できた
+  *** ViewControllerのことを意識しなくても良い
+  **** 👉例: delegate?.updateCount(count: count) のようなデータの更新をViewControllerに伝えなくても良い
+  ** テストがかきやすくなった
+  * 悪い
+  ** コード量が他パターンより多い
+  ** 書き方に慣れるまで時間がかかる
 
 RxSwiftを使った場合の一番大きな良い点はやはり「ViewModelはViewControllerのことを考えなくてもよくなる」ところです。ViewControllerがViewModelの値を監視して変更があったらUIを自動で変更するため、ViewModel側から値が変わったよ！と通知する必要がなくなるのです。
 
@@ -609,8 +609,8 @@ RxSwiftを使った場合の一番大きな良い点はやはり「ViewModelはV
 
 === この章のストーリー
 
-* WKWebView+KVOを使ったWebViewアプリを作成
-* WKWebView+RxSwiftに書き換える
+  * WKWebView+KVOを使ったWebViewアプリを作成
+  * WKWebView+RxSwiftに書き換える
 
 === イメージ
 

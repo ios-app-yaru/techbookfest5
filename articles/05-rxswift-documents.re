@@ -136,15 +136,15 @@ RxSwift（ReactiveExtension）について少し調べた方は大体みたこ�
 
 Observableに流れるイベントには次の種類あります。
 
-* /onNext
-** デフォルトのイベント
-** 値を格納でき、何度でも呼ばれる
-* onError
-** エラーイベント
-** １度だけ呼ばれ、その時点で終了、購読を破棄
-* onCompleted
-** 完了イベント
-** １度だけ呼ばれ、その時点で終了、購読を破棄
+  * onNext
+  ** デフォルトのイベント
+  ** 値を格納でき、何度でも呼ばれる
+  * onError
+  ** エラーイベント
+  ** １度だけ呼ばれ、その時点で終了、購読を破棄
+  * onCompleted
+  ** 完了イベント
+  ** １度だけ呼ばれ、その時点で終了、購読を破棄
 
 これをコードでどう扱うかと言うと、次のように扱います
 
@@ -233,10 +233,10 @@ Subject、Relayは簡単に言うと、イベントの検知に加えてイベ�
 
 Subject、Relayは色々ありますが、代表としてよく使われる次の４種類を紹介します。
 
-* PublishSubject
-* BehaviorSubject
-* PublishRelay
-* BehaviorRelay
+  * PublishSubject
+  * BehaviorSubject
+  * PublishRelay
+  * BehaviorRelay
 
 それぞれの違いをざっくりとですが、下記のテーブル図にまとめました。
 
@@ -351,37 +351,37 @@ OperatorというはObservableのイベント値を途中で変換したり、�
 
 Operatorは本当に沢山、色々なことができてそれだけで１冊の本が書けるレベルです。なので、ここではよく使われるOperatorを簡単に紹介します。
 
-* 変換
-** map
-*** 通常の高階関数と同じ動き
-** flatMap
-*** 通常の高階関数と同じ動き
-** reduce
-*** 通常の高階関数と同じ動き
-** scan
-*** reduceに似ていて途中結果もイベント発行ができる
-** debounce
-*** 指定時間イベントが発生しなかったら最後に流されたイベントを流す
-* 絞り込み
-** filter
-*** 通常の高階関数と同じ動き
-** take
-*** 指定時間の間だけイベントを通知してonCompletedする
-** skip
-*** 名前の通り、指定時間の間はイベントを無視する
-** distinct
-*** 重複イベントを除外する
-* 組み合わせ
-** zip
-*** 複数のObservableを組み合わせる（異なる型でも可能）
-** merge
-*** 複数のObservableを組み合わせる（異なる型では不可能）
-** combineLatest
-*** 複数のObservableの最新値を組み合わせる（異なる型でも可能）
-** sample
-*** 引数に渡したObservableのイベントが発生されたら元のObservableの最新イベントを通知
-** concat
-*** 複数のObservableのイベントを順番に組み合わせる（異なる方では不可能）
+  * 変換
+  ** map
+  *** 通常の高階関数と同じ動き
+  ** flatMap
+  *** 通常の高階関数と同じ動き
+  ** reduce
+  *** 通常の高階関数と同じ動き
+  ** scan
+  *** reduceに似ていて途中結果もイベント発行ができる
+  ** debounce
+  *** 指定時間イベントが発生しなかったら最後に流されたイベントを流す
+  * 絞り込み
+  ** filter
+  *** 通常の高階関数と同じ動き
+  ** take
+  *** 指定時間の間だけイベントを通知してonCompletedする
+  ** skip
+  *** 名前の通り、指定時間の間はイベントを無視する
+  ** distinct
+  *** 重複イベントを除外する
+  * 組み合わせ
+  ** zip
+  *** 複数のObservableを組み合わせる（異なる型でも可能）
+  ** merge
+  *** 複数のObservableを組み合わせる（異なる型では不可能）
+  ** combineLatest
+  *** 複数のObservableの最新値を組み合わせる（異なる型でも可能）
+  ** sample
+  *** 引数に渡したObservableのイベントが発生されたら元のObservableの最新イベントを通知
+  ** concat
+  *** 複数のObservableのイベントを順番に組み合わせる（異なる方では不可能）
 
 ここで一覧で紹介されてもおぼえきれねーよ！と思うかもしれませんがその通りです。すぐ覚えなくても良いので、こんなことできるのか〜とフワっと覚えていただければ良いです。
 
@@ -446,13 +446,13 @@ Observable.zip(api1Observable, api2Observable)
 
 HotなObservableの特徴は次の通りです。
 
-* subscribeされなくても動作する
-* 複数の箇所でsubscribeしても全てのObservableで同じイベントが同時に流れる
+  * subscribeされなくても動作する
+  * 複数の箇所でsubscribeしても全てのObservableで同じイベントが同時に流れる
 
 ColdなObservableの特徴は次の通りです。
 
-* subscribeしたときに動作する
-* 複数の箇所でsubscribeしたとき、それぞれのObservableでそれぞれのイベントが流れる
+  * subscribeしたときに動作する
+  * 複数の箇所でsubscribeしたとき、それぞれのObservableでそれぞれのイベントが流れる
 
 ColdなObservableは主に非同期通信処理で使われます。
 試しにsubscribe時に１つの要素を返すObservableを作成する関数を定義してみましょう

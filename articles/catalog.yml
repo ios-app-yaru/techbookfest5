@@ -1,8 +1,8 @@
 PREDEF:
   - preface.re
+  - 01-getting-started.re
 
 CHAPS:
-  - 01-getting-started.re
   - 02-ios-dev-swift.re
   - 03-rxswift-description.re
   - 04-rxswift-install.re
