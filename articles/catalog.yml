@@ -1,17 +1,17 @@
 PREDEF:
   - preface.re
-  - 01-getting-started.re
+  - 00-getting-started.re
 
 CHAPS:
-  - 02-ios-dev-swift.re
-  - 03-rxswift-description.re
-  - 04-rxswift-install.re
-  - 05-rxswift-documents.re
-  - 06-rxswift-tutorial.re
-  - 07-rxswift-hyper-example.re
-  - 08-next-step.re
-  - 09-other-extensions-library.re
-  - 10-rxswift-tips.re
+  - 01-ios-dev-swift.re
+  - 02-rxswift-description.re
+  - 03-rxswift-install.re
+  - 04-rxswift-documents.re
+  - 05-rxswift-tutorial.re
+  - 06-rxswift-hyper-example.re
+  - 07-next-step.re
+  - 08-other-extensions-library.re
+  - 09-rxswift-tips.re
 
 APPENDIX:
 
