@@ -7,7 +7,7 @@ jobs:
       - checkout
       - run:
           name: Build PDF
-          command: ./build-in-docker.sh
+          command: bash build-in-docker.sh
       - store_artifacts:
           path: ./articles/book.pdf
           destination: book.pdf
