@@ -1,4 +1,4 @@
-= 様々なRxSwift系ライブラリ
+= さまざまなRxSwift系ライブラリ
 == RxOptional
 == RxWebkit
 == RxDataSources
