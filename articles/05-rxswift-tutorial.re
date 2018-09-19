@@ -1,20 +1,23 @@
 = 簡単なアプリを作ってみよう！
 
-ここまではRxSwift/RxCocoaの概念や基本的な使い方について紹介してきましたが、ここからは実際にアプリを作りながら説明していきます。
+//lead{
+ここまではRxSwift/RxCocoaの概念や基本的な使い方について紹介してきました。
+ここからは実際にアプリを作りながら解説していきます。
+//}
 
-まずは簡単なアプリから作ってみましょう。
+まずは簡単なアプリから作ってみましょう。@<br>{}
+いきなりRxSwiftでコードを書いても理解に時間がかかるかと思うので、１つのテーマごとにcallbackやdelegate、KVOパターンを使って実装し、これをどうRxSwiftに置き換えるか？という観点でアプリを作っていきます。@<br>{}
+（本書のテーマである「比較して学ぶ」というのはこのことを指しています）
 
-とはいえ、いきなりRxSwiftでコードを書いても理解に時間がかかるかと思います。（自分はそうでした）
-
-なので、１つのテーマごとにcallbackやKVO、delegateで書かれたコードを最初に書いて、これをどうRxSwiftに置き換えるか？という観点でアプリを作っていきます。（本書のテーマである「比較して学ぶ」というのはこのことを指しています）
-
-では、作っていきましょう！テーマはこちら！
+では、作っていきましょう！
 
 == カウンターアプリを作ってみよう！
 
-この節ではカウンターアプリをテーマにcallback、delegate、RxSwiftでどうかくかを書きます。
+//lead{
+この章ではカウンターアプリをテーマにcallback、delegate、RxSwift、それぞれのパターンで実装したコードを比較し、どう書くかを学びます。
+//}
 
-まずはアプリの機能要件を決めます！
+まずはアプリの機能要件を決めます。
 
 === 機能要件
 
@@ -22,10 +25,6 @@
   * カウントアップができる
   * カウントダウンができる
   * リセットができる
-
-=== アーキテクチャ
-
-  * MVVM
 
 === 画面のイメージ
 
@@ -53,13 +52,12 @@ Xcodeを新規で起動して、 Create a new Xcode project を選択します�
   プロジェクトの設定
 //}
 
-プロジェクトの設定をします。 ここは各自好きなように設定してください。
-
+プロジェクトの設定をします。 ここは各自好きなように設定してください。@<br>{}
 Nextボタンを押してプロジェクトの作成ができたら、一度Xcodeを終了します
 
 === 環境設定
 
-terminal.app を起動し、作成したプロジェクトのルートまで移動します
+terminal.app を起動し、作成したプロジェクトのディレクトリまで移動します
 
 //cmd{
 ryo-takahashi@~/CounterApp>
@@ -114,27 +112,25 @@ Pod installation complete! There are 2 dependencies from the Podfile and 2 total
 [!] Automatically assigning platform `ios` with version `11.4` on target `CounterApp` because no platform was specified. Please specify a platform for this target in your Podfile. See `https://guides.cocoapods.org/syntax/podfile.html=platform`.
 //}
 
-環境設定はこれで完了です。
+環境設定はこれで完了です。@<br>{}
+次回以降プロジェクトを開く時は、必ず「CounterApp.xcworkspace」 から開くようにしましょう
 
-次回以降プロジェクトを開く時は、必ず「YOUR_PROJECT_NAME.xcworkspace」 から開くようにしましょう
-
-（*.xcworkspaceから開かないと導入したライブラリが使えません）
+（Xcode上、もしくはFinder上でCounterApp.xcworkspaceを指定しないと導入したライブラリが使えません）
 
 === 開発を加速させる設定
 
 //lead{
-  ★このセクションは今後何度も使うので付箋やマーカーを引いておきましょう！
+  ■このセクションは今後何度も使うので付箋やマーカーを引いておきましょう！■
 //}
 
-この節では、節タイトルのとおり開発を加速させる簡単な設定を行います。本書のテーマとは少しずれるので早足で進めます。
-
-具体的には、Storyboardを廃止して ViewController + Xib を使って開発する手法に切り替えます。
+この節では、節タイトルのとおり開発を加速させる簡単な設定を行います。本書のテーマとは少しずれるので早足で進めます。@<br>{}
+具体的には、Storyboardを廃止して ViewController + Xib を使って開発する手法に切り替えるための設定を行います。
 
 ==== Storyboardの廃止
 
-Storyboardは画面遷移の設定が簡単にできたり、パッと見るだけで画面がどう遷移していくかわかりやすくてよいのですが、
-
-反面としてアプリが大きくなってくると画面遷移が複雑で逆に見辛くなったり、小さなViewController（アラートやダイアログを出すものなど）の生成が面倒だったり、チーム人数が複数になると*.storyboardがconflictしまくるなど色々問題があるので、Storyboardを使うのをやめます。
+Storyboardは画面遷移の設定が簡単にできたり、パッと見るだけで画面がどう遷移していくかわかりやすくてよいのですが、@<br>{}
+反面としてアプリが大きくなってくると画面遷移が複雑で逆に見辛くなったり、小さなViewController（アラートやダイアログを出すものなど）の生成が面倒だったり、@<br>{}
+チーム人数が複数になると*.storyboardがconflictしまくるなど色々問題があるので、Storyboardを使うのをやめます。
 
 Storyboardを廃止するために、次のことを行います
 
@@ -151,14 +147,15 @@ Storyboardを廃止するために、次のことを行います
 
 ===== Info.plist@<br>{}
 
-Info.plistにはデフォルトでMain.storyboardを使ってアプリを起動するような設定が書かれているので、それを削除します
+Info.plistにはデフォルトでMain.storyboardを使ってアプリを起動するような設定が書かれているので、その項目を削除します
 
   * Info.plistを開く
   * Main storyboard file base name の項目を削除する
 
 ===== AppDelegateの整理
 
-Main.storyboardを削除したことによって、一番最初に起動するViewControllerの設定が失われ、アプリの起動が失敗するようになってしまったので、AppDelegateに一番最初に起動するViewControllerを設定します。
+Main.storyboardを削除したことによって、一番最初に起動するViewControllerの設定が失われるため、アプリを正しく起動できません。
+これを解消するために、AppDelegate.swiftに一番最初に起動するViewControllerを設定します。
 
 //listnum[appdelegate][AppDelegate.swiftを開く][swift]{
 //AppDelegate.swift
@@ -193,7 +190,7 @@ Main.storyboardを削除してことによって一番最初に起動するViewC
   ViewController.xibの設定
 //}
 
-OutletsのviewとViewControllerのViewをつなげる
+OutletsのviewとViewControllerのViewを接続します。
 
 //image[viewcontroller-view-outlet][ViewController.xibの設定２][scale=0.8]{
   ViewController.xibの設定２
@@ -207,20 +204,24 @@ OutletsのviewとViewControllerのViewをつなげる
   起動したアプリの画面
 //}
 
+起動に失敗する場合、ViewController.xibが正しく設定されているかもういちど確認してみましょう。
+
 これで環境設定は終了です。
 今後画面を追加していくときは同様の手順で作成していきます。
+
+===== 新しい画面を追加するときの手順まとめ
 
   1. ViewController.swiftの作成
   2. ViewController.xibの作成
   3. ViewController.xibの設定
-  4. Classの指定
-  5. ViewのOutletの設定
+    3. Classの指定
+    3. ViewのOutletの設定
 
 ===== Tips: 画面遷移
 
-ViewController.swift + ViewController.xib構成にしたことによって、ViewControllerの生成が楽になりました。
-
-また、そのおかげで画面遷移が少ない行で実装できるようになりました。次のコードで画面遷移を実装できます。
+ViewController.swift + ViewController.xib構成にしたことによって、ViewControllerの生成が楽になりました。@<br>{}
+楽になったおかげで、画面遷移の実装がが少ない行で済むようになりました。@<br>{}
+次のコードで画面遷移を実装できます。
 
 //listnum[pushviewcontroller][画面遷移の実装][swift]{
 let viewController = ViewController()
@@ -229,7 +230,7 @@ navigationController?.pushViewController(viewController, animated: true)
 
 === CallBackで作るカウンターアプリ
 
-ようやくここから本題に入ります、まずはViewController.swiftを整理しましょう
+さて、ようやくここから本題に入ります、まずはViewController.swiftを整理しましょう。
 
   * ViewController.swiftを開く
   * 次のように編集
@@ -246,6 +247,7 @@ class ViewController: UIViewController {
 }
 //}
 
+スッキリしました。使わないメソッドやコメントは積極的に削除していきましょう。@<br>{}
 次に、画面を作成します。
 
 UIButton３つとUILabelを１つ配置しましょう
@@ -254,9 +256,8 @@ UIButton３つとUILabelを１つ配置しましょう
   部品の設置
 //}
 
-UI部品の配置が終わったら、早速ViewControllerと繋げましょう。
-
-UILabelはIBOutlet、UIButtonはIBActionとして繋げます
+UI部品の配置が終わったら、早速ViewControllerと繋げます。@<br>{}
+UILabelはIBOutlet、UIButtonはIBActionとして繋げていきます。
 
 //listnum[viewcontroller-add-ibaction][IBActionの作成][swift]{
 import UIKit
@@ -280,7 +281,7 @@ class ViewController: UIViewController {
 }
 //}
 
-次に、ViewModelを作ります。ViewModelには次の役割をもたせます
+次に、ViewModelを作ります。ViewModelには次の役割をもたせています。
 
   * カウントデータの保持
   * カウントアップ、カウントダウン、カウントリセットの処理
@@ -306,46 +307,45 @@ class ViewModel {
 }
 //}
 
-ViewModelを作ったので、ViewControllerでViewModelを使うように修正と、IBActionの修正を行っていきます。
+ViewModelを作ったので、ViewControllerでViewModelを使うように修正します。
 
 //listnum[fix-callback-viewcontroller-viewmodel][ViewControllerの修正][swift]{
 class ViewController: UIViewController {
 
-    @IBOutlet weak var countLabel: UILabel!
+  @IBOutlet weak var countLabel: UILabel!
 
-    private var viewModel: ViewModel!
+  private var viewModel: ViewModel!
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        viewModel = ViewModel()
-    }
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    viewModel = ViewModel()
+  }
 
-    @IBAction func countUp(_ sender: Any) {
-        viewModel.incrementCount(callback: { [weak self] count in
-            self?.updateCountLabel(count)
-        })
-    }
+  @IBAction func countUp(_ sender: Any) {
+    viewModel.incrementCount(callback: { [weak self] count in
+      self?.updateCountLabel(count)
+    })
+  }
 
-    @IBAction func countDown(_ sender: Any) {
-        viewModel.decrementCount(callback: { [weak self] count in
-            self?.updateCountLabel(count)
-        })
-    }
+  @IBAction func countDown(_ sender: Any) {
+    viewModel.decrementCount(callback: { [weak self] count in
+      self?.updateCountLabel(count)
+    })
+  }
 
-    @IBAction func countReset(_ sender: Any) {
-        viewModel.resetCount(callback: { [weak self] count in
-            self?.updateCountLabel(count)
-        })
-    }
+  @IBAction func countReset(_ sender: Any) {
+    viewModel.resetCount(callback: { [weak self] count in
+      self?.updateCountLabel(count)
+    })
+  }
 
-    private func updateCountLabel(_ count: Int) {
-        countLabel.text = String(count)
-    }
+  private func updateCountLabel(_ count: Int) {
+    countLabel.text = String(count)
+  }
 }
 //}
 
-これで、機能要件を満たすことができました。
-
+これで、機能要件を満たすことができました。@<br>{}
 実際に Build & Run して確認してみましょう。
 
 callbackで書く場合のメリット・デメリットをまとめてみます。
@@ -353,22 +353,21 @@ callbackで書く場合のメリット・デメリットをまとめてみます
   * メリット
   ** 記述が簡単
   * デメリット
-  ** ボタンを増やすたびにボタンを押下時の処理メソッドが増えていく
+  ** ボタンを増やすたびに対応するボタンの処理メソッドが増えていく
   *** ラベルの場合も同様
   *** 画面が大きくなっていくにつれてメソッドが多くなり、コードが読みづらくなってくる
   ** ViewControllerとViewModelに分けたものの、完全にUIと処理の切り分けができているわけではない
 
 === Delegateで作るカウンターアプリ
 
-次に、delegateを使って実装してみましょう。
-
+次に、delegateを使って実装してみましょう。@<br>{}
 delegateを使う場合、設計はMVPパターンのほうが向いてるので、MVPパターンに沿って実装していきます。
 
 まずはDelegateを作ります
 
 //listnum[create-counter-delegate-protocol][Delegateの作成][swift]{
 protocol CounterDelegate {
-    func updateCount(count: Int)
+  func updateCount(count: Int)
 }
 //}
 
@@ -376,94 +375,92 @@ protocol CounterDelegate {
 
 //listnum[create-counter-presenter][Presenterの作成][swift]{
 class CounterPresenter {
-    private var count = 0 {
-        didSet {
-            delegate?.updateCount(count: count)
-        }
+  private var count = 0 {
+    didSet {
+      delegate?.updateCount(count: count)
     }
+  }
 
-    private var delegate: CounterDelegate?
+  private var delegate: CounterDelegate?
 
-    func attachView(_ delegate: CounterDelegate) {
-        self.delegate = delegate
-    }
+  func attachView(_ delegate: CounterDelegate) {
+    self.delegate = delegate
+  }
 
-    func detachView() {
-        self.delegate = nil
-    }
+  func detachView() {
+    self.delegate = nil
+  }
 
-    func incrementCount() {
-        count += 1
-    }
+  func incrementCount() {
+    count += 1
+  }
 
-    func decrementCount() {
-        count -= 1
-    }
+  func decrementCount() {
+    count -= 1
+  }
 
-    func resetCount() {
-        count = 0
-    }
+  func resetCount() {
+    count = 0
+  }
 }
 //}
 
-最後に、ViewControllerをさきほど作成したPresenterを使うように修正するのと、Delegateをextensionするように修正しましょう
+最後に、ViewControllerをさきほど作成したPresenterを使うように修正しましょう。
 
 //listnum[fix-viewcontroller-presenter][ViewControllerの修正][swift]{
 class ViewController: UIViewController {
 
-    @IBOutlet weak var countLabel: UILabel!
+  @IBOutlet weak var countLabel: UILabel!
 
-    private let presenter = CounterPresenter()
+  private let presenter = CounterPresenter()
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        presenter.attachView(self)
-    }
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    presenter.attachView(self)
+  }
 
-    @IBAction func countUp(_ sender: Any) {
-        presenter.incrementCount()
-    }
+  @IBAction func countUp(_ sender: Any) {
+    presenter.incrementCount()
+  }
 
-    @IBAction func countDown(_ sender: Any) {
-        presenter.decrementCount()
-    }
+  @IBAction func countDown(_ sender: Any) {
+    presenter.decrementCount()
+  }
 
-    @IBAction func countReset(_ sender: Any) {
-        presenter.resetCount()
-    }
+  @IBAction func countReset(_ sender: Any) {
+    presenter.resetCount()
+  }
 }
 
 extension ViewController: CounterDelegate {
-    func updateCount(count: Int) {
-        countLabel.text = String(count)
-    }
+  func updateCount(count: Int) {
+    countLabel.text = String(count)
+  }
 }
 //}
 
-Build ＆ Run してみましょう。callbackの場合と同じ動きをします。
-
+Build ＆ Run してみましょう。callbackの場合とまったく同じ動きをしていたら成功です。@<br>{}
 Delegateを使った書き方のメリット・デメリットをまとめます。
 
   * メリット
   ** 処理を委譲できる
-  ** incrementCount(), decrementCount(), resetCount()がデータの処理に集中できる
-  ** callback(count)しなくてもよい
+  *** @<code>{incrementCount()}、@<code>{decrementCount()}、@<code>{resetCount()}がデータの処理に集中できる
+  *** @<code>{callback(count)}しなくてもよい
   * デメリット
-  ** ボタンを増やすたびにメソッドが増えていく
+  ** ボタンを増やすたびに対応する処理メソッドが増えていく
 
-データを処理する関数が完全に処理に集中できるようになったのはよいことですが、まだボタンとメソッドの個数が１：１になっている問題が残っていて、このままアプリが大きくなっていくにつれてメソッドが多くなり、どのボタンの処理がどのメソッドの処理なのかパッと見た感じではわからなくなってしまいます。
+データを処理する関数が完全に処理に集中できるようになったのはよいことですが、まだボタンとメソッドの個数が１：１になっている問題が残っています。@<br>{}
+このままアプリが大きくなっていくにつれてメソッドが多くなり、どのボタンの処理がどのメソッドの処理なのかパッと見た感じではわからなくなり、コード全体の見通しが悪くなってしまいます。
 
-この問題はRxSwift/RxCocoaを使うことで解決できます。
-
+この問題はRxSwift/RxCocoaを使うことで解決できます。@<br>{}
 実際にRxSwiftを使って作ってみましょう。
 
 === RxSwiftで作るカウンターアプリ
 
-さきほどのPresenterとCounterProtocolはもう使わないので削除しても大丈夫です。
+さきほどのPresenterとCounterProtocolはもう使わないので削除しておきましょう。
+まずはRxSwiftを用いたViewModelを作るためのProtocolとInput用の構造体を作ります
 
-まずはViewModelを作るためのProtocolとInput用の構造体を作ります
-
-//listnum[create-protocol-struct-rxswift-pattern][ProtocolとStructの作成][swift]{
+//list[create-protocol-struct-rxswift-pattern][ProtocolとStructの作成][swift]{
 // ViewModelと同じクラスファイルに定義したほうが良いかも（好みやチームの規約による）
 
 // ボタンの入力シーケンス
@@ -485,73 +482,73 @@ protocol RxViewModelType {
 }
 //}
 
-次にViewModelを作ります。CallBackパターンでも作りましたが、紛らわしくならないように新しい名前で作り直します
+次にViewModelを作ります。CallBackパターンでも作りましたが、紛らわしくならないように新しい名前で作り直します。
 
 //listnum[create-viewmodel-rxswift-pattern][swift]{
 import RxSwift
 import RxCocoa
 
 class RxViewModel: RxViewModelType {
-    var outputs: RxViewModelOutput?
+  var outputs: RxViewModelOutput?
 
-    private let countRelay = BehaviorRelay<Int>(value: 0)
-    private let initialCount = 0
-    private let disposeBag = DisposeBag()
+  private let countRelay = BehaviorRelay<Int>(value: 0)
+  private let initialCount = 0
+  private let disposeBag = DisposeBag()
 
-    required init(input: RxViewModelInput) {
-        self.outputs = self
-        resetCount()
+  required init(input: RxViewModelInput) {
+    self.outputs = self
+    resetCount()
 
-        input.countUpButton
-            .subscribe(onNext: { [weak self] in
-                self?.incrementCount()
-            })
-            .disposed(by: disposeBag)
+    input.countUpButton
+      .subscribe(onNext: { [weak self] in
+        self?.incrementCount()
+      })
+      .disposed(by: disposeBag)
 
-        input.countDownButton
-            .subscribe(onNext: { [weak self] in
-                self?.decrementCount()
-            })
-            .disposed(by: disposeBag)
+    input.countDownButton
+      .subscribe(onNext: { [weak self] in
+        self?.decrementCount()
+      })
+      .disposed(by: disposeBag)
 
-        input.countResetButton
-            .subscribe(onNext: { [weak self] in
-                self?.resetCount()
-            })
-            .disposed(by: disposeBag)
+    input.countResetButton
+      .subscribe(onNext: { [weak self] in
+        self?.resetCount()
+      })
+      .disposed(by: disposeBag)
 
-    }
+  }
 
 
-    private func incrementCount() {
-        let count = countRelay.value + 1
-        countRelay.accept(count)
-    }
+  private func incrementCount() {
+    let count = countRelay.value + 1
+    countRelay.accept(count)
+  }
 
-    private func decrementCount() {
-        let count = countRelay.value - 1
-        countRelay.accept(count)
-    }
+  private func decrementCount() {
+    let count = countRelay.value - 1
+    countRelay.accept(count)
+  }
 
-    private func resetCount() {
-        countRelay.accept(initialCount)
-    }
-
+  private func resetCount() {
+    countRelay.accept(initialCount)
+  }
 }
 
 extension RxViewModel: RxViewModelOutput {
-    var counterText: SharedSequence<DriverSharingStrategy, String> {
-        let counterText = countRelay
-            .map {
-                "Rxパターン:\($0)"
-            }
-            .asDriver(onErrorJustReturn: "")
-        return counterText
-    }
+  var counterText: SharedSequence<DriverSharingStrategy, String> {
+    let counterText = countRelay
+      .map {
+        "Rxパターン:\($0)"
+      }
+      .asDriver(onErrorJustReturn: "")
+    return counterText
+  }
 }
 //}
 
-ViewControllerも修正しましょう。全てのIBActionと接続を消してIBOutletを定義して接続しましょう。
+ViewControllerも修正しましょう。@<br>{}
+全てのIBActionと接続を削除してIBOutletを定義し、接続しましょう。
 
 //listnum[fix-viewcontroller-rxswift-pattern][ViewControllerの修正][swift]{
 import RxSwift
@@ -559,28 +556,28 @@ import RxCocoa
 
 class RxViewController: UIViewController {
 
-    @IBOutlet weak var countLabel: UILabel!
-    @IBOutlet weak var countUpButton: UIButton!
-    @IBOutlet weak var countDownButton: UIButton!
-    @IBOutlet weak var countResetButton: UIButton!
+  @IBOutlet weak var countLabel: UILabel!
+  @IBOutlet weak var countUpButton: UIButton!
+  @IBOutlet weak var countDownButton: UIButton!
+  @IBOutlet weak var countResetButton: UIButton!
 
-    private let disposeBag = DisposeBag()
+  private let disposeBag = DisposeBag()
 
-    var viewModel: RxViewModel!
+  var viewModel: RxViewModel!
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setupViewModel()
-    }
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    setupViewModel()
+  }
 
-    private func setupViewModel() {
-        let input = RxViewModelInput(countUpButton: countUpButton.rx.tap.asObservable(), countDownButton: countDownButton.rx.tap.asObservable(), countResetButton: countResetButton.rx.tap.asObservable())
-        viewModel = RxViewModel(input: input)
+  private func setupViewModel() {
+    let input = RxViewModelInput(countUpButton: countUpButton.rx.tap.asObservable(), countDownButton: countDownButton.rx.tap.asObservable(), countResetButton: countResetButton.rx.tap.asObservable())
+    viewModel = RxViewModel(input: input)
 
-        viewModel.outputs?.counterText
-            .drive(countLabel.rx.text)
-            .disposed(by: disposeBag)
-    }
+    viewModel.outputs?.counterText
+      .drive(countLabel.rx.text)
+      .disposed(by: disposeBag)
+  }
 }
 //}
 
@@ -594,7 +591,7 @@ Build & Run で実行してみましょう。まったく同じ動作をして�
 そんなときは、１度いじっていたxib/storyboardのIBActionの接続・接続解除、IBOutletの接続・接続解除が正しくできているか確認してみましょう。
 //}
 
-setupViewModel関数として切り出して定義してviewDidLoad()内で呼び出しています。
+ViewController内では、setupViewModel関数として切り出して定義してviewDidLoad()内で呼び出しています。
 
 この書き方についてまとめてみます。
 
@@ -606,23 +603,36 @@ setupViewModel関数として切り出して定義してviewDidLoad()内で呼�
   *** 処理を集中できた
   *** increment, decrement, resetがデータの処理に集中できた
   *** ViewControllerのことを意識しなくてもよい
-  **** 👉例: delegate?.updateCount(count: count) のようなデータの更新をViewControllerに伝えなくてもよい
+  **** 例: @<code>{delegate?.updateCount(count: count)} のようなデータの更新の通知を行わなくてもよい
   ** テストがかきやすくなった
-  * 悪い
+  * デメリット
   ** コード量が他パターンより多い
   ** 書き方に慣れるまで時間がかかる
 
-RxSwiftを使った場合の一番大きなよい点はやはり「ViewModelはViewControllerのことを考えなくてもよくなる」ところです。
+RxSwiftを使った場合の一番大きなメリットはやはり「ViewModelはViewControllerのことを考えなくてもよくなる」ところです。@<br>{}
+ViewControllerがViewModelの値を監視して変更があったらUIを自動で変更させているため、ViewModel側から値が変わったよ！と通知する必要がなくなるのです。
 
-ViewControllerがViewModelの値を監視して変更があったらUIを自動で変更するため、ViewModel側から値が変わったよ！と通知する必要がなくなるのです。
+次に、テストが書きやすくなりました。今まではViewControllerとViewModel（Presenter)が密になっていてテストが書きづらい状況でしたが、今回は分離ができているのでとても書きやすくなりました。@<br>{}
+やり方としてはViewModelをインスタンス化するときにInputを注入し、Outputを期待したとおりになっているかのテストを書くイメージになります。
 
-次に、テストが書きやすくなりました。今まではViewControllerとViewModel（Presenter)が密になっていてテストが書きづらい状況でしたが、今回は分離ができたのでとても書きやすくなりました。
+ですが、このRxSwift+MVVMの書き方は慣れるまで時間がかかるかと思います。@<br>{}
+まずはUIButton.rx.tapだけ使う、PublishSubject系だけを使う・・・など小さく始めるのも１つの方法です。
 
-やり方としてはViewModelをインスタンス化するときにInputを注入し、Outputを期待したとおりになっているかのテストを書く感じになります。
+=== まとめ
 
-ですが、この方法は慣れるまで時間がかかるかと思います。まずはUIButton.rx.tapだけ使う、PublishSubject系だけを使う・・・など小さく始めるのもありかと思います。
+この章では、callback、delegate、RxSwift、３つのパターンでカウンターアプリを作りました。
+callback、delegateパターンで課題であったUIとデータの分離できていない問題に関しては、RxSwiftを用いたことで解決することができました。
 
-個人開発のアプリであれば全リプレースにチャレンジしてみても面白いかもしれませんが、業務で使うアプリでチームメンバーのほとんどがRxSwiftに慣れていない場合、キャッチアップで手一杯になって逆に開発効率が落ちることもありえるのでちゃんとチームメンバーと相談しましょう！
+全ての開発においてRxSwiftを導入した書き方が正しいとは限りませんが、１つの解決策として覚えておくだけでもよいと思います。
+
+==== おまけ：カウンターアプリを昇華
+
+★この章はおまけです。さきほど作ったコードに加えて、次の機能を追加してみましょう！
+
+  * 追加の機能要件
+    * +10カウントアップできる
+    * -10カウントダウンできる
+    * カウンターの値をDBに保存しておいて、復帰時にDBから参照させるように変更
 
 == WKWebViewを使ったアプリ
 
