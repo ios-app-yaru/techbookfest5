@@ -625,7 +625,7 @@ callback、delegateパターンで課題であったUIとデータの分離で�
 
 全ての開発においてRxSwiftを導入した書き方が正しいとは限りませんが、１つの解決策として覚えておくだけでもよいと思います。
 
-==== おまけ：カウンターアプリを昇華
+==== おまけ：カウンターアプリを昇華させよう１
 
 ★この章はおまけです。さきほど作ったコードに加えて、次の機能を追加してみましょう！
 
@@ -634,9 +634,11 @@ callback、delegateパターンで課題であったUIとデータの分離で�
     * -10カウントダウンできる
     * カウンターの値をDBに保存しておいて、復帰時にDBから参照させるように変更
 
-== WKWebViewを使ったアプリ
+== WebViewアプリを作ってみよう！
 
-この章ではKVOの実装パターンをRxSwiftに置き換える方法について学びます。
+//lead{
+この章ではWKWebViewを使ったアプリをテーマに、KVOの実装パターンをRxSwiftに置き換える方法について学びます。
+//}
 
 === この章のストーリー
 
@@ -649,9 +651,12 @@ callback、delegateパターンで課題であったUIとデータの分離で�
   アプリのイメージ
 //}
 
-WebViewとProgressViewを配置して、Webページの読み込みに合わせてゲージ、インジケータ、Navigationタイトルを変更する機能を作ります。
+WebViewとProgressViewを配置して、Webページの読み込みに合わせてゲージ・インジケータ・Navigationタイトルを変更するようなアプリを作ります。
 
-サクっといきましょう。KVOで実装した場合、次のコードになります。
+サクっといきましょう！まずは新規プロジェクトを作成します。@<br>{}
+プロジェクトの設定やViewControllerの設定は第５章の「開発を加速させる設定」を参照してください。@<br>{}
+ここではWKWebViewController.xibという名前で画面を作成し、中にWKWebViewとUIProgressViewを配置します。@<br>{}
+画面ができたら、ViewControllerクラスを作っていきます。
 
 //listnum[kvo-webview][KVOで実装する][swift]{
 import UIKit
@@ -702,37 +707,33 @@ class WKWebViewController: UIViewController {
 }
 //}
 
-KVO（Key-Value Observing:キー値監視）とは、特定のオブジェクトのプロパティ値の変化を監視する仕組みです。ObjectiveーCのメカニズムを使っていて、NSValueクラスに大きく依存しています。
-また、構造体（struct）はNSObjectを継承できないためKVOの仕組みは使えません。
+KVO（Key-Value Observing:キー値監視）とは、特定のオブジェクトのプロパティ値の変化を監視する仕組みです。KVOはObjectiveーCのメカニズムを使っていて、NSValueクラスに大きく依存しています。@<br>{}
+そのため、NSObjectを継承できない構造体（struct）はKVOの仕組みが使えません。
 
-KVOをSwiftで使うためにはオブジェクトをクラスで定義し、プロパティに @objc属性とdynamicをつけます。
+KVOをSwiftで使うためにはオブジェクトをclassで定義し、プロパティに@<code>{objc}属性と@<code>{dynamic}をつけます。
+WKWebViewのプロパティのうち、@<code>{title}、@<code>{url}、@<code>{estimatedProgress}は標準でKVOに対応しているので、今回はそれを使います。
 
-WKWebViewにはtitle, url, estimatedProgressなどKVOに対応したプロパティがあるので今回はそれを使っています。
+では実際コード内で何をしているかというと、@<code>{viewDidLoad()}時にWebViewのプロパティの値を監視させて、値が変更されたときにUIを更新させています。@<br>{}
+addObserverの引数にプロパティ名を渡すとその値が変化された時に @<code>{observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?)} が呼ばれます。@<br>{}
+@<code>{observeValue}の@<code>{keyPath}には@<code>{addObserver}で設定した@<code>{forKeyPath}の値が流れてくるので、その値で条件分岐してUIを更新します。
 
-では実際コード内で何をしているかというと、viewDidLoad()時にWebViewの値を監視させて、値が変更されたときにUIを更新させています。
+この方法では見て分かるとおり、全ての値変化の通知を@<code>{observeValue}で受け取って条件分岐するため、段々と@<code>{observeValue}メソッドが肥大化していく問題があります。@<br>{}
+また、KVOはObjective-Cのメカニズムであるため、型の安全性が考慮されていません。@<br>{}
+さらに、KVOを使った場合の注意点として@<code>{addObserver}した場合、deinit時に@<code>{removeObserver}を呼ばないと、最悪の場合メモリリークを引き起こし、アプリが強制終了する可能性があります。@<br>{}
+忘れずにremoveObserverを呼びましょう。
 
-addObserverの引数にプロパティ名を渡すとその値が変化された時に @<code>{observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?)} が呼ばれるようになります。
+とはいえ、人間は忘れます。removeObserverを呼ぼうと注意していても絶対にいつか忘れます。@<br>{}
+クラスが肥大化してくるにつれ、その確率は上がってきます。
 
-observeValueのkeyPathにはaddObserverで設定したforKeyPathの値が流れてくるので、その値で条件分岐してUIを更新します。
-
-ただ、全ての通知をobserveValueで受け取って条件分岐するため、段々とobserveValueメソッドが肥大化していく問題があります。
-
-また、KVOはObjective-Cのメカニズムであるため、型の安全性が考慮されているわけではありません。
-
-KVOを使った場合の注意点として、addObserverした場合、deinit時にremoveObserverを呼ばないとアプリが強制終了する可能性があります。忘れずにremoveObserverを呼びましょう。
-
-とはいえ、removeObserverを呼ぼうと注意していても人間は忘れます、それにクラスが大きくなってくるとなおさらremoveObserverを呼ぶのを忘れます。
-
-こういった問題はRxSwiftがまるまるっと解決してくれます！！RxSwiftに書き換えてみましょう。
-
-と、その前にRxOptionalというRxSwiftの拡張ライブラリを導入します。理由は後述しますが、簡単にいうとOptionalな値を流すストリームに対してさまざまなことができるようにするライブラリです。
+こういった問題はRxSwiftがまるまるっと解決してくれます！！RxSwiftに書き換えてみましょう。@<br>{}
+と、その前にRxOptionalというRxSwiftの拡張ライブラリを導入します。理由は後述しますが、簡単にいうとOptionalな値を流すストリームに対してさまざまなことができるようになるライブラリです。
 
 Podfileにライブラリを追加しましょう
 
 //list[add-lib-rxoptional][Podfileの修正][ruby]{
 pod 'RxSwift'
 pod 'RxCocoa'
-pod 'RxOptional' = New!
+pod 'RxOptional' # ★この行を追加
 //}
 
 では、導入したライブラリも使いつつ、KVOで書かれた実装をRxSwiftを使うようにリプレースしていきます。
@@ -796,9 +797,8 @@ class WKWebViewController: UIViewController {
 }
 //}
 
-どうでしょうか？ネストも浅くなり、かなり読みやすくなってのではないでしょうか。
-
-色々説明するところはありますが、この章ではじめてでてきたメソッドについて説明していきます。
+どうでしょうか？ネストも浅くなり、かなり読みやすくなりました。@<br>{}
+色々説明するポイントはありますが、この章ではじめ出てきたメソッドについて説明していきます。
 
 ==== import RxOptional
 
@@ -806,27 +806,22 @@ class WKWebViewController: UIViewController {
 
 ==== rx.observe
 
-rx.observeはKVOを取り巻く単純なラッパーです。単純であるため、パフォーマンスが優れていますが、用途は限られています。
+@<code>{rx.observe}はKVOを取り巻く単純なラッパーです。単純であるため、パフォーマンスが優れていますが、用途は限られています。@<br>{}
+@<code>{self.}から始まるパスと、子オブジェクトのみ監視できます。
 
-self.から始まるパスと、子オブジェクトだけ監視できます。
+たとえば、@<code>{self.view.frame}を監視したい場合、第二引数に@<code>{view.frame}を指定します。@<br>{}
+ただし、プロパティに対して強参照するため、@<code>{self}内のパラメータに対して@<code>{rx.observe}してしまうと、循環参照を引き起こし最悪の場合アプリがクラッシュします。@<br>{}
+弱参照したい場合は、@<code>{rx.observeWeakly}を使いましょう。
 
-たとえば、self.view.frameを監視したい場合、第二引数に"view.frame"を指定します。
-
-ただし、プロパティに対して強参照するため、循環参照を引き起こし最悪アプリがクラッシュする可能性があります。弱参照したい場合は、rx.observeWeaklyを使いましょう。
-
-KVOはObjective-Cの仕組みで動いていると書きましたが、RxCocoaでは実は構造体であるCGRect、CGSize、CGPointに対してKVOを行う仕組みが実装されています。
-
-他の構造体を購読したいときはNSValueから手動で抽出する仕組みを実装することでできます。
-
-RxCocoaのKVORepresentable+CoreGraphics.swiftにKVORepresentableプロトコルを使って抽出する実装コードが書かれているので、独自で作りたい場合はここを参照しましょう。
+KVOはObjective-Cの仕組みで動いていると書きましたが、RxCocoaでは実は構造体であるCGRect、CGSize、CGPointに対してKVOを行う仕組みが実装されています。@<br>{}
+これはNSValueから値を手動で抽出する仕組みを使っていて、RxCocoaライブラリ内のKVORepresentable+CoreGraphics.swiftにKVORepresentableプロトコルを使って抽出する実装コードが書かれているので、独自で作りたい場合はここを参照しましょう。
 
 ==== filterNil()
 
 RxOptionalで定義されているOperator
 
-名前でなんとなくイメージできるかもしれませんが、nilの場合は値を流さず、nilじゃない場合はunwrapして値を流すOperatorです。
-
-わかりやすく、コードで比較してみましょう。次のコードはどちらもまったく同じ動作をします。
+名前でなんとなくイメージできるかもしれませんが、nilの場合は値を流さず、nilじゃない場合は@<code>{unwrap}して値を流すOperatorです。@<br>{}
+コードで比較するとわかりやすいです、次のコードを見てみましょう。どちらもまったく同じ動作をします。
 
 //list[operator-filternil-example][filterNil()の比較][swift]{
 // RxSwift
@@ -845,32 +840,32 @@ Observable<String?>
 
 ==== share()
 
-文章で説明するより、まずは次のコードを見てください。
+一言で説明すると、ColdなObservableをHotなObservableへ変換するOperatorです。@<code>{}
+まずは次のコードを見てください。
 
 //list[operator-share-example][share()がない場合][swift]{
-    let text = textField.rx.text
-        .map { text -> String in
-            print("call")
-            return "☆☆\(text)☆☆"
-        }
+  let text = textField.rx.text
+    .map { text -> String in
+      print("call")
+      return "☆☆\(text)☆☆"
+    }
 
-    text
-        .bind(to: label1.rx.text)
-        .disposed(by: disposeBag)
+  text
+    .bind(to: label1.rx.text)
+    .disposed(by: disposeBag)
 
-    text
-        .bind(to: label2.rx.text)
-        .disposed(by: disposeBag)
+  text
+    .bind(to: label2.rx.text)
+    .disposed(by: disposeBag)
 
-    text
-        .bind(to: label3.rx.text)
-        .disposed(by: disposeBag)
+  text
+    .bind(to: label3.rx.text)
+    .disposed(by: disposeBag)
 //}
 
-上記のコードはUITextFieldであるtextFieldへのテキスト入力を監視し、値を複数のLabelへbind、リアルタイムで入力したテキストをラベルへ反映する仕組みを実装するコードです。
+上記のコードはUITextFieldである@<code>{textField}へのテキスト入力を監視し、ストリームの途中で値を加工して複数のLabelへbindしています。
 
-ここでtextFieldへ「123」と入力した場合、@<code>{print("call")}は何回呼ばれるか予想してみましょう。
-
+ここでtextFieldへ「123」と入力した場合、@<code>{print("call")}は何回呼ばれるか予想してみましょう。@<br>{}
 パッと見た感じだと、3回入力するので3回出力するのでは？と思いがちですが実際は違います。実行して試してみましょう！
 
 //emlist[]{
@@ -885,30 +880,24 @@ call
 call
 //}
 
-callは９回呼ばれます。なるほど？
-
+callは９回呼ばれます。なるほど？@<br>{}
 値を入力するたびにmap関数が３回呼ばれてますね。これはいけない。
 
 今回のように値を変換したりprint出力するだけならそれほどパフォーマンスに影響はありませんが、データベースアクセスするものや、通信処理が発生するものではこの動作は好ましくありません。
 
-では、なぜこの現象が起こるのか？
-
+では、なぜこの現象が起こるのか？@<br>{}
 その前に、textField.rx.textが何なのかを紐解いて見ましょう。
 
-textField.rx.textはRxCocoaでextension定義されているプロパティで、@<code>{Observable<String?>}ではなく、@<code>{ControlProperty<String?>}として定義されています。（が、実態はObservableです）
+@<code>{textField.rx.text}はRxCocoaでextension定義されているプロパティで、@<code>{Observable<String?>}ではなく、@<code>{ControlProperty<String?>}として定義されています。（実態はObservableですが。）
+ControlPropertyは主にUI要素のプロパティで使われていて、メインスレッドで値が購読されることが保証されています。
 
-ControlPropertyは主にUI要素のプロパティで使われていて、メインスレッドで値が購読されることを保証しています。
+また、実はこれ、ColdなObservableなんです。@<br>{}
+ColdなObservableの仕様として、subscribeした時点で計算リソースが割当られ、複数回subscribeするとその都度ストリームが生成されるという仕組みがあると説明しました。
 
-また、これはColdなObservableです。
-
-ColdなObservableの仕様として、subscribeした時点で計算リソースが割当られ、複数回subscribeするとその都度ストリームが生成されるという仕組みがあります。
-
-今回の場合、３回@<code>{subscribe(bind)}したので、３個のストリームが生成されます。
-
+そのため、今回の場合３回@<code>{subscribe(bind)}したので、３個のストリームが生成されます。@<br>{}
 するとどうなるかというと、値が変更されたときにOperatorが３回実行されてしまうようになります。
 
-このままではまずいので、どうにかして何回購読してもOperatorを１回実行で済むように実装したいです。
-
+このままではまずいので、どうにかして何回購読してもOperatorを１回実行で済むように実装したいですね。@<br>{}
 では、どうすればよいのかというと、HotなObservableに変換してあげるとよいです。
 
 やりかたはいくつかあるのですが、今回は @<code>{share()} というOperatorを使います。実際のコードは次のとおりです。
@@ -930,7 +919,6 @@ let text = textField.rx.text
 //}
 
 Build & Run を実行してもう一度「１２３」とテキストに入力してみましょう。
-
 出力結果が次のようになっていたら成功です。
 
 //emlist[]{
@@ -941,30 +929,30 @@ call
 
 ==== observeOn
 
-ストリームの実行スレッドを決めるオペレータで、このオペレータよりあとに書かれているストリームに対して適用されます
-
+ストリームの実行スレッドを決めるOperatorで、これよりあとに書かれているストリームに対して適用されます@<br>{}
 引数には「ImmediateSchedulerType」プロトコルに準拠したクラスを指定します。
 
 ==== MainScheduler.instance
 
-MainSchedulerのシングルトンインスタンスを指定しています。
-
+MainSchedulerのシングルトンインスタンスを指定しています。@<br>{}
 observeOnの引数にMainSchedulerのシングルトンインスタンスを渡してあげると、その先のOperatorはメインスレッドで処理してくれるようになります。
+
+==== ★☆★本題へ★☆★
 
 説明が長くなりましたが、本題に戻りましょう。
 
-KVOで書いた処理をRxSwiftに置き換えてみた結果、かなり読みやすくなりましたね。
+KVOで書いた処理をRxSwiftに置き換えてみた結果、かなり読みやすくなりました。@<br>{}
+特に、@<code>{removeObserver}を気にしなくてもよくなるのでだいぶ安全になりますね。
 
-特に、removeObserverを気にしなくてもよくなるのはだいぶ安全になりますね。
+@<code>{removeObserver}を気にしなくてもよくなったというよりは、RxSwiftの場合はremoveObserverの役割が@<code>{.disposed(by:)}に変わったイメージのほうがわかりやすいかもしれません。@<br>{}
+@<code>{disposed(by:)} を結局呼ばないといけないのなら、そんなに変わらなくね？と思うかもしれませんが、RxSwiftでは呼び忘れるとWarningが出るのでremoveObserverだったころより忘れる確率は低くなります。
 
-というよりは、RxSwiftの場合はremoveObserverの役割が@<code>{.disposed(by:)}に変わったイメージのほうがわかりやすいかもしれません。
+しかし、書きやすくなったといっても、まだこの書き方では次の問題が残っています。
 
-@<code>{disposed(by:)} を結局呼ばないといけないのなら、そんなに変わらなくね？と思うかもしれませんが、RxSwiftではWarningが出るのでremoveObserverだったころより忘れる確率は低くなります。
+  * Key値がベタ書きになっている
+  * 購読する値の型を指定してあげないといけない
 
-しかし、この方法ではKey値がベタ書きになっていることと、値の型を指定してあげないといけないという問題も残っています。
-
-もっと使いやすくするように自分でextensionを定義するのもアリですが、
-
+もっと使いやすくするように自分でextensionを定義するのもアリですが、@<br>{}
 実はもっと便利にWKWebViewを扱える「RxWebKit」というRxSwift拡張ライブラリがあるので、それを使ってみましょう。
 
 Podfileを編集します
@@ -1045,10 +1033,8 @@ class RxWebkitViewController: UIViewController {
 
 Build & Run で実行してみましょう。まったく同じ動作であれば成功です。
 
-RxWebKitを使ったことでさらに可動性がよくなりました。
-
-RxWebKitはその名前のとおり、WebKitをRxSwiftで使いやすくしてくれるように拡張定義しているラッパーライブラリです。
-
+RxWebKitを使ったことでさらに可動性がよくなりました。@<br>{}
+RxWebKitはその名前のとおり、WebKitをRxSwiftで使いやすくしてくれるように拡張定義しているラッパーライブラリです。@<br>{}
 これを使うことで、「Keyのべた書き」と「値の型指定」問題がなくなりました。感謝です。
 
-RxWebKitには他にも@<code>{canGoBack()}、@<code>{canGoForward()}に対してsubscribeすることもできるので、色々な用途に使えそうですね。
+RxWebKitには他にも@<code>{canGoBack()}、@<code>{canGoForward()}に対してsubscribeやbindすることもできるので、色々な用途に使えそうですね。
