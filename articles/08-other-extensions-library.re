@@ -1,11 +1,13 @@
 = さまざまなRxSwift系ライブラリ
 
 //lead{
-この章ではさまざまなRxSwiftの拡張ライブラリについて紹介していきます。多くの有名な拡張ライブラリは、RxSwift CommunityというGitHub Projectで管理されていて、さまざまな人が日々コントリビュートしています。
+この章ではRxSwiftの拡張ライブラリについて紹介していきます。
+拡張ライブラリといっても、かなり種類があるのでその中から私がよく使うものをピックアップして紹介していきます。
 //}
 
-== RxDataSources ★1.4k
+== RxDataSources
 
+スター数：1,521（２０１８年０９月２２日時点）@<br>{}
 RxDataSourcesはざっくりいうと、UITableView、UICollectionViewをRxSwiftの仕組みを使ってイイ感じに差分更新をしてくれるライブラリです。@<br>{}
 このライブラリを使うと、UITableViewやUICollectionViewを使ったアプリを作る際にdelegateの実装の負担が少なく済むようになったり、セクションを楽に組み立てられるようになったりします。
 
@@ -27,13 +29,13 @@ pod init
 vi Podfile
 //}
 
-//emlist[]{
-  platform :ios, '11.4'
-  use_frameworks!
+//list[podfile-rxdatasource][Podfile][Ruby]{
+platform :ios, '11.4'
+use_frameworks!
 
-  target 'RxDataSourceExample' do
-    pod 'RxDataSources', '~> 3.0'
-  end
+target 'RxDataSourceExample' do
+  pod 'RxDataSources', '~> 3.0'
+end
 //}
 
 //cmd{
@@ -434,10 +436,77 @@ Build & Runで次のような画面になっていたら成功です。
   その他セクション追加後の画面
 //}
 
-== RxAlamofire ★1k
+RxDatasourcesとUICollectionViewを組み合わせた書き方もほぼ同じ手順で実装できるので、参考にしてみてください。
 
-== RxKeyboard ★800
+== RxKeyboard
 
-== RxOptional ★441
+RxKeyboardはキーボードのframeの値の変化をRxSwiftで楽に購読できるようにする拡張ライブラリです。@<br>{}
+キーボードの真上にViewを配置して、キーボードの高さに応じてUIViewを動かしたり、ScrollViewを動かしたりできるようになります。
 
-== RxFirebase ★42
+Qiitaに「iMessageの入力UIのようなキーボードの表示と連動するUIを作る with RxSwift, RxKeyboard」というタイトルでRxKeyboardを使ったサンプルコードの記事を書いているので、興味のあるかたは参照してください。
+
+  * Qiita「iMessageの入力UIのようなキーボードの表示と連動するUIを作る with RxSwift, RxKeyboard」
+  ** https://qiita.com/k0uhashi/items/671ec40520967bc3949f
+
+== RxOptional
+
+本書でもRxOptionalについて少し触れましたが、Optionalな値が流れるストリームに対していろいろできるようにする拡張ライブラリです。
+たとえば、次のように使うことができます。
+
+//list[rxoptional-filternil][filterNil][Swift]{
+Observable<String?>
+  .of("One", nil, "Three")
+  .filterNil()
+  // Observable<String?> -> Observable<String>
+  .subscribe { print($0) }
+//}
+
+//emlist[]{
+One
+Three
+//}
+
+@<code>{replaceNilWith}オペレータを使うことでnil値の置き換え操作もできます。
+
+//list[rxoptional-replacenilwith][replaceNilWith][Swift]{
+Observable<String?>
+    .of("One", nil, "Three")
+    .replaceNilWith("Two")
+    // Observable<String?> -> Observable<String>
+    .subscribe { print($0) }
+//}
+
+//emlist[]{
+One
+Two
+Three
+//}
+
+他にも、@<code>{errorOnNil}オペレータを使うとnilが流れてきたときにerrorを流すことができたり、
+
+//list[rxoptional-errorOnNil][errorOnNil][Swift]{
+Observable<String?>
+    .of("One", nil, "Three")
+    .errorOnNil()
+    // Observable<String?> -> Observable<String>
+    .subscribe { print($0) }
+//}
+
+//emlist[]{
+One
+Found nil while trying to unwrap type <Optional<String>>
+//}
+
+また、@<code>{Array}、@<code>{Dictionary}、@<code>{Set}に対しても使うことができます。
+
+//list[rxoptional-array][filterEmpty][Swift]{
+Observable<[String]>
+    .of(["Single Element"], [], ["Two", "Elements"])
+    .filterEmpty()
+    .subscribe { print($0) }
+//}
+
+//emlist{
+["Single Element"]
+["Two","Elements"]
+//}
