@@ -13,7 +13,7 @@ RxDataSourcesはざっくりいうと、UITableView、UICollectionViewをRxSwift
 
 === イメージ
 
-//image[rxdatasource-tableview-sample][RxDataSources+UITableViewのサンプル]{
+//image[rxdatasource-tableview-sample][RxDataSources+UITableViewのサンプル][scale=0.3]{
   RxDataSources+UITableViewのサンプル
 //}
 
@@ -39,106 +39,377 @@ pod install
 //}
 
 ５章の開発を加速させる設定を済ませた前提で進めます。@<br>{}
-まずはモデルを作ります。
 
-//list[person-swift][Person.swift][swift]{
-  struct Person {
-    let name: String
+まずはSectionModelというのを作成します
+SectionModelはSectionModelTypeプロトコルに準拠する構造体で定義されており、これをうまく使うことでセクションとその中のアイテムを表現できます。
+
+//list[section-of-person][SettingsSectionModel][swift]{
+  typealias SettingsSectionModel = SectionModel<SettingsSection, SettingsItem>
+
+  enum SettingsSection {
+      case account
+      case common
+
+      var headerHeight: CGFloat {
+          return 40.0
+      }
+
+      var footerHeight: CGFloat {
+          return 1.0
+      }
   }
-//}
 
-次に、SectionModelというのを作成します
-SectionModelはSectionModelTypeプロトコルに準拠する構造体で定義し、これをうまく使うことでセクションを
+  enum SettingsItem {
+      // account section
+      case account
+      case security
+      case notification
+      case contents
+      // common section
+      case sounds
+      case dataUsing
+      case accessibility
 
-//list[section-of-person][SectionOfPerson][swift]{
-  struct SectionOfPerson {
-      var header: String
-      var items: [Item]
-  }
+      // other
+      case description(text: String)
 
-  extension SectionOfPerson: SectionModelType {
-      typealias Item = Person
+      var title: String? {
+          switch self {
+          case .account:
+              return "アカウント"
+          case .security:
+              return "セキュリティ"
+          case .notification:
+              return "通知"
+          case .contents:
+              return "コンテンツ設定"
+          case .sounds:
+              return "サウンド設定"
+          case .dataUsing:
+              return "データ利用時の設定"
+          case .accessibility:
+              return "アクセシビリティ"
+          case .description:
+              return nil
+          }
+      }
 
-      init(original: SectionOfPerson, items: [SectionOfPerson.Item]) {
-          self = original
-          self.items = items
+      var rowHeight: CGFloat {
+          switch self {
+          case .description:
+              return 72.0
+          default:
+              return 48.0
+          }
+      }
+
+      var accessoryType: UITableViewCellAccessoryType {
+          switch self {
+          case .account, .security, .notification, .contents, .sounds, .dataUsing, .accessibility:
+              return .disclosureIndicator
+          case .description:
+              return .none
+          }
       }
   }
 //}
 
-@<code>{SectionOfPerson}の@<code>{header}がSectionのTitleで、@<code>{items}がSection内のセルデータ群です。@<br>{}
-このサンプルアプリでは、@<code>{header}に@<code>{section 1}、@<code>{items}に@<code>{Persion(name: "Nozaki")}などが入るようなイメージです。
+enumで定義した@<code>{SettingsSection}の各caseが１つのセクションで、@<code>{SettingsItem}がセクション内のセルデータ群です。@<br>{}
 
 次に、ViewModelを作っていきましょう。
 
-//list[customviewmodel][CustomViewModel.swift][swift]{
-  class CustomViewModel {
+//listnum[customviewmodel][SettingsViewModel.swift][swift]{
+  import RxSwift
+  import RxDataSources
 
-    let items = BehaviorRelay<[SectionOfPerson]>(value: [])
+  class SettingsViewModel {
 
-    func updateItem() {
-        var sections: [SectionOfPerson] = []
-        sections.append(SectionOfPerson(header: "section 1", items: [SectionOfPerson.Item(name: "Nozaki"), SectionOfPerson.Item(name: "Sakura")]))
-        sections.append(SectionOfPerson(header: "section 2", items: [SectionOfPerson.Item(name: "Kashima"), SectionOfPerson.Item(name: "Hori")]))
-        sections.append(SectionOfPerson(header: "section 3", items: [SectionOfPerson.Item(name: "Seo"), SectionOfPerson.Item(name: "Wakamatsu")]))
-        items.accept(sections)
-    }
+      let items = BehaviorSubject<[SettingsSectionModel]>(value: [])
+
+      func updateItem() {
+          let sections: [SettingsSectionModel] = [
+              accountSection(),
+              commonSection()
+          ]
+          items.onNext(sections)
+      }
+
+      private func accountSection() -> SettingsSectionModel {
+          let items: [SettingsItem] = [
+              .account,
+              .security,
+              .notification,
+              .contents
+          ]
+          return SettingsSectionModel(model: .account, items: items)
+      }
+
+      private func commonSection() -> SettingsSectionModel {
+          let items: [SettingsItem] = [
+              .sounds,
+              .dataUsing,
+              .accessibility,
+              .description(text: "基本設定はこの端末でログインしている全てのアカウントに適用されます。")
+          ]
+          return SettingsSectionModel(model: .common, items: items)
+      }
   }
 //}
 
-//list[customviewcontroller][CustomViewController.swift][swift]{
+最後にViewControllerを作ります。
+
+//listnum[customviewcontroller][CustomViewController.swift][swift]{
 import UIKit
 import RxSwift
 import RxDataSources
 
-class CustomViewController: UIViewController, UITableViewDelegate {
+class SettingsViewController: UIViewController {
 
-  @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var tableView: UITableView!
 
-  private var disposeBag = DisposeBag()
+    private var disposeBag = DisposeBag()
 
-  # こいつとデータのBehaviorRelayをbindするとtableReloadやnumberOfSectionsをよしなにやってくれる
-  private lazy var dataSource = RxTableViewSectionedReloadDataSource<SectionOfPerson>(configureCell: configureCell, titleForHeaderInSection: titleForHeaderInSection)
+    private lazy var dataSource = RxTableViewSectionedReloadDataSource<SettingsSectionModel>(configureCell: configureCell)
 
-  # delegateでいう `cellForRowAt` の部分
-  private lazy var configureCell: RxTableViewSectionedReloadDataSource<SectionOfPerson>.ConfigureCell = { [weak self] (dataSource, tableView, indexPath, person) in
-    let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-    cell.textLabel?.text = person.name
-    return cell
-  }
+    private lazy var configureCell: RxTableViewSectionedReloadDataSource<SettingsSectionModel>.ConfigureCell = { [weak self] (dataSource, tableView, indexPath, _) in
+        let item = dataSource[indexPath]
+        switch item {
+        case .account, .security, .notification, .contents, .sounds, .dataUsing, .accessibility:
+            let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+            cell.textLabel?.text = item.title
+            cell.accessoryType = item.accessoryType
+            return cell
+        case .description(let text):
+            let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+            cell.textLabel?.text = text
+            cell.isUserInteractionEnabled = false
+            return cell
+        }
+    }
 
-  # delegateでいう `titleForHeaderInSection` の部分
-  private lazy var titleForHeaderInSection: RxTableViewSectionedReloadDataSource<SectionOfPerson>.TitleForHeaderInSection = { [weak self] (dataSource, indexPath) in
-    return dataSource.sectionModels[indexPath].header
-  }
+    private var viewModel: SettingsViewModel!
 
-  private var viewModel: CustomViewModel!
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupViewController()
+        setupTableView()
+        setupViewModel()
+    }
 
-  override func viewDidLoad() {
-    super.viewDidLoad()
-    setupViewController()
-    setupTableView()
-    setupViewModel()
-  }
+    private func setupViewController() {
+        navigationItem.title = "設定"
+    }
 
-  private func setupViewController() {
-    self.title = "タイトル"
-  }
-  private func setupTableView() {
-    tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-    tableView.rx.setDelegate(self).disposed(by: disposeBag)
-  }
-  private func setupViewModel() {
-    viewModel = CustomViewModel()
+    private func setupTableView() {
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        tableView.contentInset.bottom = 12.0
+        tableView.rx.setDelegate(self).disposed(by: disposeBag)
+        tableView.rx.itemSelected
+            .subscribe(onNext: { [weak self] indexPath in
+                guard let item = self?.dataSource[indexPath] else { return }
+                self?.tableView.deselectRow(at: indexPath, animated: true)
+                switch item {
+                case .account:
+                    // 遷移させる処理
+                    // コンパイルエラー回避のためにbreakをかいていますが処理を書いていればbreakは必要ありません。
+                    break
+                case .security:
+                    // 遷移させる処理
+                    break
+                case .notification:
+                    // 遷移させる処理
+                    break
+                case .contents:
+                    // 遷移させる処理
+                    break
+                case .sounds:
+                    // 遷移させる処理
+                    break
+                case .dataUsing:
+                    // 遷移させる処理
+                    break
+                case .accessibility:
+                    // 遷移させる処理
+                    break
+                case .description:
+                    break
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+    private func setupViewModel() {
+        viewModel = SettingsViewModel()
 
-    # SectionModelとdataSourceをbindさせる
-    viewModel.items
-      .bind(to: tableView.rx.items(dataSource: dataSource))
-      .disposed(by: disposeBag)
+        viewModel.items
+            .bind(to: tableView.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
 
-    viewModel.updateItem()
-  }
+        viewModel.updateItem()
+    }
 }
+
+extension SettingsViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        let item = dataSource[indexPath]
+        return item.rowHeight
+    }
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        let section = dataSource[section]
+        return section.model.headerHeight
+    }
+
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        let section = dataSource[section]
+        return section.model.footerHeight
+    }
+
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerView = UIView()
+        headerView.backgroundColor = .clear
+        return headerView
+    }
+
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        let footerView = UIView()
+        footerView.backgroundColor = .clear
+        return footerView
+    }
+}
+//}
+
+Build & Run で実行確認できます。
+
+=== その他セクションを追加してみよう！
+
+//lead{
+  さきほど作ったRxDataSources+UITableViewのサンプルアプリを題材に、新しくセクションとセクションアイテムを追加する方法について学びます。
+//}
+
+まずはセクションを追加するために、SettingsSectionにcaseを追加します。
+
+//emlist[]{
+enum SettingsSection {
+  case account
+  case common
+  case other // 追加
+  // ...
+}
+//}
+
+次に、セクションアイテムを追加するため、SettingsItemにcaseを追加します。
+
+//list[add-section-item][SettingsItem][swift]{
+enum SettingsItem {
+  // ...
+  // common section
+  case sounds
+  case dataUsing
+  case accessibility
+  // other section
+  case credits
+  case version
+  case privacyPolicy
+  // ...
+
+  var title: String? {
+        switch self {
+        // ..
+        case .credits:
+            return "クレジット"
+        case .version:
+            return "バージョン情報"
+        case privacyPolicy:
+            reutrn "プライバシーポリシー"
+        }
+    }
+
+
+    var accessoryType: UITableViewCellAccessoryType {
+        switch self {
+        case .account, .security, .notification, .contents, .sounds, .dataUsing, .accessibility, .credits, .version, .privacyPolicy:
+            return .disclosureIndicator
+        case .description:
+            return .none
+        }
+    }
+}
+//}
+
+セクションとそのアイテムの定義ができたら、実際に表示させるためにViewModelのitemsへデータを追加します。
+
+//list[add-viewmodel][ViewModelを編集][Swift]{
+    func updateItem() {
+        let sections: [SettingsSectionModel] = [
+            accountSection(),
+            commonSection(),
+            otherSection() // 追加
+        ]
+        items.onNext(sections)
+    }
+
+    // ...
+
+    private func otherSection() -> SettingsSectionModel {
+        let items: [SettingsItem] = [
+            .credits,
+            .version,
+            .privacyPolicy
+        ]
+        return SettingsSectionModel(model: .other, items: items)
+    }
+//}
+
+データの追加ができたので、今度はそのセクションセルのUIを定義します。
+今回は他のメニューと同じUIでよいので、switch文を軽く対応させるだけです。
+
+//list[add-viewcontroller][ViewControllerを編集][Swift]{
+  // ...
+  private lazy var configureCell: RxTableViewSectionedReloadDataSource<SettingsSectionModel>.ConfigureCell = { [weak self] (dataSource, tableView, indexPath, _) in
+      let item = dataSource[indexPath]
+      switch item {
+      case .account, .security, .notification, .contents, .sounds, .dataUsing, .accessibility, .credits, .version, .privacyPolicy:
+          let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+          cell.textLabel?.text = item.title
+          cell.accessoryType = item.accessoryType
+          return cell
+      // ...
+  }
+
+  // ...
+
+  private func setupTableView() {
+      // ...
+      tableView.rx.itemSelected
+          .subscribe(onNext: { [weak self] indexPath in
+              guard let item = self?.dataSource[indexPath] else { return }
+              self?.tableView.deselectRow(at: indexPath, animated: true)
+              switch item {
+              case .account:
+                  // 遷移させる処理
+                  // コンパイルエラー回避のためにbreakをかいていますが処理を書いていればbreakは必要ありません。
+                  break
+              // ...
+              case .credits:
+                  // 遷移させる処理
+                  break
+              case .version:
+                  // 遷移させる処理
+                  break
+              case .privacyPolicy:
+                  // 遷移させる処理
+                  break
+              case .description:
+                  break
+              }
+          })
+          .disposed(by: disposeBag)
+    // ...
+//}
+
+Build & Runで次のような画面になっていたら成功です。
+
+//image[rxdatasource-add-other-section][その他セクション追加後の画面][scale=0.3]{
+  その他セクション追加後の画面
 //}
 
 == RxAlamofire ★1k
