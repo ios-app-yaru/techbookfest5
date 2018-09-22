@@ -4,12 +4,14 @@ let fs = require("fs");
 let yaml = require("js-yaml");
 
 const articles = "articles";
+const publish = 'publish';
 const bookConfig = yaml.safeLoad(fs.readFileSync(`${articles}/config.yml`, "utf8"));
 
 const reviewPrefix = process.env["REVIEW_PREFIX"] || "bundle exec ";
 const reviewPostfix = process.env["REVIEW_POSTFIX"] || "";             // REVIEW_POSTFIX="-peg" npm run pdf とかするとPEGでビルドできるよ
 const reviewPreproc = `${reviewPrefix}review-preproc${reviewPostfix}`;
 const reviewCompile = `${reviewPrefix}review-compile${reviewPostfix}`;
+const reviewWebMaker = `${reviewPrefix}review-webmaker${reviewPostfix}`;
 const reviewPdfMaker = `${reviewPrefix}review-pdfmaker${reviewPostfix}`;
 const reviewEpubMaker = `${reviewPrefix}review-epubmaker${reviewPostfix}`;
 
@@ -22,82 +24,104 @@ module.exports = grunt => {
 					`${articles}/*.pdf`,
 					`${articles}/*.epub`,
 					`${articles}/*.html`,
-					`${articles}/*.md`,
 					`${articles}/*.xml`,
-					`${articles}/*.txt`
-				]
-			}
+					`${articles}/*.txt`,
+				],
+			},
+			publish: {
+				src: `${publish}/`,
+			},
+		},
+		sass: {
+			dist: {
+				options: {
+					bundleExec: true,
+					sourcemap: 'none',
+				},
+				files: {
+					'articles/style.css': 'articles/style.scss',
+					'articles/style-web.css': 'articles/style-web.scss',
+				},
+			},
+		},
+		copy: {
+			publish: {
+				files: [
+					{expand: true, cwd: `${articles}/webroot/`, src: ['**'], dest: `${publish}/`},
+				],
+			},
 		},
 		shell: {
 			preprocess: {
 				options: {
 					execOptions: {
 						cwd: articles,
-					}
+					},
 				},
-				command: `${reviewPreproc} -r --tabwidth=2 *.re`
+				command: `${reviewPreproc} -r --tabwidth=2 *.re`,
 			},
 			compile2text: {
 				options: {
 					execOptions: {
 						cwd: articles,
-					}
+					},
 				},
-				command: `${reviewCompile} --target=text`
-			},
-			compile2markdown: {
-				options: {
-					execOptions: {
-						cwd: articles,
-					}
-				},
-				command: `${reviewCompile} --target=markdown`
+				command: `${reviewCompile} --target=text`,
 			},
 			compile2html: {
 				options: {
 					execOptions: {
 						cwd: articles,
-					}
+					},
 				},
-				command: `${reviewCompile} --target=html --stylesheet=style.css --chapterlink`
+				command: `${reviewCompile} --target=html --yaml=config.yml --chapterlink --footnotetext`,
 			},
 			compile2latex: {
 				options: {
 					execOptions: {
 						cwd: articles,
-					}
+					},
 				},
-				command: `${reviewCompile} --target=latex --footnotetext`
+				command: `${reviewCompile} --target=latex --footnotetext`,
 			},
 			compile2idgxml: {
 				options: {
 					execOptions: {
 						cwd: articles,
-					}
+					},
 				},
-				command: `${reviewCompile} --target=idgxml`
+				command: `${reviewCompile} --target=idgxml`,
+			},
+			compile2web: {
+				options: {
+					execOptions: {
+						cwd: articles,
+					},
+				},
+				command: `${reviewWebMaker} config.yml`,
 			},
 			compile2pdf: {
 				options: {
 					execOptions: {
 						cwd: articles,
-					}
+					},
 				},
-				command: `${reviewPdfMaker} config.yml`
+				command: `${reviewPdfMaker} config.yml`,
 			},
 			compile2epub: {
 				options: {
 					execOptions: {
 						cwd: articles,
-					}
+					},
 				},
-				command: `${reviewEpubMaker} config.yml`
-			}
-		}
+				command: `${reviewEpubMaker} config.yml`,
+			},
+		},
 	});
 
-	function generateTask(target) {
-		return ["clean", "shell:preprocess", `shell:compile2${target}`];
+	function generateTask(target, pretask) {
+		pretask = pretask || [];
+		return ["clean"].concat(pretask).concat(["shell:preprocess", `shell:compile2${target}`]);
 	}
 
 	grunt.registerTask(
@@ -111,19 +135,19 @@ module.exports = grunt => {
 		generateTask("text"));
 
 	grunt.registerTask(
-		"markdown",
-		"原稿をコンパイルしてMarkdownファイルにする",
-		generateTask("markdown"));
-
-	grunt.registerTask(
 		"html",
 		"原稿をコンパイルしてHTMLファイルにする",
-		generateTask("html"));
+		generateTask("html", ["sass"]));
 
 	grunt.registerTask(
 		"idgxml",
 		"原稿をコンパイルしてInDesign用XMLファイルにする",
 		generateTask("idgxml"));
+
+	grunt.registerTask(
+		"web",
+		"原稿をコンパイルしてwebページにする",
+		generateTask("web", ["sass"]).concat(['copy:publish']));
 
 	grunt.registerTask(
 		"pdf",
@@ -135,5 +159,5 @@ module.exports = grunt => {
 		"原稿をコンパイルしてepubファイルにする",
 		generateTask("epub"));
 
-	require('load-grunt-tasks')(grunt);
+	require("load-grunt-tasks")(grunt);
 };

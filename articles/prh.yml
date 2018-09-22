@@ -3,10 +3,6 @@
 # 対応は不完全(途中で飽きた) 一部手心を加えている
 version: 1
 
-imports:
-  # 気合で移行した気持ちになった
-  - ../prh-rules/media/techbooster.yml
-
 rules:
   - expected: asm.js
     pattern:  ams.js
@@ -65,10 +61,6 @@ rules:
   - expected: いったん
     pattern:  一旦
     prh: 漢字で書かず、ひらがなで書くと読みやすくなります。
-  - expected: クロージャ
-    pattern: クロージャー
-  - expected: GitHub
-    pattern: Github
   - expected: こと
     pattern:  /(記|大|仕|返|無|食|見|議)?事(?!情|件|前|後|例|実|体|態|項|務|象)/
     regexpMustEmpty: $1

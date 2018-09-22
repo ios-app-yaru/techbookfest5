@@ -27,7 +27,7 @@ booktitle: 比較して学ぶRxSwift4入門
 
 # 著者名。「, 」で区切って複数指定できる
 # 読みを入れる例 aut: [{name: "青木峰郎", file-as: "アオキミネロウ"}, {name: "武藤健志", file-as: "ムトウケンシ"}, {name: "高橋征義", file-as: "タカハシマサヨシ"}, {name: "角征典", file-as: "カドマサノリ"}]
-aut: ["Ryo Takahashi"]
+aut: ["髙橋 凌"]
 
 # 以下はオプション
 # 以下はオプション(autと同じように配列書式で複数指定可能)。
@@ -58,9 +58,8 @@ edt: ["k0uhashi"]
 # a-oth, oth: その他
 # a-pht, pht: 撮影責任者
 # a-pbl, pbl: 出版社（発行所）
-pbl: k0uhashi
+pbl: 出版社（Placeholder）
 # a-prt, prt: 印刷所
-prt: 印刷所
 # a-red, red: 項目の枠組起草者
 # a-rev, rev: 評論者
 # a-spn, spn: 援助者
@@ -74,10 +73,10 @@ date: 2018-10-08
 # 複数指定する場合は次のように記述する
 # [["初版第1刷の日付", "初版第2刷の日付"], ["第2版第1刷の日付"]]
 # 日付の後ろを空白文字で区切り、任意の文字列を置くことも可能。
-history: [["2018-10-08 技術書典5版 v1.0.0"]]
+history: [["2018-10-08 技術書典５版 v1.0.0"]]
 # 権利表記(配列で複数指定可)
 # rights: (C) 2016 Re:VIEW Developers
-rights: (C) 2018 Ryo Takahashi
+rights: (C) 2018 iOSアプリ開発がんばるぞ！！の会
 # description: 説明
 # subject: 短い説明用タグ(配列で複数指定可)
 # type: 書籍のカテゴリーなど(配列で複数指定可)
@@ -89,8 +88,8 @@ rights: (C) 2018 Ryo Takahashi
 # デバッグフラグ。nullでないときには一時ファイルをカレントディレクトリに作成し、削除もしない
 debug: null
 
-# 固有IDに使用するドメイン。省略した場合は時刻に基づくランダムUUIDが入る
-urnid: urn:uid:https://twitter.com.
+# 固有IDに使用するドメイン。指定しない場合には、時刻に基づくランダムUUIDが入る
+urnid: urn:uid:https://github.com/ios-app-yaru/techbookfest5
 #
 # ISBN。省略した場合はurnidが入る
 # isbn: null
@@ -98,8 +97,8 @@ urnid: urn:uid:https://twitter.com.
 # HTMLファイルの拡張子(省略した場合はhtml)
 htmlext: html
 #
-# CSSファイル(配列で複数指定可、yamlファイルおよびRe:VIEWファイルを置いたディレクトリにあること)
-stylesheet: ["style.scss"]
+# CSSファイル(配列で複数指定可)
+stylesheet: ["style.css"]
 
 # ePUBのバージョン (2か3)
 epubversion: 3
@@ -108,12 +107,12 @@ epubversion: 3
 htmlversion: 5
 
 # 目次として抽出する見出しレベル
-toclevel: 3
+toclevel: 2
 
 # 採番の設定。採番させたくない見出しには「==[nonum]」のようにnonum指定をする
 #
 # 本文でセクション番号を表示する見出しレベル
-secnolevel: 3
+secnolevel: 2
 
 # 以下のsecnolevelはまだ未実装。
 # 前付でセクション番号を表示する見出しレベル(未実装)
@@ -136,32 +135,32 @@ toc: true
 # cover: null
 #
 # 表紙に配置し、書籍の影絵にも利用する画像ファイル。省略した場合はnull (画像を使わない)。画像ディレクトリ内に置いてもディレクトリ名は不要(例: cover.jpg)
-# coverimage: cover.png
+# coverimage: cover.jpg
 #
 # 表紙の後に大扉ページを作成するか。省略した場合はnull (作成しない)
 titlepage: true
 #
-# 自動生成される大扉ページを上書きするファイル。ファイル名を指定すると大扉として入る
+# 自動生成される大扉ページを上書きするファイル。ファイル名を指定すると大扉として入る (PDFMaker向けにはLaTeXソース断片、EPUBMaker向けにはHTMLファイル)
 # titlefile: null
 #
-# 原書大扉ページにするHTMLファイル。ファイル名を指定すると原書大扉として入る
+# 原書大扉ページにするHTMLファイル。ファイル名を指定すると原書大扉として入る (PDFMaker向けにはLaTeXソース断片、EPUBMaker向けにはHTMLファイル)
 # originaltitlefile: null
 #
-# 権利表記ページファイル。ファイル名を指定すると権利表記として入る
+# 権利表記ページファイル。ファイル名を指定すると権利表記として入る (PDFMaker向けにはLaTeXソース断片、EPUBMaker向けにはHTMLファイル)
 # creditfile: null
 
 # 奥付を作成するか。デフォルトでは作成されない。trueを指定するとデフォルトの奥付、ファイル名を指定するとそれがcolophon.htmlとしてコピーされる
 colophon: true
 
-# 裏表紙ファイル (画像はcoversまたはimagesに配置する)。ファイル名を指定すると裏表紙として入る
+# 裏表紙データファイル (PDFMaker向けにはLaTeXソース断片、EPUBMaker向けにはHTMLファイル)
 # backcover: null
 
-# プロフィールページファイル。ファイル名を指定すると著者紹介として入る
+# プロフィールページファイル  (PDFMaker向けにはLaTeXソース断片、EPUBMaker向けにはHTMLファイル)。ファイル名を指定すると著者紹介として入る
 # profile: null
 # プロフィールページの目次上の見出し
 # profiletitle: 著者紹介
 
-# 広告ファイル。ファイル名を指定すると広告として入る
+# 広告ファイル。ファイル名を指定すると広告として入る (PDFMaker向けにはLaTeXソース断片、EPUBMaker向けにはHTMLファイル)
 # advfile: null
 
 # 取り込む画像が格納されているディレクトリ。省略した場合は以下
@@ -176,10 +175,9 @@ colophon: true
 # fontdir内から取り込まれる対象となるファイル拡張子。省略した場合は以下
 # font_ext: ["ttf", "woff", "otf"]
 
-# ソースコードハイライトを利用する (pygmentsには外部gemが必要)
+# ソースコードハイライトを利用する (rouge,pygmentsには外部gemが必要)
 # highlight:
 #   html: "rouge"
-#   html: "pygments"
 #   latex: "listings"
 
 # カタログファイル名を指定する
@@ -211,6 +209,8 @@ direction: "ltr"
 epubmaker:
   # HTMLファイルの拡張子
   htmlext: xhtml
+  # 表紙に配置し、書籍の影絵にも利用する画像ファイル。省略した場合はnull (画像を使わない)。画像ディレクトリ内に置いてもディレクトリ名は不要(例: cover.jpg)
+  coverimage: cover.jpg
   #
   # 目次を要素の階層表現にしない。省略した場合(null)は階層化する。
   # 特に部扉が入るなどの理由で、構成によっては階層化目次でepubcheckに
@@ -278,15 +278,18 @@ epubmaker:
   # epubmaker:階層を使うものはここまで
 
 # LaTeX用のスタイルファイル(styディレクトリ以下に置くこと)
+# texstyle: reviewmacro
 # tatsumacroは、電子書籍版の制作に利用する
 # texstyle: tatsumacro
 texstyle: techbooster-doujin
+
 #
 # LaTeX用のdocumentclassを指定する
+# tatsumacro利用の場合はこちら
 # texdocumentclass: ["jsbook", "oneside,14pt,uplatex"]
-# texdocumentclass: ["jsbook", "b5j,twoside,openany,uplatex"]
-texdocumentclass: ["jsbook", "a5j,twoside,openany,uplatex,9pt"]
-#
+# TechBoosterの指定は次の通り
+texdocumentclass: ["jsbook", "b5j,twoside,openany,uplatex"]
+
 # LaTeX用のコマンドを指定する
 # texcommand: "uplatex"
 #
