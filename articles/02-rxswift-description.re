@@ -13,8 +13,7 @@
 
 == RxSwiftって何？
 
-RxSwiftとはMicrosoftが公開した.NET Framework向けのライブラリである「Reactive Extensions」の概念をSwiftでも扱えるようにした拡張ライブラリです。@<br>{}
-GitHub上でオープンソースライブラリと公開されていてさまざまな人がコントリビュートしています。
+RxSwiftとはMicrosoftが公開した.NET Framework向けのライブラリである「Reactive Extensions」の概念をSwiftでも扱えるようにした拡張ライブラリで、GitHub上でオープンソースライブラリとして公開されています。
 
 同じく、Reactive Extensionsの概念を取り入れた「ReactiveSwift」というライブラリも存在します。@<br>{}
 本書では、ReactiveSwiftについては触れず、RxSwiftにのみ焦点を当てて解説していきます。
@@ -47,11 +46,11 @@ Reactive Extensionsを導入することによって、リアクティブプロ�
 次のコードを見てみましょう。
 
 //listnum[tetuduki-example][擬似コード][swift]{
-  a = 2
-  b = 3
-  c = a * b
-  a = 3
-  print(c)
+a = 2
+b = 3
+c = a * b
+a = 3
+print(c)
 //}
 
 何の前提も無く、プログラマーにこの疑似コードで出力される値を聞くと、大体は「6」と答えます。

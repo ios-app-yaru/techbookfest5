@@ -61,6 +61,10 @@ rules:
   - expected: いったん
     pattern:  一旦
     prh: 漢字で書かず、ひらがなで書くと読みやすくなります。
+  - expected: delegate
+    pattern: Delegate
+  - expected: callback
+    pattern: /(CallBack|callBack|Callback)/
   - expected: こと
     pattern:  /(記|大|仕|返|無|食|見|議)?事(?!情|件|前|後|例|実|体|態|項|務|象)/
     regexpMustEmpty: $1

@@ -3,18 +3,18 @@
 == 参考URL・ドキュメント・文献
 
   * Apple Developer Documentation
-  ** https://developer.apple.com/documentation/
+  ** @<href>{https://developer.apple.com/documentation/}
   * Swift.org - Documentation
-  ** https://swift.org/documentation/
+  ** @<href>{https://swift.org/documentation/}
   * ReactiveX
-  ** http://reactivex.io/
+  ** @<href>{http://reactivex.io/}
   * RxSwift Repository
-  ** https://github.com/ReactiveX/RxSwift
+  ** @<href>{https://github.com/ReactiveX/RxSwift}
   * RxSwift Community
-  ** https://github.com/RxSwiftCommunity
+  ** @<href>{https://github.com/RxSwiftCommunity}
   * CocoaPods
-  ** https://cocoapods.org/
+  ** @<href>{https://cocoapods.org/}
   * Homebrew
-  ** https://brew.sh/index_ja
+  ** @<href>{https://brew.sh/index_ja}
   * Qiita
-  ** https://qiita.com/
+  ** @<href>{https://qiita.com/}
