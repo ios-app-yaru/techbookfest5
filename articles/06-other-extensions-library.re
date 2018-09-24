@@ -295,7 +295,8 @@ extension SettingsViewController: UITableViewDelegate {
 }
 //}
 
-Build & Run で実行確認できます。
+最後にViewController.xibを作成し、画面幅いっぱいのTableViewを設置、ViewController.swiftのIBOutletと接続しましょう。@<br>{}
+Build & Run で実行し、イメージのようになっていたら成功です。
 
 === その他セクションを追加してみよう！
 
@@ -450,7 +451,7 @@ Qiitaに「iMessageの入力UIのようなキーボードの表示と連動す�
 
 == RxOptional
 
-本書でもRxOptionalについて少し触れましたが、Optionalな値が流れるストリームに対していろいろできるようにする拡張ライブラリです。
+本書でもRxOptionalについて少し触れましたが、Optionalな値が流れるストリームに対していろいろできるようにする拡張ライブラリです。@<br>{}
 たとえば、次のように使うことができます。
 
 //list[rxoptional-filternil][filterNil][Swift]{
@@ -497,7 +498,7 @@ One
 Found nil while trying to unwrap type <Optional<String>>
 //}
 
-また、@<code>{Array}、@<code>{Dictionary}、@<code>{Set}に対しても使うことができます。
+@<code>{Array}、@<code>{Dictionary}、@<code>{Set}に対しても使うことができます。
 
 //list[rxoptional-array][filterEmpty][Swift]{
 Observable<[String]>
