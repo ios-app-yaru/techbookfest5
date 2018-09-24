@@ -1,15 +1,17 @@
-= 基本的な書き方
+= RxSwiftの基本的な書き方
 
-ここからは、RxSwiftの書き方を説明していきます。@<br>{}
-RxSwiftの書き方はさまざまあり、本書では全てを紹介できませんがよく使われるところを抜粋して紹介します。
+//lead{
+本章では、RxSwiftの基本的な書き方や仕組みについて解説していきます。
+RxSwiftを支える全ての仕組みを解説することは本書のテーマから逸れてしまうので、良く使われるところを抜粋して解説します。
+//}
 
 == メソッドチェーンのように直感的に書ける
 
-RxSwift/RxCocoaは、メソッドチェーンのように直感的に書くことができます。@<br>{}
-メソッドチェーンとは、その名前のとおりメソッドを実行してその結果に対してさらにメソッドを実行するような書き方を指します。
+RxSwift/RxCocoaは、メソッドチェーンのように直感的にコードを書くことができます。@<br>{}
+メソッドチェーンとは、その名前のとおりメソッドを実行し、その結果に対してさらにメソッドを実行するような書き方を指します。
 jQueryを扱ってた人はなんとなく分かるのではないでしょうか？
 
-具体的には次のように書くことができます
+たとえば、次のように書けます。
 
 //listnum[method-chain-example][hogeButtonのイベント購読][swift]{
 hogeButton.rx.tap
@@ -22,7 +24,7 @@ hogeButton.rx.tap
 hogeButtonのタップイベントを購読し、タップされたときにsubscribeメソッドの引数であるonNextのクロージャ内の処理を実行します。@<br>{}
 最後にクラスが解放されたとき、自動的に購読を破棄してくれるように@<code>{disposed(by:)}メソッドを使っています。
 
-まとめると、次の流れで定義しています。
+まとめると、次のように処理を定義しています。
 
   1. イベントの購読
   2. イベントが流れてきたときの処理
@@ -30,8 +32,7 @@ hogeButtonのタップイベントを購読し、タップされたときにsubs
 
 == Hello World
 
-RxSwiftでのHello World的な書き方を書いてみます。@<br>{}
-公式なHelloWorldの書き方ではありませんが、なんとなく概念は掴めるかと思います
+RxSwiftでのHelloWorld的なものを書いてみます。@<br>{}
 
 //listnum[ストリームを定義し、好きなタイミングで値を流し、購読する][subject-example][swift]{
 import RxSwift
@@ -60,16 +61,16 @@ value = Hello World!!!
 
 処理の流れのイメージは次のとおりです。
 
-  1. `helloWorldSubject` というSubjectを定義
+  1. @<code>{helloWorldSubject}というSubjectを定義
   2. Subjectを購読
   3. 値が流れてきたら print文で値を出力させる
   4. 定義したクラスが破棄されたら購読も自動的に破棄させる
   5. 値を流す
 
-Subjectを使った書き方はよく使われます。@<br>{}
-たとえば、ViewController/ViewModel間のデータの受け渡しや親子ViewController間でのデータの受け渡しで使われます。@<br>{}
+Subjectを使った書き方はViewController/ViewModel間のデータの受け渡しや、@<br>{}
+遷移元/遷移先のViewController間でのデータの受け渡しでよく使われます。
 
-上記のコードは同じクラス内に書いているので、Subjectの強みがあまり生かせていません。@<br>{}
+また、前述したコードは同じクラス内に書いていて、Subjectの強みが生かせていません。@<br>{}
 実際にViewController/ViewModelに分けて書いてみましょう。
 
 //listnum[subject-example-viewmodel][ViewController/ViewModelに分けて書く][swift]{
@@ -110,34 +111,22 @@ class HogeViewModel {
 このコードを図で表してみましょう。
 
 //image[helloworldsubject][Subject イメージ図]{
-  Subject イメージ図
+Subject イメージ図
 //}
 
-ViewControllerがViewModelのSubjectを購読したことで、変更があった場合にイベント・値を受け取れます。@<br>{}
-ViewModelはデータの変更をViewControllerに伝える必要がなくなるので、ViewControllerを知らなくても良くなり、「UIとロジックの分離」ができました。テストも書きやすくなりますね。
-
-ここまでで、なんとなく処理の流れは掴めたでしょうか？@<br>{}
-ここで記載したHelloWorldのコードで使われている仕組みはRxSwiftの数ある仕組みの中ではほんの一部にしかすぎないので、やりながら覚えていきましょう！
+ViewControllerがViewModelのSubjectを購読し、イベントを受け取っています。@<br>{}
+なんとなく処理の流れは掴めたでしょうか？@<br>{}
+ここで記載したHelloWorldのコードで使われている仕組みはRxSwiftの機能のほんの一部にしかすぎないので、やりながら覚えていきましょう！
 
 == よく使われるクラス・メソッドについて
 
-さて、ここまで本書を読み進めてきた中で、いくつか気になるワードやメソッド、クラスが出てきたのではないでしょうか？@<br>{}
-ここからようやくそれらのクラスとそれらを支える概念についてもう少し深く触れていきます。
+さて、ここまで本書を読み進めてきた中で、いくつか気になるワードやクラス、メソッドが出てきたのではないでしょうか？@<br>{}
+ここからようやくそれらのクラスと支える概念についてもう少し深く触れていきます。
 
 === Observable
 
-Observableは翻訳すると観測可能という意味で文字どおり観測可能なものを表現するクラスで、イベントを検知するためのものです。
-
-まずは、次の図を見てください。
-
-//image[what-observable][Observable]{
-  Observable
-//}
-
-RxSwift（ReactiveExtensions）について少し調べた方は大体みたことのあるような図ではないでしょうか？@<br>{}
-これがまさにObservableを表しています。
-
-Observableに流れるイベントには次の種類あります。
+Observableは翻訳すると観測可能という意味で文字どおり観測可能なものを表現するクラスで、イベントを検知するためのものです。@<br>{}
+Observableが通知するイベントには次の種類あります。
 
   * onNext
   ** デフォルトのイベントを流す
@@ -149,10 +138,10 @@ Observableに流れるイベントには次の種類あります。
   ** 完了イベント
   ** １度だけ呼ばれ、その時点で終了、購読を破棄
 
-これをコードでどう扱うかというと、次のように扱います
+コードでは、次のように扱います。
 
-//listnum[subject-subscribe-example][hogeSubjectの購読の仕方][swift]{
-hogeSubject
+//listnum[subject-subscribe-example][hogeObservableの購読の仕方][swift]{
+hogeObservable
   .subscribe(onNext: {
     print("next")
   }, onError: {
@@ -162,19 +151,27 @@ hogeSubject
   })
 //}
 
-コードを見てなんとなく予想できるかと思いますが、onNextイベントが流れてきたときはonNextのクロージャが実行され、onErrorイベントが流れてきたときはonErrorのクロージャが実行されます。
-
-また、onErrorやonCompletedは省略することができます。@<br>{}
-UIKitをsubscribeする場合はonErrorやonCompletedイベントが流れてこないので、onNextのクロージャ以外は省略しましょう。
+onNextイベントが流れてきたときはonNextのクロージャが実行され、onErrorイベントが流れてきたときはonErrorのクロージャが実行されます。@<br>{}
+また、onErrorやonCompletedは省略することができ、それらのイベントが流れてこないことが保証されている場合は省略しましょう。
 
 省略する場合は次のように書きます。
 
 //listnum[abridgement-other-than-onnext][onNext以外を省略する][swift]{
-  hogeSubject.
-    subscribe(onNext: {
-      print("next")
-    })
+hogeObservable
+  .subscribe(onNext: {
+    print("next")
+  })
 //}
+
+また、Observableは次の図を使って説明されることがよくあります。
+
+//image[what-observable][Observable]{
+Observable
+//}
+
+RxSwift（Reactive Extensions）について少し調べた方は大体みたことのあるような図ではないでしょうか？@<br>{}
+この図はマーブルダイアグラムといい、横線が時間軸で左から右に時間が流れるようなイメージです。@<br>{}
+マーブルダイアグラムを使った解説は初級者向けではないのでここでは割愛しますが、頭の隅に置いといてください。
 
 ==== Tips: ObservableとObserver
 
@@ -192,7 +189,7 @@ hogeObservable // Observable (イベント発生元)
   .disposed(by: disposeBag)
 //}
 
-コードで見てみるとわかりやすいですね。名前は似てますが違う意味だというのを頭の隅に入れておくと理解がより進む
+コードで見てみるとわかりやすいです。名前は似てますが違う意味だというのを頭の隅に入れておくと理解がより進みます。
 
 === Dispose
 
@@ -203,13 +200,12 @@ hogeObservable // Observable (イベント発生元)
 Observableをsubscribe（bind等）すると、Disposeクラスのインスタンスが帰ってきます。@<br>{}
 Disposeは購読を解除（破棄）するためのクラスで、@<code>{dispose()}メソッドを呼ぶことで明示的に購読を破棄できます。
 
-今回はそのDisposeクラスの@<code>{disposed(by:)}メソッドを使っていています。
-これは何なのかというと、そのクラス内にDisposeBagというインスタンスを保持しておいて、引数のそのインスタンスを渡します。
-引数として渡すとDisposeBagはDisposeインスタンスを貯め、自身が解放（deinit）されたときに管理している購読を全て自動で解放（unsubscribe）してくれるようになります。
-
+今回はそのDisposeクラスの@<code>{disposed(by:)}メソッドを使っていています。@<br>{}
+クラス内にDisposeBagクラスのインスタンスを保持しておいて、引数のそのインスタンスを渡します。@<br>{}
+引数として渡すとDisposeBagはDisposeインスタンスを貯め、自身が解放（deinit）されたときに管理している購読を全て自動で解放（unsubscribe）してくれるようになります。@<br>{}
 特に購読の破棄を意識することなく、Observableを扱えるようになっているのはこの仕組みのおかげです。
 
-コードで見てみましょう
+コードで見てみましょう。
 
 //listnum[dispose-example][Disposeのサンプルコード][swift]{
 class HogeViewController {
@@ -230,25 +226,27 @@ class HogeViewController {
 }
 //}
 
-上記の場合だと、HogeViewControllerが解放（deinit）されるときに保持しているhogeButtonのsubscribeとfooButtonのsubscribeのDisposableをdisposeしてくれます。
+@<list>{dispose-example}では、HogeViewControllerが解放（deinit）されるときに保持しているhogeButtonとfooButtonのDisposableをdisposeしてくれます。
 
-とりあえず購読したら必ず@<code>{disposed(by: disposeBag)}しておけば大体間違いないです。
+とりあえず購読したら@<code>{disposed(by: disposeBag)}しておけば大体間違いないです。
 
 ==== Tips: シングルトンインスタンス内でDisposeBagを扱うときは注意！
 
-DisposeBagはとても便利な仕組みですが、シングルトンインスタンス内でDisposeBagを扱う時は注意が必要です。DisposeBagの仕組みはそのクラスが解放されたとき、管理してるDisposableをdisposeするとさきほど記述しましたね。@<br>{}
+DisposeBagはとても便利な仕組みですが、シングルトンインスタンス内で扱う時は注意が必要です。@<br>{}
+DisposeBagの仕組みはそのクラスが解放されたとき、管理してるDisposableをdisposeするとさきほど記述しました。@<br>{}
 つまりDisposeBagのライフサイクルは保持しているクラスのライフサイクルと同一のものになります。
 
-しかし、シングルトンインスタンスのライフサイクルはアプリのライフサイクルと同一のため、いつまでたってもdisposableされず、メモリリークになる可能性があります。@<br>{}
-回避策がまったくないわけではありませんが、ここでは詳細を省きます。シングルトンインスタンスで扱う場合には注意が必要！ということだけ覚えておいてください。
+しかし、シングルトンインスタンスのライフサイクルはアプリのライフサイクルと同一のため、いつまでたっても@<code>{dispose}されず、最悪の場合メモリリークになる可能性があります。@<br>{}
+回避策がまったくないわけではありませんが、ここでは詳細を省きます。@<br>{}
+シングルトンインスタンスで扱う場合には注意が必要！ということだけ覚えておいてください。
 
-=== Subject、 Relay
+=== Subject、Relay
 
-Subject、Relayは簡単にいうと、イベントの検知に加えてイベントの発生もできるすごいやつです。@<br>{}
-ここで少しObservableについて振り返ってみましょう。Observableとは、イベントを検知するためのクラスでしたね。@<br>{}
-Subject、Relayはそれに加えてイベントを発生させることもできるクラスです。
+Subject、Relayは簡単にいうと、イベントの検知に加えてイベントの発生もできる便利なクラスです。@<br>{}
+ここで少しObservableについて振り返ってみましょう。Observableとは、イベントを検知するためのクラスでした。@<br>{}
+Subject、Relayはそれに加えて自身でイベントを発生させることもできるクラスです。
 
-Subject、Relayの種類は色々ありますが、代表としてよく使われる次の４種類を紹介します。
+代表としてよく使われる次の４種類を紹介します。
 
   * PublishSubject
   * BehaviorSubject
@@ -258,33 +256,36 @@ Subject、Relayの種類は色々ありますが、代表としてよく使わ�
 それぞれの違いをざっくりとですが、次のテーブル図にまとめました。
 
 //table[kind-of-subject-relay][SubjectとRelayの主な種類]{
-  .                 流れるイベント                  初期値
-  -------------------------------
-  PublishSubject    onNext, onError, onComplete   持たない
-  BehaviorSubject   onNext, onError, onComplete   持つ
-  PublishRelay      onNext                        持たない
-  BehaviorRelay     onNext                        持つ
+.	流れるイベント	初期値
+-------------------------------
+PublishSubject	onNext, onError, onComplete	持たない
+BehaviorSubject	onNext, onError, onComplete	持つ
+PublishRelay	onNext	持たない
+BehaviorRelay	onNext	持つ
 //}
 
 === 初期値について
 
-初期値をもつ・もたないの違いは、Subject、Relayをsubscribe（bind等）した瞬間にイベントが流れるか流れないかの違いです。@<br>{}
-やりたいことに合わせて使い分けましょう。
+初期値をもつ・もたないの違いは、Subject、Relayをsubscribe（bind等）した瞬間にイベントが流れるか流れないかの違いで、やりたいことに合わせて使い分けます。
 
 === それぞれの使い分け
 
-使い分けましょう、とはいわれても最初はどう使い分けるかが難しいと思います。
+大まかな使い分けは次の通りです。
 
-ざっくりとした使い分けの紹介ですが、「通信処理やDB処理等」エラーが発生したときにその内容によって処理を分岐させたい場合はSubject、UIに値をBindするようなものはRelayを使いましょう。@<br>{}
-RxSwiftのデメリットでも触れましたが、UIにBindしているObservableでonErrorやonCompleteが発生しまうと、購読が止まってしまう為、onNextのみが流れるRelayを使うのが適切です。
+  * Subject
+  ** 「通信処理やDB処理等」エラーが発生したときにその内容によって処理を分岐させたい
+  * Relay
+  ** UIに値をBindする
+
+UIにBindしているObservableでonErrorやonCompleteが発生しまうと購読が止まってしまい、そのさきのタップイベントや入力イベントを拾えなくなってしまうので、onNextのみが流れることが保証されているRelayを使うのが適切です。
 
 ==== Tips: internal（public）なSubject,Relay
 
 Subject, Relayはすごく便利でいろいろなことができます。@<br>{}
-便利なのは開発の幅が広がるのでよいことですが、いろいろ出来すぎてしまうと逆にコードが複雑になってしまうことがあります。
+便利なのは開発の幅が広がるのでよいことですが、逆にコードが複雑になってしまうことがあります。
 
 どういうことかというと、internal（public）なSubject、Relayを定義してしまうと、@<br>{}
-クラスの外からもイベントを発生させることができるため、どこでイベント発生させているかアプリが肥大化していくうちに段々わからなくなり、デバッグをするのがかなり大変になってきます。
+クラスの外からもイベントを発生させることができるため、アプリが肥大化していくうちにどこでイベント発生させているかわかりずらくなり、デバッグをするのが大変になってきます。
 
 その解決策として、Subject、Relayはprivateとして定義して、外部へ公開するためのObservableを用意するのが一般的に用いられています。
 
@@ -300,8 +301,7 @@ var itemsObservable: Observable<[Item]> {
 
 ==== Tips: Relayは、Subjectの薄いラッパー
 
-SubjectとRelay、それぞれ特徴が違うと書きましたが、Relayの実装コードを見てみると実はRelayはSubjectの薄いラッパーとして定義されていることがわかります。
-
+SubjectとRelay、それぞれ特徴が違うと書きましたが、Relayの実装コードを見てみると実はRelayはSubjectの薄いラッパーとして定義されていることがわかります。@<br>{}
 それぞれonNextイベントは流せますが、Relayの場合はonNextイベントを流すメソッドがSubjectと異なるので注意しましょう
 
 //listnum[subject-relay-on-next-diff][SubjectとRelayのonNextイベントの流し方][swift]{
@@ -333,9 +333,8 @@ public final class PublishRelay<Element>: ObservableType {
 
 === bind
 
-Observable/Observerに対してbindメソッドを使うと指定したObservable/Observerにイベントストリームを接続することができます。@<br>{}
-「bind」と聞くと双方向データバインディングを想像しますが、RxSwiftのbindは単方向データバインディングです。@<br>{}
-双方向データバインディングが不可能というわけではありませんが、筆者の観測範囲では使っている人は少ないです。
+Observable/Observerに対してbindメソッドを使うと指定したものにイベントストリームを接続することができます。@<br>{}
+「bind」と聞くと双方向データバインディングを想像しますが、RxSwiftのbindは単方向データバインディングです。
 
 bindメソッドは、独自でなにか難しいことをやっているわけではなく、振る舞いはsubscribeとだいたい同じです。
 
@@ -375,7 +374,7 @@ nameTextField.rx.text
 
 そこで活躍するのがOperatorという概念です。@<br>{}
 OperatorはObservableに対してイベントの値の変換・絞り込み等、加工を施して新たにObservableを生成する仕組みです。@<br>{}
-他にも、２つのObservableのイベントを合成・結合することもできます。
+他にも、２つのObservableのイベントを合成・結合もできます。
 
 Operatorは色々なことができて全てのOperatorの概要、使い方の説明だけで１冊の本が書けるレベルです。@<br>{}
 本書とは少し趣旨がずれてしまうため、ここではよく使われるOperatorにフォーカスを絞って、紹介します。
@@ -414,11 +413,8 @@ Operatorは色々なことができて全てのOperatorの概要、使い方の�
   ** concat
   *** 複数のObservableのイベントを順番に組み合わせる（異なる方では不可能）
 
-ここで一覧で紹介されても覚えきれないよ！と思うかもしれませんがそのとおりです。@<br>{}
-すぐ覚える必要はないので、こんなことできるのか〜とフワっと覚えていただければよいです。
-
 RxSwiftを書き始めたばっかりの人はどれがどんな動きをするか全然わからないと思うので、@<br>{}
-さらにスコープを狭めて、割と簡単に使いやすく、よく使うものをサンプルコードを加えてピックアップしました。
+さらにスコープを狭めて、簡単でよく使うものをサンプルコードを加えてピックアップしました。
 
 ==== map
 
@@ -442,7 +438,7 @@ numberObservable
 //}
 
 また、かならずObservableに流れるイベントの値を使う必要はありません。@<br>{}
-次のようにクラス変数やメソッド内変数を取り入れてbindすることもできます
+次のようにクラス変数やメソッド内変数を取り入れてbindすることもできます。
 
 //listnum[operator-filter-2-example][Operator - filter サンプル2][swift]{
 // ボタンをタップしたときにnameLabelにユーザの名前を表示する
@@ -459,13 +455,13 @@ showUserNameButton.rx.tap
 
 ==== zip
 
-複数のAPIにリクエストして同時に反映したい場合に使用します
+複数のAPIにリクエストして同時に反映したい場合に使用します。
 
 //listnum[operator-zip-example][Operator - zip サンプル][swift]{
 Observable.zip(api1Observable, api2Observable)
   .subscribe(onNext { (api1, api2) in
     // ↑タプルとして受け取ることができます
-    //...
+    // ...
   })
   .disposed(by: disposeBag)
 //}

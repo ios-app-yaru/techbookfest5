@@ -7,40 +7,38 @@
   * オブザーバパターン
   ** プログラム内のオブジェクトのイベント（事象）を他のオブジェクトへ通知する処理で使われるデザインパターンの一種
   * RxSwift
-  ** ReactiveExtensionsの概念をSwiftで扱えるようにした拡張ライブラリ
+  ** Reactive Extensionsの概念をSwiftで扱えるようにした拡張ライブラリ
   * RxCocoa
-  ** ReactiveExtensionsの概念をUIKitで扱えるようにした拡張ライブラリ　主にRxSwiftと一緒に導入される
+  ** Reactive Extensionsの概念をUIKitで扱えるようにした拡張ライブラリ　主にRxSwiftと一緒に導入される
 
 == RxSwiftって何？
 
 RxSwiftとはMicrosoftが公開した.NET Framework向けのライブラリである「Reactive Extensions」の概念をSwiftでも扱えるようにした拡張ライブラリで、GitHub上でオープンソースライブラリとして公開されています。
 
-同じく、Reactive Extensionsの概念を取り入れた「ReactiveSwift」というライブラリも存在します。@<br>{}
-本書では、ReactiveSwiftについては触れず、RxSwiftにのみ焦点を当てて解説していきます。
+同じくReactive Extensionsの概念を取り入れた「ReactiveSwift」というライブラリも存在しますが、本書では、ReactiveSwiftについては触れず、RxSwiftにのみ焦点を当てて解説していきます。
 
 Reactive Extensionsについては後述しますが、RxSwiftを導入することによって非同期操作とイベント/データストリーム（時系列処理）の実装が用意にできるようになります。
 
 == Reactive Extensionsって何？
 
-=== 思想
+=== 概念
 
 Reactive Extensionsとは、「オブザーバパターン」「イテレータパターン」「関数型プログラミング」の概念を実装している.NET Framework向けの拡張ライブラリです。@<br>{}
-Reactive Extensionsを導入することによって、リアクティブプログラミングが実現できます。
+これを導入することによって、リアクティブプログラミングが実現できます。
 
 === 歴史
 
-元々は Microsoftが研究して開発した.NET用のライブラリで、２００９年に「Reactive Extensions」という名前で公開しました。現在は製品化され「ReactiveX」という名前に変更されています。@<br>{}
-この「Reactive Extensions」の考え方がとても有用だったため、色々な言語へと移植されています。@<br>{}
+元々はMicrosoftが研究して開発した.NET用のライブラリで、２００９年に「Reactive Extensions」という名前で公開されました。現在は製品化され「ReactiveX」という名前に変更されています。@<br>{}
+この「Reactive Extensions」の概念が有用だったため、色々な言語へと移植されています。@<br>{}
 たとえば、JavaであればRxJava、JavaScriptであればRxJSと、静的型付け・動的型付けなど関係なしに、さまざまな言語に垣根を超えて移植されています。@<br>{}
 その中の１つが本書で紹介する「RxSwift」です。
 
-本書では RxSwiftと関連するライブラリ群についてのみ解説しますが世の中にはさきほど挙げたものの以外に「RxRuby」、「RxScala」などさまざまな言語向けのライブラリがあります。@<br>{}
-どのライブラリも概念はおおまかな考え方は一緒です。概念だけでも１度覚えておくと他の言語でもすぐに扱えるようになるためこの機会にぜひ覚えてみましょう！
+本書ではRxSwiftと関連するライブラリ群についてのみ解説しますが、RxSwiftとさきほど挙げたライブラリ群の概念のおおまかな考え方は一緒です。概念だけでも１度覚えておくと他の言語のRx系ライブラリでもすぐに扱えるようになるためこの機会にぜひ覚えてみましょう！
 
 == リアクティブプログラミングとは？
 
 リアクティブプログラミングとは「時間とともに変化する値」と「振る舞い」の関係を宣言的に記述するプログラミングの手法です。
-ボタンをタップするとアラートを表示、のようなインタラクティブなシステムや通信処理、アニメーションのようにダイナミックに状態が変化するようなシステムに対して宣言的に動作を記述することができるため、フロントエンド側のシステムでよく使われます。
+「ボタンをタップするとアラートを表示」のようなインタラクティブなシステムや通信処理、アニメーションのようにダイナミックに状態が変化するようなシステムに対して宣言的に動作を記述することができるため、フロントエンド側のシステムでよく使われます。
 
 リアクティブプログラミングの説明の前に、少し命令型のプログラミングの書き方について振り返ってみます。
 次のコードを見てみましょう。
@@ -53,34 +51,37 @@ a = 3
 print(c)
 //}
 
-何の前提も無く、プログラマーにこの疑似コードで出力される値を聞くと、大体は「6」と答えます。
+何の前提も無く、プログラマーにこの疑似コードで出力される値を聞くと、大体は「6」と答えます。@<br>{}
 命令型プログラミングとしてのこの結果は正しいですが、リアクティブプログラミングの観点からみた結果としては正しくありません。
 
-冒頭の部分で少し触れましたが、リアクティブプログラミングは「値」と「振る舞い」の「関係」を宣言的に記述するプログラミングの手法です。
-リアクティブプログラミングの観点では、「@<code>{c}にはその時点での@<code>{a * b}の演算の結果を代入する」のではなく、「@<code>{c}は@<code>{a * b}の関係をもつ」という意味で解釈されます。
-つまり、@<code>{c}に@<code>{a * b}の関係を定義した後は、aの値が変更されるたびにbの値がバックグラウンドで再計算されるようになります。
-よって、例の疑似コードをリアクティブプログラミングの観点からみた結果としては、「９」が出力されることになります。
+冒頭の部分で少し触れましたが、リアクティブプログラミングは「値」と「振る舞い」の「関係」を宣言的に記述するプログラミングの手法です。@<br>{}
+リアクティブプログラミングの観点では、「@<code>{c}にはその時点での@<code>{a * b}の演算の結果を代入する」のではなく、「@<code>{c}は@<code>{a * b}の関係をもつ」という意味で解釈されます。@<br>{}
+つまり、@<code>{c}に@<code>{a * b}の関係を定義した後は、@<code>{a}の値が変更されるたびに@<code>{b}の値がバックグラウンドで再計算されるようになります。@<br>{}
+結果、例題の疑似コードをリアクティブプログラミングの観点からみた場合は、「９」が出力されるということになります。
 
-また、リアクティブプログラミングは、Excelを題材として説明されることがよくあります。
+=== リアクティブプログラミングとExcel
+
+リアクティブプログラミングは、Excelを題材として説明されることがよくあります。@<br>{}
+Excelの計算式を想像してみてください。
 
 //image[excel-2x3][Excel][scale=0.8]{
-  excel-2x3
+excel-2x3
 //}
 
 C1セルにはA1セル値とB1セル値を掛け算した結果を出力させています。
 試しにA1セルを変更してみます。
 
 //image[excel-3x3][Excel][scale=0.8]{
-  excel-3x3
+excel-3x3
 //}
 
 A1の値の変更に合わせて、C1が自動で再計算されました。
-値と振る舞いの関係を定義する、これがリアクティブプログラミングです。
+値と振る舞いの関係を定義する、概念的にはこれがリアクティブプログラミングです。
 
 == RxSwiftの特徴
 
-RxSwiftの特徴は色々ありますが、主な特徴として「値の変化が検知しやすい」「非同期処理を簡潔に書ける」が挙げられます。@<br>{}
-これは主にUIの変更の検知（タップや文字入力）や通信処理等で使われ、RxSwiftを用いるとdelegateやcallbackを用いたコードよりもスッキリと見やすいコードを書けるようになります。
+RxSwiftの主な特徴として「値の変化が検知しやすい」「非同期処理を簡潔に書ける」が挙げられます。@<br>{}
+これはUIの変更の検知（タップや文字入力）や通信処理等で使われ、RxSwiftを用いるとdelegateやcallbackを用いたコードよりもスッキリと見やすいコードを書けるようになります。
 
 その他のメリットとしては次のものが挙げられます。
 
@@ -92,7 +93,7 @@ RxSwiftの特徴は色々ありますが、主な特徴として「値の変化�
   * 処理スレッドを変えやすい
 
 デメリットとして主に「学習コストが高い」「デバッグしにくい」が挙げられます。@<br>{}
-プロジェクトメンバーのほとんどがRxSwiftの扱いにあまり長けていない状況の中で、とりあえずRxSwiftを使えば開発速度が早くなるんでしょ？という考え方で安易に導入すると逆に開発速度が落ちる可能性があります。
+プロジェクトメンバーのほとんどがRxSwiftの扱いにあまり長けていない状況の中で、とりあえずこれを導入すれば開発速度が早くなるんでしょ？という考え方で安易に導入すると逆に開発速度が落ちる可能性があります。
 
 その他のデメリットとしては次のものが挙げられます。
 
@@ -102,8 +103,7 @@ RxSwiftの特徴は色々ありますが、主な特徴として「値の変化�
 
 == RxSwiftは何が解決できる？
 
-RxSwiftでは本当に色々なことができますが、１番わかりやすくて簡単なのは「DelegateやIBActionだと動作するところと処理が離れている」の解決だと思います。
-
+一番わかりやすくいのは「アプリのライフサイクルとUIのdelegateやIBActionなどの処理を定義している部分が離れている」の解決です。@<br>{}
 実際にコードを書いて見てみましょう。
 
 UIButtonとUILabelが画面に配置されていて、ボタンをタップすると文字列が変更されるという仕様のアプリを題材として作ります。
@@ -117,18 +117,21 @@ UIButtonとUILabelが画面に配置されていて、ボタンをタップす�
 //listnum[ibaction][IBActionを用いたコード][swift]{
 class SimpleTapViewController: UIViewController {
 
-    @IBOutlet weak var messageLabel: UILabel!
+  @IBOutlet weak var messageLabel: UILabel!
 
-    @IBAction func buttonTap(_ sender: Any) {
-        messageLabel.text = "Changed!!"
-    }
+  @IBAction func buttonTap(_ sender: Any) {
+    messageLabel.text = "Changed!!"
+  }
 }
 //}
 
 通常の書き方だと、１つのボタンに対して１つの関数を定義します。@<br>{}
 この場合だとUIと処理が1対1で非常に強い結合度になりますね。
 
-仕様が非常にシンプルなため、コードもシンプルに書けてはいますが、ボタンを１つ増やすたびに対応する関数が１つずつ増えていき、コード量が次第に大きくなってしまいます。@<br>{}
+仕様がシンプルなため、コードもシンプルに見やすく書けています。@<br>{}
+ここから、もうひとつボタンを増やすことを想像してみましょう。@<br>{}
+ボタンを１つ増やすたびに対応する関数が１つずつ増えていき、更に画面のパーツが増えるたびにメソッドが増えていき、読みづらくなってしまいます。
+
 次に、RxSwiftを用いて書いてみます。
 
 //listnum[ibaction-to-rxswift][RxSwiftを用いたコード][swift]{
@@ -157,15 +160,16 @@ class SimpleTapViewController: UIViewController {
 tapButtonのタップイベントを購読し、イベントが発生したらUILabelのテキストを変更しています。
 
 コードを見比べてみると、１つのボタンと１つの関数が強く結合していたのが、１つのボタンと１つのプロパティの結合で済むようになっていて、UIと処理の制約を少し緩くできました。@<br>{}
-シンプルな処理なのでコード量はRxSwiftを用いた場合のほうが長いですが、この先ボタンを増やすことを考えると、１つ増やすたびに対応するプロパティが１行増えるだけなので、コードがとてもシンプルになります。
+シンプルな仕様なのでコード量はRxSwiftを用いた場合のほうが長いですが、@<br>{}
+この先ボタンを増やすことを考えると、１つ増やすたびに対応するプロパティが１行増えるだけなので、比較するとこちらのほうが可動性が高くなります。
 
 また、画面上のUIを変更してもソースコードへの影響は少なくなるので変更が楽になります。
 
-addTargetを利用する場合のコードも見てみましょう@<br>{}
-UILabel, UITextFieldを画面に２つずつ配置し、入力したテキストをバリデーションして「あとN文字」とUILabelに反映するよくある仕組みのアプリを作ってみます
+addTargetを利用する場合のコードも見てみましょう。@<br>{}
+UILabel, UITextFieldを画面に２つずつ配置し、入力したテキストをバリデーションして「あとN文字」とUILabelに反映するよくある仕組みのアプリを作ってみます。
 
 //image[simpletextfieldlabelexample1][画面のイメージ][scale=0.3]{
-  画面のイメージ
+画面のイメージ
 //}
 
 
@@ -208,58 +212,52 @@ class ExampleViewController: UIViewController {
 //}
 
 UIと処理のコードが離れているので、パッとじゃ処理のイメージがしにくいですね。@<br>{}
-対象のViewがもっと増えるとどの関数がどのUIの処理なのかわかりにくくなってしまいます。
+対象のViewが更に増えるとどの関数がどのUIの処理なのかわかりにくくなってしまいます。
 
-次にRxSwiftを用いて書いてみます
+次にRxSwiftを用いて書いてみます。
 
 //listnum[addtarget-to-rxswift][RxSwift version][swift]{
 import RxSwift
 import RxCocoa
+import RxOptional
 
 class RxExampleViewController: UIViewController {
 
-    // フィールド宣言は全く同じなので省略
+  // フィールド宣言は全く同じなので省略
 
-    private let disposeBag = DisposeBag()
+  private let disposeBag = DisposeBag()
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
+  override func viewDidLoad() {
+    super.viewDidLoad()
 
-        nameField.rx.text
-            .map { [weak self] text -> String? in
-                guard let text = text else { return nil }
-                guard let maxNameFieldSize = self?.maxNameFieldSize else { return nil }
-                let limitCount = maxNameFieldSize - text.count
-                return self?.limitText(limitCount)
-            }
-            .filterNil() // import RxOptional が必要
-            .observeOn(MainScheduler.instance)
-            .bind(to: nameLabel.rx.text)
-            .disposed(by: disposeBag)
+    nameField.rx.text
+      .map { [weak self] text -> String? in
+        guard let text = text else { return nil }
+        guard let maxNameFieldSize = self?.maxNameFieldSize else { return nil }
+        let limitCount = maxNameFieldSize - text.count
+        return self?.limitText(limitCount)
+      }
+      .filterNil() // import RxOptional が必要
+      .observeOn(MainScheduler.instance)
+      .bind(to: nameLabel.rx.text)
+      .disposed(by: disposeBag)
 
-        addressField.rx.text
-            .map { [weak self] text -> String? in
-                guard let text = text else { return nil }
-                guard let maxAddressFieldSize = self?.maxAddressFieldSize else { return nil }
-                let limitCount = maxAddressFieldSize - text.count
-                return self?.limitText(limitCount)
-            }
-            .filterNil() // import RxOptional が必要
-            .observeOn(MainScheduler.instance)
-            .bind(to: addressLabel.rx.text)
-            .disposed(by: disposeBag)
-    }
+    addressField.rx.text
+      .map { [weak self] text -> String? in
+        guard let text = text else { return nil }
+        guard let maxAddressFieldSize = self?.maxAddressFieldSize else { return nil }
+        let limitCount = maxAddressFieldSize - text.count
+        return self?.limitText(limitCount)
+      }
+      .filterNil() // import RxOptional が必要
+      .observeOn(MainScheduler.instance)
+      .bind(to: addressLabel.rx.text)
+      .disposed(by: disposeBag)
+  }
 }
 //}
 
 さきほどのaddTargetのパターンとまったく同じ動作をします。@<br>{}
-全ての処理がviewDidLoad()上で書けるようになり、UIと処理がバラバラにならないのですごく見やすいですね。
+全ての処理がviewDidLoad()上で書けるようになり、UIと処理がバラバラにならないので読みやすいですね。
 
-慣れていない方はまだ少し読みにくいかもしれませんが、Rxの書き方に慣れるとすごく読みやすくなります。
-
-== 導入事例
-
-  * LINE（プロダクト不明）
-  ** 出典元：iOSDCのノベルティ
-  * NIKKEI 日経電子版
-  ** 出典元：iOSDCのノベルティ
+慣れていない方はまだ読みにくいかもしれませんが、Rxの書き方に慣れると読みやすくなります。
