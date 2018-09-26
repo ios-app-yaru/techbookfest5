@@ -53,7 +53,7 @@ RxSwiftは2016年頃にiOSアプリ開発者界隈へ一気に普及し、2018�
 == お問い合わせ先
 
   * Twitter
-  ** https://twitter.com/@k0uhashi
+  ** https://twitter.com/k0uhashi
 
 == 免責事項
 

@@ -20,7 +20,7 @@ CocoaPodsとは、iOS/Mac向けのアプリを開発する際のライブラリ�
 
 //cmd{
 gem install cocoapods
-gem install -v 1.5.3 cocoapods = バージョンを本書と同じにしたい場合はコッチ
+gem install -v 1.5.3 cocoapods # バージョンを本書と同じにしたい場合はコッチ
 //}
 
 これでCocoaPodsを端末に導入することができました。

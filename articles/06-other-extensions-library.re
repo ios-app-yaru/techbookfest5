@@ -175,7 +175,8 @@ class SettingsViewController: UIViewController {
   private var disposeBag = DisposeBag()
 
   private lazy var dataSource =
-    RxTableViewSectionedReloadDataSource<SettingsSectionModel>(configureCell: configureCell)
+    RxTableViewSectionedReloadDataSource<SettingsSectionModel>(
+      configureCell: configureCell)
 
   private lazy var configureCell:
     RxTableViewSectionedReloadDataSource<SettingsSectionModel>.ConfigureCell =

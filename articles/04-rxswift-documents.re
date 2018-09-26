@@ -51,7 +51,7 @@ helloWorldSubject.onNext("Hello World!!")
 helloWorldSubject.onNext("Hello World!!!")
 //}
 
-結果は次のとおり
+結果
 
 //emlist[]{
 value = Hello World!

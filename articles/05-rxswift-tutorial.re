@@ -105,11 +105,15 @@ Installing RxSwift (4.2.0)
 Generating Pods project
 Integrating client project
 
-[!] Please close any current Xcode sessions and use `CounterApp.xcworkspace` for this project from now on.
-Sending stats
-Pod installation complete! There are 2 dependencies from the Podfile and 2 total pods installed.
+[!] Please close any current Xcode sessions and use
+`CounterApp.xcworkspace` for this project from now on.Sending stats
+Pod installation complete! There are 2 dependencies
+from the Podfile and 2 total pods installed.
 
-[!] Automatically assigning platform `ios` with version `11.4` on target `CounterApp` because no platform was specified. Please specify a platform for this target in your Podfile. See `https://guides.cocoapods.org/syntax/podfile.html=platform`.
+[!] Automatically assigning platform `ios` with version `11.4` on
+target `CounterApp` because no platform was specified.
+Please specify a platform for this target in your Podfile.
+See `https://guides.cocoapods.org/syntax/podfile.html=platform`.
 //}
 
 環境設定はこれで完了です。@<br>{}
@@ -164,15 +168,18 @@ import UIKit
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-    var window: UIWindow?
+  var window: UIWindow?
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        self.window = UIWindow(frame: UIScreen.main.bounds)
-        let navigationController = UINavigationController(rootViewController: ViewController())
-        self.window?.rootViewController = navigationController
-        self.window?.makeKeyAndVisible()
-        return true
-    }
+  func application(_ application: UIApplication,
+      didFinishLaunchingWithOptions launchOptions:
+        [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+    self.window = UIWindow(frame: UIScreen.main.bounds)
+    let navigationController =
+      UINavigationController(rootViewController: ViewController())
+    self.window?.rootViewController = navigationController
+    self.window?.makeKeyAndVisible()
+    return true
+  }
 
 }
 //}
@@ -569,7 +576,11 @@ class RxViewController: UIViewController {
   }
 
   private func setupViewModel() {
-    let input = RxViewModelInput(countUpButton: countUpButton.rx.tap.asObservable(), countDownButton: countDownButton.rx.tap.asObservable(), countResetButton: countResetButton.rx.tap.asObservable())
+    let input = RxViewModelInput(
+        countUpButton: countUpButton.rx.tap.asObservable(),
+        countDownButton: countDownButton.rx.tap.asObservable(),
+        countResetButton: countResetButton.rx.tap.asObservable()
+      )
     viewModel = RxViewModel(input: input)
 
     viewModel.outputs?.counterText
@@ -657,7 +668,7 @@ WebViewとProgressViewを配置して、Webページの読み込みに合わせ�
 ここではWKWebViewController.xibという名前で画面を作成し、中にWKWebViewとUIProgressViewを配置します。@<br>{}
 画面ができたら、ViewControllerクラスを作っていきます。
 
-//listnum[kvo-webview][KVOで実装する][swift]{
+//list[kvo-webview][KVOで実装する][swift]{
 import UIKit
 import WebKit
 
@@ -672,9 +683,11 @@ class WKWebViewController: UIViewController {
 
   private func setupWebView() {
     // webView.isLoadingの値の変化を監視
-    webView.addObserver(self, forKeyPath: "loading", options: .new, context: nil)
+    webView.addObserver(self, forKeyPath: "loading",
+      options: .new, context: nil)
     // webView.estimatedProgressの値の変化を監視
-    webView.addObserver(self, forKeyPath: "estimatedProgress", options: .new, context: nil)
+    webView.addObserver(self, forKeyPath: "estimatedProgress",
+      options: .new, context: nil)
 
     let url = URL(string: "https://www.google.com/")
     let urlRequest = URLRequest(url: url!)
@@ -688,9 +701,12 @@ class WKWebViewController: UIViewController {
     webView?.removeObserver(self, forKeyPath: "estimatedProgress")
   }
 
-  override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+  override func observeValue(forKeyPath keyPath: String?,
+      of object: Any?, change: [NSKeyValueChangeKey : Any]?,
+      context: UnsafeMutableRawPointer?) {
     if keyPath == "loading" {
-      UIApplication.shared.isNetworkActivityIndicatorVisible = webView.isLoading
+      UIApplication.shared
+        .isNetworkActivityIndicatorVisible = webView.isLoading
       if !webView.isLoading {
         // ロード完了時にProgressViewの進捗を0.0(非表示)にする
         progressView.setProgress(0.0, animated: false)
@@ -700,7 +716,8 @@ class WKWebViewController: UIViewController {
     }
     if keyPath == "estimatedProgress" {
       // ProgressViewの進捗状態を更新
-      progressView.setProgress(Float(webView.estimatedProgress), animated: true)
+      progressView
+        .setProgress(Float(webView.estimatedProgress), animated: true)
     }
   }
 }
