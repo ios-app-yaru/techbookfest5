@@ -5,9 +5,11 @@
 RxSwiftリポジトリより引用（2018年8月31日現在）
 
   * Xcode 9.0
-  * Swift 4
+  * Swift 4.0
   * Swift 3.x （rxswift-3.0 ブランチを指定)
   * Swift 2.3 （rxswift-2.0 ブランチを指定)
+
+※ Xcode 9.0、Swift 4.0と書いていますがXcode 10、Swift 4.2でも動作します。
 
 == 導入方法
 
@@ -44,8 +46,8 @@ vi Podfile
 use_frameworks!
 
 target 'YOUR_TARGET_NAME' do
-    pod 'RxSwift',    '~> 4.0'
-    pod 'RxCocoa',    '~> 4.0'
+    pod 'RxSwift',    '~> 4.3.1'
+    pod 'RxCocoa',    '~> 4.3.1'
 end
 //}
 

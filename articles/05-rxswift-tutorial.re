@@ -83,8 +83,8 @@ vi Podfile
 target 'CounterApp' do
   use_frameworks!
 
-  pod 'RxSwift' # ★この行を追加
-  pod 'RxCocoa' # ★この行を追加
+  pod 'RxSwift',    '~> 4.3.1' # ★この行を追加
+  pod 'RxCocoa',    '~> 4.3.1' # ★この行を追加
 
 end
 //}
@@ -100,8 +100,8 @@ pod install
 //cmd{
 Analyzing dependencies
 Downloading dependencies
-Installing RxCocoa (4.2.0)
-Installing RxSwift (4.2.0)
+Installing RxCocoa (4.3.1)
+Installing RxSwift (4.3.1)
 Generating Pods project
 Integrating client project
 

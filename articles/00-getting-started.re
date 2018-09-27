@@ -46,8 +46,8 @@ RxSwiftは2016年頃にiOSアプリ開発者界隈へ一気に普及し、2018�
 == 想定環境
 
   * OSX High Sierra
-  * Xcode 9.4
-  * Swift 4.1
+  * Xcode 10
+  * Swift 4.2
   * cocoapods 1.5.3
 
 == お問い合わせ先
