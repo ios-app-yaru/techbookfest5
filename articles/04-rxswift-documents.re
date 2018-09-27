@@ -73,7 +73,7 @@ Subjectを使った書き方はViewController/ViewModel間のデータの受け�
 また、前述したコードは同じクラス内に書いていて、Subjectの強みが生かせていません。@<br>{}
 実際にViewController/ViewModelに分けて書いてみましょう。
 
-//listnum[subject-example-viewmodel][ViewController/ViewModelに分けて書く][swift]{
+//list[subject-example-viewmodel][ViewController/ViewModelに分けて書く][swift]{
 class HogeViewController: UIViewController {
 
   private let disposeBag = DisposeBag()
@@ -207,20 +207,24 @@ Disposeは購読を解除（破棄）するためのクラスで、@<code>{dispo
 
 コードで見てみましょう。
 
-//listnum[dispose-example][Disposeのサンプルコード][swift]{
-class HogeViewController {
+//list[dispose-example][Disposeのサンプルコード][swift]{
+class HogeViewController:UIViewController {
   @IBOutlet weak var hogeButton: UIButton!
   @IBOutlet weak var fooButton: UIButton!
   private let disposeBag = DisposeBag()
 
-  override viewDidLoad() {
+  override func viewDidLoad() {
     super.viewDidLoad()
     hogeButton.rx.tap
-      .subscribe(onNext: { // .. })
+      .subscribe(onNext: {
+        // ..
+      })
       .disposed(by: disposeBag)
 
     fooButton.rx.tap
-      .subscribe(onNext: { // .. })
+      .subscribe(onNext: {
+        // ..
+      })
       .disposed(by: disposeBag)
   }
 }
@@ -292,10 +296,10 @@ Subject, Relayはすごく便利でいろいろなことができます。@<br>{
 次のコードのように定義します。
 
 //listnum[behaviorrelay-example][BehaviorRelayのサンプル][swift]{
-private let items: BehaviorRelay<[Item]>(value: [])
+let items = BehaviorRelay<[String]>(value: [])
 
-var itemsObservable: Observable<[Item]> {
-  return items
+var itemsObservable: Observable<[String]> {
+  return items.asObservable()
 }
 //}
 
@@ -358,7 +362,7 @@ nameTextField.rx.text
 // ②subscribeを利用
 nameTextField.rx.text
   .subscribe(onNext: { [weak self] text in
-    nameLabel.text = text
+    self?.nameLabel.text = text
   })
   .disposed(by: disposeBag)
 //}
@@ -421,19 +425,21 @@ RxSwiftを書き始めたばっかりの人はどれがどんな動きをする�
 //listnum[operator-map-example][Operator - map のサンプル][swift]{
 // hogeTextFieldのテキスト文字数を数えてfooTextLabelのテキストへ反映
 hogeTextField.rx.text
-  .map { return "あと\($0.count)文字 }
+  .map { text -> String? in
+    guard let text = text else { return nil }
+    return "あと\(text.count)文字"
+  }
   .bind(to: fooTextLabel.rx.text)
   .disposed(by: disposeBag)
-}
 //}
 
 ==== filter
 
 //listnum[operator-filter-example][Operator - filter サンプル][swift]{
 // 整数が流れるObservableから偶数のイベントのみに絞り込んでevenObservableに流す
-numberObservable
+numberSubject
   .filter { $0 % 2 == 0 }
-  .bind(to: evenObservable)
+  .bind(to: evenSubject)
   .disposed(by: disposeBag)
 //}
 
@@ -448,8 +454,7 @@ showUserNameButton.rx.tap
   .map { [weak self] in
     return self?.user.name
   }
-  .filterNil() // import RxOptionalが必要
-  .bind(nameLabel.rx.text)
+  .bind(to: nameLabel.rx.text)
   .disposed(by: disposeBag)
 //}
 
@@ -459,7 +464,7 @@ showUserNameButton.rx.tap
 
 //listnum[operator-zip-example][Operator - zip サンプル][swift]{
 Observable.zip(api1Observable, api2Observable)
-  .subscribe(onNext { (api1, api2) in
+  .subscribe(onNext: { (api1, api2) in
     // ↑タプルとして受け取ることができます
     // ...
   })

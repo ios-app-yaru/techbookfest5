@@ -223,7 +223,7 @@ UIと処理のコードが離れているので、パッとじゃ処理のイメ
 //list[addtarget-to-rxswift][RxSwift version][swift]{
 import RxSwift
 import RxCocoa
-import RxOptional
+import RxOptional // RxOptionalというRxSwift拡張ライブラリのインストールが必要
 
 class RxExampleViewController: UIViewController {
 

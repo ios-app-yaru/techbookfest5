@@ -171,11 +171,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   var window: UIWindow?
 
   func application(_ application: UIApplication,
-      didFinishLaunchingWithOptions launchOptions:
-        [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+                   didFinishLaunchingWithOptions launchOptions:
+    [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     self.window = UIWindow(frame: UIScreen.main.bounds)
     let navigationController =
-      UINavigationController(rootViewController: ViewController())
+        UINavigationController(rootViewController: ViewController())
     self.window?.rootViewController = navigationController
     self.window?.makeKeyAndVisible()
     return true
@@ -228,7 +228,7 @@ OutletsのviewとViewControllerのViewを接続します。
 ViewController.swift + Xib構成にしたことによって、ViewControllerの生成が楽になり、画面遷移の実装がが少ない行で済むようになりました。@<br>{}
 画面遷移は次のコードで実装できます。
 
-//listnum[pushviewcontroller][画面遷移の実装][swift]{
+//list[pushviewcontroller][画面遷移の実装][swift]{
 let viewController = ViewController()
 navigationController?.pushViewController(viewController, animated: true)
 //}
@@ -314,7 +314,7 @@ class ViewModel {
 
 ViewModelを作ったので、ViewControllerでViewModelを使うように修正します。
 
-//listnum[fix-callback-viewcontroller-viewmodel][ViewControllerの修正][swift]{
+//list[fix-callback-viewcontroller-viewmodel][ViewControllerの修正][swift]{
 class ViewController: UIViewController {
 
   @IBOutlet weak var countLabel: UILabel!
@@ -523,7 +523,6 @@ class RxViewModel: RxViewModelType {
       .disposed(by: disposeBag)
 
   }
-
 
   private func incrementCount() {
     let count = countRelay.value + 1
@@ -747,9 +746,9 @@ addObserverの引数にプロパティ名を渡すとその値が変化された
 Podfileにライブラリを追加しましょう
 
 //list[add-lib-rxoptional][Podfileの修正][ruby]{
-pod 'RxSwift'
-pod 'RxCocoa'
-pod 'RxOptional' # ★この行を追加
+pod 'RxSwift',    '~> 4.3.1'
+pod 'RxCocoa',    '~> 4.3.1'
+pod 'RxOptional', '~> 3.5.0'
 //}
 
 では、導入したライブラリも使いつつ、KVOで書かれた実装をRxSwiftを使うようにリプレースしていきます。
@@ -972,10 +971,10 @@ KVOで書いた処理をRxSwiftに置き換えてみた結果、かなり読み�
 Podfileを編集します
 
 //list[add-rxwebkit-on-podfile][Podfileの編集][ruby]{
-  pod 'RxSwift'
-  pod 'RxCocoa'
-  pod 'RxOptional'
-  pod 'RxWebKit'
+pod 'RxSwift',    '~> 4.3.1'
+pod 'RxCocoa',    '~> 4.3.1'
+pod 'RxOptional', '~> 3.5.0'
+pod 'RxWebKit', '~> 0.3.7'
 //}
 
 ライブラリをインストールします。

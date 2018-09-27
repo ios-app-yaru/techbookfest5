@@ -34,7 +34,9 @@ platform :ios, '11.4'
 use_frameworks!
 
 target 'RxDataSourceExample' do
-  pod 'RxDataSources', '~> 3.1'
+  pod 'RxSwift',    '~> 4.3.1'
+  pod 'RxCocoa',    '~> 4.3.1'
+  pod 'RxDataSources', '~> 3.1.0'
 end
 //}
 
@@ -48,6 +50,9 @@ pod install
 @<code>{SectionModel}は@<code>{SectionModelType}プロトコルに準拠する構造体で定義されており、これをうまく使うことでセクションとその中のセクションセルを表現できます。
 
 //list[section-of-person][SettingsSectionModel][Swift]{
+import UIKit
+import RxDataSources
+
 typealias SettingsSectionModel = SectionModel<SettingsSection, SettingsItem>
 
 enum SettingsSection {
@@ -107,7 +112,7 @@ enum SettingsItem {
         }
     }
 
-    var accessoryType: UITableViewCellAccessoryType {
+    var accessoryType: UITableViewCell.AccessoryType {
         switch self {
         case .account, .security, .notification, .contents,
              .sounds, .dataUsing, .accessibility:
@@ -129,35 +134,35 @@ import RxDataSources
 
 class SettingsViewModel {
 
-    let items = BehaviorSubject<[SettingsSectionModel]>(value: [])
+  let items = BehaviorSubject<[SettingsSectionModel]>(value: [])
 
-    func updateItem() {
-        let sections: [SettingsSectionModel] = [
-            accountSection(),
-            commonSection()
-        ]
-        items.onNext(sections)
-    }
+  func updateItem() {
+    let sections: [SettingsSectionModel] = [
+      accountSection(),
+      commonSection()
+    ]
+    items.onNext(sections)
+  }
 
-    private func accountSection() -> SettingsSectionModel {
-        let items: [SettingsItem] = [
-            .account,
-            .security,
-            .notification,
-            .contents
-        ]
-        return SettingsSectionModel(model: .account, items: items)
-    }
+  private func accountSection() -> SettingsSectionModel {
+    let items: [SettingsItem] = [
+      .account,
+      .security,
+      .notification,
+      .contents
+    ]
+    return SettingsSectionModel(model: .account, items: items)
+  }
 
-    private func commonSection() -> SettingsSectionModel {
-        let items: [SettingsItem] = [
-            .sounds,
-            .dataUsing,
-            .accessibility,
-            .description(text: "基本設定はこの端末でログインしている全てのアカウントに適用されます。")
-        ]
-        return SettingsSectionModel(model: .common, items: items)
-    }
+  private func commonSection() -> SettingsSectionModel {
+    let items: [SettingsItem] = [
+      .sounds,
+      .dataUsing,
+      .accessibility,
+      .description(text: "基本設定はこの端末でログインしている全てのアカウントに適用されます。")
+    ]
+    return SettingsSectionModel(model: .common, items: items)
+  }
 }
 //}
 
@@ -175,124 +180,124 @@ class SettingsViewController: UIViewController {
   private var disposeBag = DisposeBag()
 
   private lazy var dataSource =
-    RxTableViewSectionedReloadDataSource<SettingsSectionModel>(
-      configureCell: configureCell)
+      RxTableViewSectionedReloadDataSource<SettingsSectionModel>(
+          configureCell: configureCell)
 
   private lazy var configureCell:
     RxTableViewSectionedReloadDataSource<SettingsSectionModel>.ConfigureCell =
-      { [weak self] (dataSource, tableView, indexPath, _) in
-        let item = dataSource[indexPath]
-        switch item {
-        case .account, .security, .notification, .contents,
-             .sounds, .dataUsing, .accessibility:
-            let cell = tableView.dequeueReusableCell
-              (withIdentifier: "cell", for: indexPath)
-            cell.textLabel?.text = item.title
-            cell.accessoryType = item.accessoryType
-            return cell
-        case .description(let text):
-            let cell = tableView.dequeueReusableCell
-              (withIdentifier: "cell", for: indexPath)
-            cell.textLabel?.text = text
-            cell.isUserInteractionEnabled = false
-            return cell
+    { [weak self] (dataSource, tableView, indexPath, _) in
+      let item = dataSource[indexPath]
+      switch item {
+      case .account, .security, .notification, .contents,
+           .sounds, .dataUsing, .accessibility:
+        let cell = tableView
+            .dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        cell.textLabel?.text = item.title
+        cell.accessoryType = item.accessoryType
+        return cell
+      case .description(let text):
+        let cell = tableView
+            .dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        cell.textLabel?.text = text
+        cell.isUserInteractionEnabled = false
+        return cell
       }
   }
 
   private var viewModel: SettingsViewModel!
 
   override func viewDidLoad() {
-      super.viewDidLoad()
-      setupViewController()
-      setupTableView()
-      setupViewModel()
+    super.viewDidLoad()
+    setupViewController()
+    setupTableView()
+    setupViewModel()
   }
 
   private func setupViewController() {
-      navigationItem.title = "設定"
+    navigationItem.title = "設定"
   }
 
   private func setupTableView() {
-      tableView.register
-        (UITableViewCell.self, forCellReuseIdentifier: "cell")
-      tableView.contentInset.bottom = 12.0
-      tableView.rx.setDelegate(self).disposed(by: disposeBag)
-      tableView.rx.itemSelected
-          .subscribe(onNext: { [weak self] indexPath in
-              guard let item = self?.dataSource[indexPath] else { return }
-              self?.tableView.deselectRow(at: indexPath, animated: true)
-              switch item {
-              case .account:
-                  // 遷移させる処理
-                  // コンパイルエラー回避のためにbreakをかいていますが処理を書いていればbreakは必要ありません。
-                  break
-              case .security:
-                  // 遷移させる処理
-                  break
-              case .notification:
-                  // 遷移させる処理
-                  break
-              case .contents:
-                  // 遷移させる処理
-                  break
-              case .sounds:
-                  // 遷移させる処理
-                  break
-              case .dataUsing:
-                  // 遷移させる処理
-                  break
-              case .accessibility:
-                  // 遷移させる処理
-                  break
-              case .description:
-                  break
-              }
-          })
-          .disposed(by: disposeBag)
+    tableView
+      .register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+    tableView.contentInset.bottom = 12.0
+    tableView.rx.setDelegate(self).disposed(by: disposeBag)
+    tableView.rx.itemSelected
+      .subscribe(onNext: { [weak self] indexPath in
+        guard let item = self?.dataSource[indexPath] else { return }
+        self?.tableView.deselectRow(at: indexPath, animated: true)
+        switch item {
+        case .account:
+          // 遷移させる処理
+          // コンパイルエラー回避のためにbreakをかいていますが処理を書いていればbreakは必要ありません。
+          break
+        case .security:
+          // 遷移させる処理
+          break
+        case .notification:
+          // 遷移させる処理
+          break
+        case .contents:
+          // 遷移させる処理
+          break
+        case .sounds:
+          // 遷移させる処理
+          break
+        case .dataUsing:
+          // 遷移させる処理
+          break
+        case .accessibility:
+          // 遷移させる処理
+          break
+        case .description:
+          break
+        }
+      })
+      .disposed(by: disposeBag)
   }
 
   private func setupViewModel() {
-      viewModel = SettingsViewModel()
+    viewModel = SettingsViewModel()
 
-      viewModel.items
-          .bind(to: tableView.rx.items(dataSource: dataSource))
-          .disposed(by: disposeBag)
+    viewModel.items
+      .bind(to: tableView.rx.items(dataSource: dataSource))
+      .disposed(by: disposeBag)
 
-      viewModel.updateItem()
+    viewModel.updateItem()
   }
 }
 
 extension SettingsViewController: UITableViewDelegate {
-  func tableView(_ tableView: UITableView,
-      heightForRowAt indexPath: IndexPath) -> CGFloat {
-      let item = dataSource[indexPath]
-      return item.rowHeight
-  }
-  func tableView(_ tableView: UITableView,
-      heightForHeaderInSection section: Int) -> CGFloat {
-      let section = dataSource[section]
-      return section.model.headerHeight
-  }
+    func tableView(_ tableView: UITableView,
+                   heightForRowAt indexPath: IndexPath) -> CGFloat {
+        let item = dataSource[indexPath]
+        return item.rowHeight
+    }
+    func tableView(_ tableView: UITableView,
+                   heightForHeaderInSection section: Int) -> CGFloat {
+        let section = dataSource[section]
+        return section.model.headerHeight
+    }
 
-  func tableView(_ tableView: UITableView,
-      heightForFooterInSection section: Int) -> CGFloat {
-      let section = dataSource[section]
-      return section.model.footerHeight
-  }
+    func tableView(_ tableView: UITableView,
+                   heightForFooterInSection section: Int) -> CGFloat {
+        let section = dataSource[section]
+        return section.model.footerHeight
+    }
 
-  func tableView(_ tableView: UITableView,
-      viewForHeaderInSection section: Int) -> UIView? {
-      let headerView = UIView()
-      headerView.backgroundColor = .clear
-      return headerView
-  }
+    func tableView(_ tableView: UITableView,
+                   viewForHeaderInSection section: Int) -> UIView? {
+        let headerView = UIView()
+        headerView.backgroundColor = .clear
+        return headerView
+    }
 
-  func tableView(_ tableView: UITableView,
-      viewForFooterInSection section: Int) -> UIView? {
-      let footerView = UIView()
-      footerView.backgroundColor = .clear
-      return footerView
-  }
+    func tableView(_ tableView: UITableView,
+                   viewForFooterInSection section: Int) -> UIView? {
+        let footerView = UIView()
+        footerView.backgroundColor = .clear
+        return footerView
+    }
 }
 //}
 
@@ -326,14 +331,15 @@ enum SettingsItem {
   case dataUsing
   case accessibility
   // other section
-  case credits
-  case version
-  case privacyPolicy
+  case credits // 追加
+  case version // 追加
+  case privacyPolicy // 追加
   // ...
 
   var title: String? {
         switch self {
         // ..
+        // 追加
         case .credits:
             return "クレジット"
         case .version:
@@ -344,10 +350,11 @@ enum SettingsItem {
     }
 
 
-    var accessoryType: UITableViewCellAccessoryType {
+    var accessoryType: UITableViewCell.AccessoryType {
         switch self {
         case .account, .security, .notification, .contents, .sounds,
-             .dataUsing, .accessibility, .credits, .version, .privacyPolicy:
+             .dataUsing, .accessibility,
+             .credits, .version, .privacyPolicy: // 追加
             return .disclosureIndicator
         case .description:
             return .none
@@ -369,7 +376,7 @@ enum SettingsItem {
     }
 
     // ...
-
+    // 追加
     private func otherSection() -> SettingsSectionModel {
         let items: [SettingsItem] = [
             .credits,
@@ -391,8 +398,8 @@ private lazy var configureCell:
       let item = dataSource[indexPath]
       switch item {
       case .account, .security, .notification, .contents,
-           .sounds, .dataUsing, .accessibility, .credits,
-           .version, .privacyPolicy:
+           .sounds, .dataUsing, .accessibility,
+           .credits, .version, .privacyPolicy: // 追加
             let cell = tableView.dequeueReusableCell
               (withIdentifier: "cell", for: indexPath)
             cell.textLabel?.text = item.title
@@ -410,11 +417,8 @@ private func setupTableView() {
             guard let item = self?.dataSource[indexPath] else { return }
             self?.tableView.deselectRow(at: indexPath, animated: true)
             switch item {
-            case .account:
-                // 遷移させる処理
-                // コンパイルエラー回避のためにbreakをかいていますが処理を書いていればbreakは必要ありません。
-                break
             // ...
+            // 追加
             case .credits:
                 // 遷移させる処理
                 break
