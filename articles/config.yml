@@ -211,7 +211,7 @@ epubmaker:
   # HTMLファイルの拡張子
   htmlext: xhtml
   # 表紙に配置し、書籍の影絵にも利用する画像ファイル。省略した場合はnull (画像を使わない)。画像ディレクトリ内に置いてもディレクトリ名は不要(例: cover.jpg)
-  coverimage: cover.jpg
+  # coverimage: cover.jpg
   #
   # 目次を要素の階層表現にしない。省略した場合(null)は階層化する。
   # 特に部扉が入るなどの理由で、構成によっては階層化目次でepubcheckに
@@ -271,7 +271,7 @@ epubmaker:
   # zip_addpath: null
   #
   # EPUBで表紙をコンテンツに含めるか。デフォルトでは作成されない。yesにするとiBooks等でも最初に表紙が表示されるようになる
-  cover_linear: true
+  # cover_linear: true
   #
   # @<href>タグでの外部リンクを禁止し、地の文にする(falseで禁止する)
   # externallink: true
